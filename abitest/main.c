@@ -1,4 +1,5 @@
 #include "funcs.h"
+#include "args.h"
 
 /* ABI testing is done for the following cases:
    1: Size and alignment -- sizal()
@@ -49,6 +50,8 @@ main (int argc, char **argv)
     current_test = 3; struniargs();
     current_test = 4; variargs();
     current_test = 5; reloc();
+
+    clear_hardware_registers;
 
     return 0;
 }

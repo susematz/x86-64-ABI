@@ -28,7 +28,7 @@
 /* #define CHECK_LARGER_UNION_PASSING */
 
 /* Variable args.  */
-/* #define CHECK_VARARGS */
+#define CHECK_VARARGS
 
 
 #endif /* DEFINED_DEFINES_H */

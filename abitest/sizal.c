@@ -12,57 +12,57 @@
 #define check_align(_t, _align) assert(__alignof__(_t) == (_align))
 
 #define check_basic_struct_size_and_align(_type, _size, _align) { \
-    struct _str { _type dummy; }; \
-    struct _str _t; \
-    check_size(_t, _size); \
-    check_align(_t, _align); \
+  struct _str { _type dummy; }; \
+  struct _str _t; \
+  check_size(_t, _size); \
+  check_align(_t, _align); \
 }
 
 #ifdef CHECK_LARGER_ARRAY_ALIGNMENT
 #define check_array_alignment_and_size(_type, _size, _align) { \
-    _type a[1], b[2], c[16]; \
-    if (_size >= 16) check_align(a, 16); else check_align(a, (_align)); \
-    if (_size < 8) check_align(b, _align); else assert(__alignof__(b) >= 16); \
-    assert(__alignof__(c) >= 16); \
-    check_size(a, _size); \
-    check_size(b, (_size*2)); \
-    check_size(c, (_size*16)); \
+  _type a[1], b[2], c[16]; \
+  if (_size >= 16) check_align(a, 16); else check_align(a, (_align)); \
+  if (_size < 8) check_align(b, _align); else assert(__alignof__(b) >= 16); \
+  assert(__alignof__(c) >= 16); \
+  check_size(a, _size); \
+  check_size(b, (_size*2)); \
+  check_size(c, (_size*16)); \
 }
 #else /* not CHECK_LARGER_ARRAY_ALIGNMENT */
 #define check_array_alignment_and_size(_type, _size, _align) { \
-    _type a[1], b[2], c[16]; \
-    if (_size >= 16) check_align(a, 16); else check_align(a, (_align)); \
-    if (_size < 8) check_align(b, _align); \
-    check_size(a, _size); \
-    check_size(b, (_size*2)); \
-    check_size(c, (_size*16)); \
+  _type a[1], b[2], c[16]; \
+  if (_size >= 16) check_align(a, 16); else check_align(a, (_align)); \
+  if (_size < 8) check_align(b, _align); \
+  check_size(a, _size); \
+  check_size(b, (_size*2)); \
+  check_size(c, (_size*16)); \
 }
 #endif /* not CHECK_LARGER_ARRAY_ALIGNMENT */
 
 #define check_type(_type, _size, _align) \
-    check_size(_type, _size); \
-    check_align(_type, _align); \
-    check_basic_struct_size_and_align(_type, _size, _align); \
-    check_array_alignment_and_size(_type, _size, _align);
+  check_size(_type, _size); \
+  check_align(_type, _align); \
+  check_basic_struct_size_and_align(_type, _size, _align); \
+  check_array_alignment_and_size(_type, _size, _align);
 
 #define check_type_with_signs(_type, _size, _align) \
-    check_type(_type, _size, _align); \
-    check_type(signed _type, _size, _align); \
-    check_type(unsigned _type, _size, _align);
+  check_type(_type, _size, _align); \
+  check_type(signed _type, _size, _align); \
+  check_type(unsigned _type, _size, _align);
 
 void
 check_bitfields (void)
 {
-    /* TODO */
+  /* TODO */
 }
 
 /* This function tests things that does not fit in other tests.  */
 void
 misfits (void)
 {
-    enum dummytype { enumtype };
-    assert(sizeof(enumtype) == 4);
-    assert(__alignof__(enumtype) == 4);
+  enum dummytype { enumtype };
+  assert(sizeof(enumtype) == 4);
+  assert(__alignof__(enumtype) == 4);
 }
 
 /* Check size of a struct and a union of three types.  */

@@ -1,3 +1,7 @@
+2000-12-15  Bo Thorsen  <bo@suse.de>
+
+	* variargs.c, defines.h: Enable varargs test
+
 2000-12-13  Bo Thorsen  <bo@dsuse.de>
 
 	* struniargs.c (test_union_passing): Added union passing test
