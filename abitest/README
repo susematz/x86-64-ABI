@@ -2,7 +2,7 @@ What's this?
 ------------
 
 This is an abitestsuite for gcc and binutils for the x86-64
-architechture. It currently tests these things:
+architechture. It currently tests these areas:
 
    1: Size and alignment -- sizal()
       Tests for correct size and alignment of all basic types, structs
@@ -14,24 +14,43 @@ architechture. It currently tests these things:
       returned correctly. Also tests for mixed struct/union/scalar types
    4: Passing a variable number of args -- variargs()
    5: Generation of relocation types -- reloc()
-      Not implemented yet.
+      This tests compilation and linking of all relocation types.
+   6: Returning values -- returning()
+      Tests value correctness in returning scalar types, structs and unions.
 
-Questions about the abitest can be directed to discuss@x86-64.org or to
+Questions about the abitest can be sent to discuss@x86-64.org or to
 Bo Thorsen <bo@suse.de>.
+
+
+TODO
+----
+
+Make a test that clobbers all registers and just returns. This is
+meant to test if all callee-saved registers are saved and restored. A
+similar test should be made to test caller-saved registers.
+
+The value returning tests could be augmented with a test to check that the
+values are not just correct, but also passed in the correct registers.
 
 
 Documentation
 -------------
 
-No setup is being done yet, so if the defaults here doesn't suit your setup,
-edit the Makefile.
+No configuration is being done yet, so if the defaults here doesn't
+suit your setup, edit the Makefile.
 
-To build the test just run `make`. This will overwrite your current
-/usr/local/share/simnow/images/start64.ram so if this is a problem, you
-should edit the Makefile before `make`ing. To run it then call
-`simnow /usr/local/share/simnow/images/snippet.bsd`.
+The test can be build to run under the Simics and Simnow sledgehammer
+emulators. One chooses by running `make simics` or `make
+simnow`. Simics is the default setup as simnow does not support all
+features tested.
 
-To make it successfully you need to have simnowlink in /opt/x86-64/bin and
+To build the test to run in Simics, just execute `make`.
+
+The Simnow build is chosen by running `make simnow`. This will overwrite
+your current /usr/local/share/simnow/images/start64.ram so if this is a
+problem, you should edit the Makefile before `make`ing. To run it then
+call `simnow /usr/local/share/simnow/images/snippet.bsd`. To make it
+successfully you need to have simnowlink in /opt/x86-64/bin and
 ldscr.lds, ldscr2.lds, libc.a and start64.o in /opt/x86-64/lib. All these
 files can be found in the runtime directory on the x86-64.org cvs server.
 You can use another directory for the x86-64 files by calling make like
@@ -58,7 +77,7 @@ the generated assembler sources and the Makefile dependency file.
 Known problems in GCC and binutils for now
 ------------------------------------------
 
-These are the bug in GCC the test uncovers:
+These are the bugs in GCC the test uncovers:
 
 - long double is wrong
 

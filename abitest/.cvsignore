@@ -8,3 +8,5 @@ a.out
 .Makefile.deps
 scalarargs2.c
 make_scalarargs2
+returning2.c
+make_returning2

@@ -1,3 +1,10 @@
+2001-02-15  Bo Thorsen  <bo@suse.de>
+
+	* make_returning2.c: Added file. Used to construct the return value
+	test.
+	* returning.c: Add return value test file.
+	* Makefile: Add return value test.
+
 2001-02-14  Bo Thorsen  <bo@suse.de>
 
 	* Makefile: Add reloc2.s compilation and linking test.

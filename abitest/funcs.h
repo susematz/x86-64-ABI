@@ -8,6 +8,7 @@ void scalarargs ();
 void struniargs ();
 void variargs ();
 void reloc ();
+void returning ();
 
 void test_bitfields ();
 
@@ -15,10 +16,10 @@ void test_bitfields ();
 void my_abort ();
 void assert (int expr);
 
-/* Auto generated test in sizal2.c.  */
+/* Auto generated tests in sizal2.c.  */
 void test_struct_and_unions ();
 
-/* Auto generated test in scalarargs2.c.  */
+/* Auto generated tests in scalarargs2.c.  */
 void test_ints_on_stack ();
 void test_too_many_ints ();
 void test_longs_on_stack ();
@@ -39,6 +40,9 @@ void test_mixed_floats_on_stack ();
 void test_too_many_mixed_floats ();
 void test_mixed_types_on_stack ();
 void test_too_many_mixed_types ();
+
+/* Auto generated tests in returning2.c  */
+void tests_scalar_returning();
 
 
 #endif // FUNCS_H

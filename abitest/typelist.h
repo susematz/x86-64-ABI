@@ -26,4 +26,5 @@ extern int fp_typecount;
 
 void init_typelist ();
 
+
 #endif // TYPELIST_H
