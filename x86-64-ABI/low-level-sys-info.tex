@@ -231,8 +231,10 @@ epilogue.
 \subsection{Parameter Passing}
 
 After the argument values have been computed, they are placed in
-registers, or pushed on the stack.  The arguments are processed in
-right-to-left order.  Since the stack grows downwards, the rightmost
+registers, or pushed on the stack.  For the purpose of passing the
+parameters, the arguments are considered from left (first argument) to
+right. The arguments that are pushed on the stack are pushed in
+reverse order.  Since the stack grows downwards, the rightmost
 argument will have the highest address.\footnote{Right-to-left order
   makes the handling of functions that take a variable number of
   arguments simpler.  The location of the first argument can always be
@@ -362,11 +364,67 @@ arguments & No\\
 \reg{st0}--\reg{st1} & temporary registers; used to return MMX arguments & No \\
 \reg{mmx2}--\reg{mmx8},&&\\
 \reg{st2}--\reg{st8} & temporary registers & No \\
-\noalign{\medskip}
-\cline{1-1}\multicolumn{3}{l}{\small Note: Register assignment is right to left.}\\
     \end{tabular}
 
   \end{center}
+\Hrule
+\end{figure}
+
+As an example of the register passing conventions, consider the
+declarations and the function call shown in
+Figure \ref{fig_passing_example}.  The corresponding register
+allocation is given in Figure \ref{fig_allocation_example}.
+
+\begin{figure}[H]
+\Hrule
+\caption{Parameter Passing Example}
+\label{fig_passing_example}
+\begin{center}
+\code{
+\begin{tabular}{|l|}
+\cline{1-1}
+typedef struct \{ \\
+\ \ int a, b;\\
+\ \ double d;\\
+\} structparm;\\
+structparm s;\\
+int e, f, g, h, i, j, k;\\
+long double ld;\\
+double m, n;\\
+\\
+extern void func (int e, int f,\\
+\phantom{extern void func (}structparm s, int g, int h,\\
+\phantom{extern void func (}long double ld, double m,\\
+\phantom{extern void func (}double n, int i, int j, int k);\\
+);\\
+\\
+func (e, f, s, g, h, ld, l, m, n, i, j, k);\\
+\cline{1-1}
+\end{tabular}
+}
+\end{center}
+\Hrule
+\end{figure}
+
+\begin{figure}[H]
+\Hrule
+\caption{Register Allocation Example}
+\label{fig_allocation_example}
+\begin{center}
+\begin{tabular}{ll|ll|ll}
+\multicolumn{2}{c}{General Purpose Registers} & 
+\multicolumn{2}{c}{Floating Point Registers} & 
+\multicolumn{2}{c}{Stack Frame Offset}\\
+\hline
+\RDI: &\code{e} & \reg{xmm0}: &\code{s.d} &\code{8:}& \code{j} \\
+\RSI: &\code{f} & \reg{xmm1}: &\code{ld}& \code{12:}& \code{k} \\
+\RDX: &\code{s.a,s.b} & \reg{xmm2}: &\code{m}&& \\
+\RCX: &\code{g} & \reg{xmm3}: &\code{n}& & \\
+\reg{r8}:&\code{h} & && & \\
+\reg{r9}:&\code{i} & && & \\
+\end{tabular}
+
+\end{center}
 \Hrule
 \end{figure}
 
