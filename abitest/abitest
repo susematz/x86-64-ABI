@@ -1,0 +1,14 @@
+#!/bin/bash
+
+SIMICSDIR=/work/simics
+
+cd $SIMICSDIR/home/x86-test-machine
+
+echo -e "run\ncpu0.pregs\nquit" | ./simics -x runtime.abitest >/tmp/simics.out 2>/dev/null
+if [ "`grep eeeeeeee /tmp/simics.out`" == "" ] ;
+then
+  echo -n "Fail: "
+  grep rcx /tmp/simics.out
+else
+  echo Test passed
+fi

@@ -29,6 +29,7 @@ assert (int expr)
     my_abort();
 }
 
+
 int
 main (int argc, char **argv)
 {

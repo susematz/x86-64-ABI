@@ -1,0 +1,12 @@
+# Replace /work/abitest with the path to the abitest directory if necessary
+
+# Create machine
+read-configuration abitest.conf
+
+# Set parameters
+
+load-file "/work/abitest/image.simics" 0x0
+
+source "../scripts/expect.py"
+source "../scripts/runtest.py"
+

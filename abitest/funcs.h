@@ -42,7 +42,7 @@ void test_mixed_types_on_stack ();
 void test_too_many_mixed_types ();
 
 /* Auto generated tests in returning2.c  */
-void tests_scalar_returning();
+void test_scalar_returning ();
 
 
 #endif // FUNCS_H

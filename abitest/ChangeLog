@@ -1,3 +1,17 @@
+2001-02-28  Bo Thorsen  <bo@suse.de>
+
+	* struniargs.c (test_struct_passing): Hardware registers should be
+	cleared after setting the struct entries.
+	(struniargs): Enable union passing test.
+	* make_returning2.c: Bugfixed two-words types. Previously there was
+	a workaround that only worked for long long. Now it works for other
+	types too.
+	* defines.h: Enable all long double tests.
+	* Makefile: Change to using simics
+	* runtime.abitest: Simics script added.
+	* abitest.conf: Simics runtime configuration file added.
+	* abitest: Script to run the abitest in simics added.
+
 2001-02-15  Bo Thorsen  <bo@suse.de>
 
 	* make_returning2.c: Added file. Used to construct the return value

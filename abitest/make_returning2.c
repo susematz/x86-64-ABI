@@ -6,6 +6,24 @@
 /* This builds the tests for returning arguments.  */
 
 
+/* Small helper function that prints spaces as '_'.  */
+void
+print_no_spaces (const char *str)
+{
+  const char *c = str;
+
+  while (*c)
+    {
+      if (*c == ' ')
+	printf ("_");
+      else
+	printf ("%c", *c);
+
+      c++;
+    }
+}
+
+
 /* Make top of the file.  */
 void
 make_file_start ()
@@ -18,9 +36,9 @@ make_file_start ()
 void
 make_testing_callee (const char *type, const char *args, const char *ret)
 {
-  printf ("%s\nfun_test_returning_%s (%s)\n{\n  return %s;\n}\n\n",
-	  type, (strcmp (type, "long long") == 0 ? "long_long" : type), args,
-	  ret);
+  printf ("%s\nfun_test_returning_", type);
+  print_no_spaces (type);
+  printf (" (%s)\n{\n  return %s;\n}\n\n", args, ret);
 }
 
 void
@@ -57,9 +75,9 @@ make_test_scalar_returning ()
   /* Make the tests.  */
   for (i=0; i<typecount; i++) {
     printf ("  def_test_returning_type");
-    printf ("(fun_test_returning_%s, %s, (%s) %d, %d);\n",
-	    (strcmp (types[i], "long long") == 0 ? "long_long" : types[i]),
-	    types[i], types[i], i+64, i+64);
+    printf ("(fun_test_returning_");
+    print_no_spaces (types[i]);
+    printf (", %s, (%s) %d, %d);\n", types[i], types[i], i+64, i+64);
   }
 
   printf ("}\n");

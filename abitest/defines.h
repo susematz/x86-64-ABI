@@ -10,7 +10,7 @@
 /* #define CHECK_INT128 */
 
 /* Scalar type long double.  */
-/* #define CHECK_LONG_DOUBLE */
+#define CHECK_LONG_DOUBLE
 
 /* Scalar type __float128.  */
 /* #define CHECK_FLOAT128 */

@@ -1,12 +1,12 @@
 X86_64DIR = /opt/x86-64
 LINK = $(X86_64DIR)/bin/simnowlink
 CC = x86_64-unknown-linux-gcc
-CFLAGS = -O -Wall
+CFLAGS = -Wall
 
 TYPELISTSOURCES = typelist.h typelist.c
 AUTOSOURCES = sizal2.c scalarargs2.c returning2.c
 AUTOEXECS = make_sizal2 make_scalarargs2 make_returning2
-AUTOCFLAGS = -O2 -Wall
+AUTOCFLAGS = -Wall
 
 SOURCES = main.c sizal.c scalarargs.c struniargs.c variargs.c reloc.c \
 	bitfields.c returning.c $(AUTOSOURCES)
@@ -14,7 +14,8 @@ OBJECTS = ${SOURCES:.c=.o} reloc2.o
 ASMSOURCES = ${SOURCES:.c=.s} ${AUTOSOURCES:.c=.s}
 
 #TARGET = abitest
-TARGET = /usr/local/share/simnow/images/start64.ram
+#TARGET = /usr/local/share/simnow/images/start64.ram
+TARGET = image.simics
 
 
 .SUFFIXES = .s
@@ -23,7 +24,16 @@ TARGET = /usr/local/share/simnow/images/start64.ram
 all: $(TARGET)
 
 $(TARGET): $(OBJECTS)
-	$(LINK) $(OBJECTS)
+	x86_64-unknown-linux-ld -T /opt/x86-64/lib/ldscr2.lds \
+	/opt/x86-64/lib/start64.o /opt/x86-64/lib/libc.a $(OBJECTS) \
+	/opt/x86-64/lib/libc.a -o a.out
+	x86_64-unknown-linux-ld -T /opt/x86-64/lib/ldscr.lds a.out -o image.simics
+
+simnow:
+	@echo "Not supported yet."
+	@exit 1
+
+simics: all
 
 clean:
 	$(RM) *.o *~ core make_sizal2 $(AUTOSOURCES) $(AUTOEXECS) a.out

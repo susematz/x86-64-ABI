@@ -90,12 +90,14 @@ test_struct_passing (void)
   struct long3_struct l3s = { 52, 53, 54 };
 #endif
 
-  clear_int_registers;
+  clear_struct_registers;
   iregs.I0 = is.i;
+  clear_int_hardware_registers;
   check_struct_passing1(is);
 
-  clear_int_registers;
+  clear_struct_registers;
   iregs.I0 = ls.l;
+  clear_int_hardware_registers;
   check_struct_passing2(ls);
 
 #ifdef CHECK_LARGER_STRUCTS
@@ -239,13 +241,11 @@ test_union_passing (void)
 }
 
 void
-struniargs (void)
+struniargs ()
 {
   test_struct_passing ();
   test_mixed_passing ();
 
   /* FIXME: This doesn't work right now??  */
-#if 0
   test_union_passing ();
-#endif
 }

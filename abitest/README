@@ -37,14 +37,22 @@ Documentation
 -------------
 
 No configuration is being done yet, so if the defaults here doesn't
-suit your setup, edit the Makefile.
+suit your setup, edit the Makefile and the runtime scripts.
 
-The test can be build to run under the Simics and Simnow sledgehammer
-emulators. One chooses by running `make simics` or `make
-simnow`. Simics is the default setup as simnow does not support all
-features tested.
+The test should be able to build to run under the Simics and Simnow
+sledgehammer emulators. One would choose by running `make simics` or
+`make simnow`. Simics is the default setup as simnow does not support
+all features tested, the most important of these is SSE, which means
+all floating point tests must be disabled if the test should be able
+to run in Simnow again. For now, run the test in Simics.
 
-To build the test to run in Simics, just execute `make`.
+To build the test to run in Simics, just execute `make`. To run them,
+copy the files abitest.conf and runtime.abitest to
+/work/simics/home/x86-test-machine. Both this and the tests assume
+that simics is placed in /work/simics. You need to change the scripts
+if this is not the case. The scripts also assume that the abitest is
+running from /work/abitest. If not, you need to change this too. To
+run the test simply type ´./abitest´.
 
 The Simnow build is chosen by running `make simnow`. This will overwrite
 your current /usr/local/share/simnow/images/start64.ram so if this is a
@@ -77,8 +85,7 @@ the generated assembler sources and the Makefile dependency file.
 Known problems in GCC and binutils for now
 ------------------------------------------
 
-These are the bugs in GCC the test uncovers:
-
-- long double is wrong
+There are no known bugs in GCC right now. The following limitations
+exist:
 
 - the types __int128, __float128, __m64 and __m128 are not implemented
