@@ -32,7 +32,7 @@
 	Functions}): Likewise.
 	* low-level-sys-info.tex (paragraph{Passing}): Likewise
 	Patch by Bryan Ford <baford@mit.edu>.
-	
+
 2003-12-18  Andreas Jaeger  <aj@suse.de>
 
 	* low-level-sys-info.tex (subsection{Registers and the Stack
