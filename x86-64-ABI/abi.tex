@@ -19,11 +19,17 @@ Draft Version \version}}
 \section*{Revision History}
 
 \begin{description}
-\item[0.92] Fix some typos (thanks to Bryan Ford), add section about
-  stack layout in the Linux kernel.
+  
+\item[0.91] Fix some typos (thanks to Bryan Ford), add section about
+  stack layout in the Linux kernel.  Fix example in figure
+  \ref{fig_passing_example} (thanks to Tom Horsley).  Add section on
+  unwinding through assembler (written by Michal Ludvig).  Remove
+  \code{mmxext} feature (thanks to Evandro Menezes).  Add section on
+  Fortran (by Steven Bosscher) and stack unwinding (by Jan
+  Hubi\v{c}ka).
 \item[0.91] Clarify that x87 is default mode, not MMX (by Hans Peter
   Anvin).
-\item[0.90] %Add example for \code{backtrace}; 
+\item[0.90]
   Change DWARF register
   numbers again; mention that \code{__m128} needs alignment; fix typo
   in figure \ref{fig-stack-frame}; add some comments on kernel
