@@ -220,12 +220,12 @@ stack frame.  \footnote{The conventional use of \RBP{} as a frame
   general-purpose register (\RBP) available.}
 
 The 128-byte area beyond the location pointed to by \RSP is considered
-shall not be modified by signal or interrupt
+to be reserved and shall not be modified by signal or interrupt
 handlers.\footnote{Locations within 128 bytes can be addressed using
   one-byte displacements.}  Therefore, functions may use this area for
 temporary data that is not needed across function calls.  In
 particular, leaf functions may use this area for their entire stack
-frame, rather than ajdusting the stack pointer in the prologue and
+frame, rather than adjusting the stack pointer in the prologue and
 epilogue.
 
 \subsection{Parameter Passing}

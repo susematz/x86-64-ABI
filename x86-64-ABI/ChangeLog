@@ -1,3 +1,7 @@
+2000-09-24  Andreas Jaeger  <aj@suse.de>
+
+	* low-level-sys-info.tex: Fix typos in red zone description.
+
 2000-09-23  Jan Hubicka  <jh@suse.cz>
             Mark Mitchell  <mark@codesourcery.com>
 
