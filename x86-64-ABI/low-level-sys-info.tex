@@ -673,10 +673,8 @@ as defined in the figure \ref{fig-reg-save}.
 
 Only registers possibly used by argument passed as
 variable arguments needs to be saved.  Other fields may not be accessed and can
-be used for other purposes
-\footnote{For example compiler may determine fact, that function never accepts
-argument passed in the XMM registers and omit the upper half of the area
-entirely.} In the case function is known to never accept argument passed
+be used for other purposes.
+In the case function is known to never accept argument passed
 in the register\footnote{This fact may be determined eighter by exploring types
 used by \code{va_arg} macro, or by fact that the named arguments already
 exhausted the argument registers entirely},
