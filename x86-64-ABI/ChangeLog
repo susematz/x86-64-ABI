@@ -1,5 +1,8 @@
 2000-07-28  Andreas Jaeger  <aj@suse.de>
 
+	* low-level-sys-info.tex (Fundamental Types): Add __float80,
+	describe __float80 and long double.
+
 	* abi-index.tex: Don't make it a chapter.
 
 	* Makefile (INCLUDES): Add new files.

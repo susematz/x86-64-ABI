@@ -59,15 +59,21 @@ scalar types and the processor's.
     Floating-& \texttt{float} & 4 & 4 & single (IEEE) \\
     point & \texttt{double} & 8 & 8 & double (IEEE) \\
     & \texttt{long double} & 16 & 16 & double extended (IEEE) \\
+    & \texttt{__float80} & 12 & 4 & x87 extended\\
     \hline
     Packed & \texttt{__m64} & 8 & 8 & \MMX{} and \threednow \\
     & \texttt{__m128} & 16 & 16 & SSE and SSE-2 \\
   \end{tabular}
 \end{figure}
 
+The \code{long double} type uses a 15 bits exponent, 113 bits for the
+mantissa (the high order significant bit is implicit) and an exponent
+bias of 16383\footnote{This type needs software emulation.}  The
+\code{__float80} type correspondends to the \code{long double} type of
+the ia32 ABI.
+
 \editornote{Should we define __int128?}
 \editornote{Why do we use 16-byte long doubles instead of 12?}
-\editornote{Define 80bit x87 double extended type.}
 
 A null pointer (for all types) has value zero.
 
