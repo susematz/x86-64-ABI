@@ -1,3 +1,7 @@
+2001-02-12  Andreas Jaeger  <aj@suse.de>
+
+	* low-level-sys-info.tex: Clarify right-to-left order.
+
 2001-01-26  Geert Bosch  <bosch@gnat.com>
 
 	* low-level-sys-info.tex: (Exception Interface): New subsection.
