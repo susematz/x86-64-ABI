@@ -5,11 +5,11 @@
 \begin{document}
 
 \author{Edited by\\
-  Jan Hubicka\thanks{jh@suse.cz}, Andreas Jaeger\thanks{aj@suse.de},
+  Jan Hubi\v{c}ka\thanks{jh@suse.cz}, Andreas Jaeger\thanks{aj@suse.de},
   Mark Mitchell\thanks{mark@codesourcery.com}}
 
 \title{System V Application Binary Interface\\
-{\Large x86-64$^{\rm TM}$ Architecture Processor Supplement\\
+{\Large AMD64 Architecture Processor Supplement\\
 Draft Version \version}}
 \maketitle
 \tableofcontents
@@ -19,6 +19,17 @@ Draft Version \version}}
 \section*{Revision History}
 
 \begin{description}
+\item[0.90] %Add example for \code{backtrace}; 
+  Change DWARF register
+  numbers again; mention that \code{__m128} needs alignment; fix typo
+  in figure \ref{fig-stack-frame}; add some comments on kernel
+  expectations; mention TLS extensions; add example for passing of
+  variable-argument lists; change semantics of \RAX in
+  variable-argument lists; improve formatting; mention that X87 class
+  is not used for passing; make \code{/lib64} a Linux specific
+  section; rename x86-64 to AMD64; describe passing of complex types.
+  Special thanks to Andi Kleen, Michal Ludvig, Michael Matz, David
+  O'Brien and Eric Young for their comments.
 \item[0.21] Define \code{__int128} as class INTEGER in register
   passing.  Mention that \reg{al} is used for variadic argument lists.  Fix
   some textual problems.  Thanks to H. Peter Anvin, Bo Thorsen, and

@@ -122,6 +122,14 @@ the relocation addend.
       \texttt{R_X86_64_PC16}  & 13 & \textit{word16} & \texttt{S + A - P} \\
       \texttt{R_X86_64_8}     & 14 & \textit{word8} & \texttt{S + A} \\
       \texttt{R_X86_64_PC8}   & 15 & \textit{word8} & \texttt{S + A - P} \\
+      \texttt{R_X86_64_DPTMOD64}   & 16 & \textit{word64} &  \\
+      \texttt{R_X86_64_DTPOFF64}   & 17 & \textit{word64} &  \\
+      \texttt{R_X86_64_TPOFF64}   & 18 & \textit{word64} &  \\
+      \texttt{R_X86_64_TLSGD}   & 19 & \textit{word32} &  \\
+      \texttt{R_X86_64_TLSLD}   & 20 & \textit{word32} &  \\
+      \texttt{R_X86_64_DTPOFF32}   & 21 & \textit{word32} &  \\
+      \texttt{R_X86_64_GOTTPOFF}   & 22 & \textit{word32} &  \\
+      \texttt{R_X86_64_TPOFF32}   & 23 & \textit{word32} &  \\
 %      \texttt{R_X86_64_GOT64} & 16 & \textit{word64} & \texttt{G + A} \\
 %      \texttt{R_X86_64_PLT64} & 17 & \textit{word64} & \texttt{L + A - P} \\
     \end{tabular}
@@ -130,7 +138,7 @@ the relocation addend.
 \end{table}
 
 The special semantics for most of these relocation types are identical
-to those used for the Intel386 architecture.  \footnote{Even though
+to those used for the \intelabi.  \footnote{Even though
   the \xARCH architecture supports IP-relative addressing modes, a GOT
   is still required since the offset from a particular instruction to
   a particular data item cannot be known by the static linker.}
@@ -166,6 +174,17 @@ relocations is not conformant to this ABI, these relocations are only
 added for documentation purposes.  The \texttt{R_X86_64_16}, and
 \texttt{R_X86_64_8} relocations truncate the computed value to 16-bits
 resp. 8-bits.
+
+The relocations \texttt{R_X86_64_DPTMOD64},
+\texttt{R_X86_64_DTPOFF64}, \texttt{R_X86_64_TPOFF64} ,
+\texttt{R_X86_64_TLSGD} , \texttt{R_X86_64_TLSLD} ,
+\texttt{R_X86_64_DTPOFF32}, \texttt{R_X86_64_GOTTPOFF} and
+\texttt{R_X86_64_TPOFF32} are listed for completeness.  They are part
+of the Thread-Local Storage ABI extensions and are documented in the
+document called ``ELF Handling for Thread-Local
+Storage''\footnote{This document is currently available via
+  \url{http://people.redhat.com/drepper/tls.pdf}}\index{Thread-Local Storage}.
+
 \end{sloppypar}
 
 %%% Local Variables: 

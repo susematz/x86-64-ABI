@@ -383,13 +383,16 @@ calling \code{\_Unwind\_DeleteException}. If not, it should return an
      for other fatal conditions, e.g. stack corruption.
 \end{description}
 
+\begin{sloppypar}
 If the stop function returns any reason code other than \code{\_URC\_NO\_REASON},
 the stack state is indeterminate from the point of view of the caller of
 \code{\_Unwind\_ForcedUnwind}. Rather than attempt to return, therefore,
 the unwind library should return \code{\_URC\_FATAL\_PHASE2\_ERROR} to its caller.
+\end{sloppypar}
 
 \paragraph{Example: \code{longjmp\_unwind()}\\}
 
+\begin{sloppypar}
 The expected implementation of \code{longjmp\_unwind()} is as follows.
 The \code{setjmp()} routine will have saved the state to be restored in its
 customary place, including the frame pointer. The \code{longjmp\_unwind()}
@@ -397,6 +400,7 @@ routine will call \code{\_Unwind\_ForcedUnwind} with a stop function that
 compares the frame pointer in the context record with the saved frame
 pointer. If equal, it will restore the \code{setjmp()} state as customary,
 and otherwise it will return \code{\_URC\_NO\_REASON} or \code{\_URC\_END\_OF\_STACK}.
+\end{sloppypar}
 
 If a future requirement for two-phase forced unwinding were identified,
 an alternate routine could be defined to request it, and an actions
@@ -561,18 +565,65 @@ that contains the calls. During unwinding, the function returns the
 start of the procedure fragment containing the call site in the current
 stack frame.
 
-\subsection{Personality Routine}
-
-\code{
-\begin{tabular}{l}
-    \_Unwind\_Reason\_Code (*\_\_personality\_routine)\\
-    \ \ (int version,\\
-    \ \ \ \_Unwind\_Action actions,\\
-    \ \ \ uint64 exceptionClass,\\
-    \ \ \ struct \_Unwind\_Exception *exceptionObject,\\
-    \ \ \ struct \_Unwind\_Context *context);\\
-\end{tabular}
-}
+% XXX: Disable for now
+%\paragraph{Example: backtrace\\}
+%
+%An example of using some of the introduced functions is the
+%\codeindex{backtrace()} function that shows all callers of a function.  It
+%can be implemented as shown in figure~\ref{fig-backtrace}.
+%
+%\begin{figure}[H]
+%\Hrule
+%\caption{Frame Unwinding Example}
+%\label{fig-backtrace}
+%{\small
+%\begin{verbatim}
+%_Unwind_Reason_Code
+%walk_stack (int ver, _Unwind_Action actions,
+%            _Unwind_Exception_Class exc_class,
+%            struct _Unwind_Exception *exc,
+%            struct _Unwind_Context *ctx, void *data)
+%{
+%  printf ("Instruction: %lx in region %lx\n",
+%          _Unwind_GetIP (ctx),
+%          _Unwind_GetRegionStart(ctx));
+%
+%  return _URC_NO_REASON;
+%}
+%
+%void
+%no_cleanup (_Unwind_Reason_Code code,
+%            struct _Unwind_Exception *exc)
+%{/* Nothing to do.  Just to make
+%    _Unwind_ForcedUnwind happy.  */
+%}
+%
+%void
+%backtrace_stack (void)
+%{
+%  struct _Unwind_Exception exc;
+%
+%  exc.exception_class = 0;
+%  exc.exception_cleanup = no_cleanup;
+%  _Unwind_ForcedUnwind (&exc, walk_stack, NULL);
+%}
+%\end{verbatim}
+%}
+%\Hrule
+%\end{figure}
+%
+%\subsection{Personality Routine}
+%
+%\code{
+%\begin{tabular}{l}
+%    \_Unwind\_Reason\_Code (*\_\_personality\_routine)\\
+%    \ \ (int version,\\
+%    \ \ \ \_Unwind\_Action actions,\\
+%    \ \ \ uint64 exceptionClass,\\
+%    \ \ \ struct \_Unwind\_Exception *exceptionObject,\\
+%    \ \ \ struct \_Unwind\_Context *context);\\
+%\end{tabular}
+%}
 
 The personality routine is the function in the C++ (or other language)
 runtime library which serves as an interface between the system

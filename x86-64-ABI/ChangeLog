@@ -1,3 +1,27 @@
+2003-04-22  Andreas Jaeger  <aj@suse.de>
+
+	* low-level-sys-info.tex: Describe passing of complex types.
+
+	* kernel.tex (section{Execution of 32-bit programs}): Move from
+	conventions.tex to here.  Change titel and section names.
+
+2003-03-19  David O'Brien  <obrien@FreeBSD.org>
+
+	* conventions.tex, low-level-sys-info.tex: Use \intelabi consisently.
+	* conventions.tex, low-level-sys-info.tex: Spell "ia" "IA-".
+
+Mon Mar 17 16:56:05 CET 2003  Jan Hubicka  <jh@suse.cz>
+
+	* abi.tex: Fix my name.
+	* low-level-sys-info.tex: Some minor formating fixes; Mention that
+	X87 class is not used for passing; Update examples of small model
+	that match medium and large too.
+
+2002-09-30  Andreas Jaeger  <aj@suse.de>
+
+	* low-level-sys-info.tex (subsection{The Stack Frame}): Fix
+	figure.  Noticed by Eric Young.
+
 2002-09-04  Andreas Jaeger  <aj@suse.de>
 
 	* Various textual fixes from Michael Matz.

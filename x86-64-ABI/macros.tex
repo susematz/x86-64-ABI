@@ -40,7 +40,7 @@
 \usepackage{here}
 
 % Version number of document - increment occasionally ;-)
-\newcommand{\version}{0.21}
+\newcommand{\version}{0.90}
 
 % Print a footer everywhere with current date
 % prelim2e needs \thistime
@@ -55,7 +55,7 @@
 \SetTime
 \def\thistime{\number\hours:\ifnum\minutes<10 0\fi\number\minutes}
 \usepackage[time]{prelim2e}
-\renewcommand{\PrelimWords}{x86-64 ABI Draft \version}
+\renewcommand{\PrelimWords}{AMD64 ABI Draft \version}
 
 % Some commands:
 \newcommand{\editornote}[1]{\footnote{#1}}
@@ -77,8 +77,7 @@
 
 %Typesetting common names
 \newcommand{\MMX}{\emph{MMX}\xspace}
-%\newcommand{\xARCH}{\textsf{x86-64}\xspace}
-\newcommand{\xARCH}{x86-64\xspace}
+\newcommand{\xARCH}{AMD64\xspace}
 \newcommand{\threednow}{3DNow!\xspace}
 
 % Typesetting paths and files

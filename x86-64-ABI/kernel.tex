@@ -1,9 +1,27 @@
-\chapter{x86-64 Linux Kernel Conventions}
+\chapter{Linux Conventions}
 
 
-This chapter is informative only.
+This chapter describes some details that are only relevant to 
+GNU/Linux systems and the Linux kernel.
 
-\section{Calling Conventions}
+\section{Execution of 32-bit Programs}
+
+% Let's follow Sparc64 and MIPS64
+
+The \xARCH processors are able to execute 64-bit \xARCH and also
+32-bit ia32 programs.  Libraries conforming to the \intelabi will live
+in the normal places like \path{/lib}, \path{/usr/lib} and
+\path{/usr/bin}.  Libraries following the \xARCH, will use
+\path{lib64} subdirectories for the libraries, e.g \path{/lib64} and
+\path{/usr/lib64}.  Programs conforming to \intelabi and to the \xARCH
+ABI will share directories like \path{/usr/bin}.  In particular, there
+will be no \path{/bin64} directory.
+
+\section{AMD64 Linux Kernel Conventions}
+
+The section is informative only.
+
+\subsection{Calling Conventions}
 
 The Linux \xARCH kernel uses internally the same calling conventions as user-level
 applications (see section \ref{sec-calling-conventions} for details).
@@ -28,7 +46,56 @@ the following differences:
 \end{enumerate}
 
 
+\subsection{Required Processor Features}
 
+Any program or kernel can expect that a \xARCH processor implements
+the features mentioned in table~\ref{features}.  In general a program
+has to check itself whether those features are available but for
+\xARCH systems, these should always be available.
+Table\~ref{features} uses the names for the processor features as
+documented in the processor manual.
+
+\begin{figure}
+\Hrule
+\caption{Required Processor Features}\label{features}
+  \begin{center}
+\begin{tabular}{l|l}
+\hline\noalign{\smallskip}
+Feature & Comment\\
+\hline
+\multicolumn{2}{c}{Features need for programs}\\
+\hline
+fpu & Necessary for \code{long double}, MMX\\
+tsc & User-visible\\
+cx8 & User-visible\\
+cmov& User-visible\\
+mmx & User-visible\\
+sse & User-visible, required for \code{float}\\
+sse2& User-visible, required for \code{double}\\
+fxsr& Required for SSE/SSE2 \\
+mmxext& User-visible\\
+syscall& For calling the kernel\\
+\hline\noalign{\smallskip}
+\multicolumn{2}{c}{Features need in the kernel}\\
+\hline
+pae& This kind of page tables is used \\
+pse& PAE needs PSE.\\
+msr & At least needed to enter long mode\\
+pge & Kernel optimization\\
+pat & Kernel optimization\\
+clflush& Kernel optimization\\
+
+  \end{tabular}
+\end{center}
+\Hrule
+\end{figure}
+
+\subsection{Miscelleaneous Remarks}
+
+Linux Kernel code is not allowed to change the x87 and SSE units.  If
+those are changed by kernel code, they have to be restored properly
+before sleeping or leaving the kernel.  On preemptive kernels also
+more precautions may be needed.
 
 
 %%% Local Variables:

@@ -8,32 +8,20 @@
 \section{GOT pointer and IP relative addressing}
 
 \index{global offset table}
-A basic difference between the i386 ABI and the \xARCH ABI is the
-way the GOT table is found.  The i386 ABI, like (most) other processor
+A basic difference between the \intelabi and the \xARCH ABI is the
+way the GOT table is found.  The \intelabi, like (most) other processor
 specific ABIs, uses a dedicated register (\reg{ebx}) to address the
 base of the GOT table.  The function prologue of every function needs
 to set up this register to the correct value.  The \xARCH processor
 family introduces a new IP-relative addressing mode which is used in
 this ABI instead of using a dedicated register.
 
-On \xARCH the GOT table contains 64 bit entries.
+On \xARCH the GOT table contains 64-bit entries.
 
-\section{Execution of 32bit programs}
-
-% Let's follow Sparc64 and MIPS64
-
-The \xARCH is able to execute 64 bit \xARCH and also 32 bit ia32
-programs.  Libraries conforming to the \intelabi will live in the
-normal places like \path{/lib}, \path{/usr/lib} and \path{/usr/bin}.
-Libraries following the \xARCH, will use \path{lib64} subdirectories
-for the libraries, e.g \path{/lib64} and \path{/usr/lib64}.  Programs
-conforming to \intelabi and to the \xARCH ABI will share directories
-like \path{/usr/bin}.  In particular, there will be no \path{bin64}
-directory.
 
 \section{C++\label{section-cpp}}
 
-For the \textindex{C++} ABI we will use the ia64 C++ ABI and instantiate it
+For the \textindex{C++} ABI we will use the IA-64 C++ ABI and instantiate it
 appropriately.  The current draft of that ABI is available at:\\
 \url{http://www.codesourcery.com/cxx-abi/}
 
