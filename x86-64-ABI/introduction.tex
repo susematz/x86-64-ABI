@@ -16,6 +16,19 @@ This ABI specifies the language bindings for the C language except
 where noted explicitly.
 \editornote{For C++ we will use ia64 C++ ABI.}
 
+\section{Major differences to i386 ABI}
+
+The major differences of the \xARCH ABI to the i386 ABI are as
+follows:
+\begin{itemize}
+\item 64 bit code and data model
+\item No explicit GOT register
+\item different function calling conventions due to more registers
+\item Usage of SSE/SSE2 for floating point
+\item 128 bit long double floating point type. \editornote{This needs
+    further discussion.}
+\end{itemize}
+
 %%% Local Variables: 
 %%% mode: latex
 %%% TeX-master: "abi"

@@ -1,5 +1,7 @@
 2000-08-10  Andreas Jaeger  <aj@suse.de>
 
+	* macros.tex: Added Hrule command.
+
 	* dl.tex: Remove proposals.
 
 	* low-level-sys-info.tex (Coding Examples): Added.

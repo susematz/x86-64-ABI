@@ -7,28 +7,14 @@ No changes required.
 
 \section{Dynamic Linking}
 
-We need three parameters for the dynamic linker to fix up the
-PLT:
-\begin{enumerate}
-\item The address of the entry point of the dynamic linker.
-\item The relocation entry that needs to be relocated (either GOT or
-  PLT, depending on the proposal)
-\item A special parameter to identify the shared object.
-\end{enumerate}
-
-\editornote{A location for these parameters has to be determined.}
-
-\editornote{So far only the conventions for shared objects have been
-  specified.  The conventions for the executable need to be written
-  down.}
-
-
 \subsubsection{Dynamic Section}
 
 No changes required.
 
 \subsubsection{Global Offset Table}
 
+The only difference is in the size of the global offset table, it
+contains 64 bit addresses.
 \index{global offset table}
 
 \begin{figure}[H]
@@ -66,8 +52,11 @@ object files have separate procedure linkage tables.
 
 
 \begin{figure}[H]
+\Hrule
 \caption{Absolute Procedure Linkage Table}
-\begin{tabular}{lll}
+\begin{center}
+\begin{tabular}{|lll|}
+\hline
 .PLT0: & pushl & got\_plus\_8; GOT[1]\\
 & jmp &got\_plus\_16 ; GOT[2] \\
 & nop & \\
@@ -80,13 +69,20 @@ object files have separate procedure linkage tables.
 .PLT2: & jmp& *name2\_in\_GOT\\
 &pushl & \$offset \\
 & jmp & .PLT0@PC \\
-&\dots\\
+&\dots&\\
+\hline
 \end{tabular}
+\end{center}
+\Hrule
 \end{figure}
 
+
 \begin{figure}[H]
+\Hrule
 \caption{Position-Independent Procedure Linkage Table}
-\begin{tabular}{lll}
+\begin{center}
+\begin{tabular}{|lll|}
+\hline
 .PLT0: & pushl & GOT+8(\%rip); GOT[1]\\
 & jmp &GOT+16(\%rip) ; GOT[2] \\
 & nop & \\
@@ -99,8 +95,11 @@ object files have separate procedure linkage tables.
 .PLT2: & jmp&*name2@GOTPC(\%rip)\\
 &pushl & \$offset \\
 & jmp & .PLT0@PC \\
-&\dots\\
+&\dots &\\
+\hline
 \end{tabular}
+\end{center}
+\Hrule
 \end{figure}
 
 Following the steps below, the dynamic linker and the program
