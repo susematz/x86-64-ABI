@@ -1,6 +1,8 @@
 2001-01-10  Andreas Jaeger  <aj@suse.de>
 
 	* object-files.tex: Replace R_X86_64_JMP_SLOT with R_X86_64_JUMP_SLOT.
+	Use PLT32 instead 64. 
+
 	* dl.tex: Likewise.
 
 2001-01-09  Andreas Jaeger  <aj@suse.de>
