@@ -1,3 +1,7 @@
+2001-02-02  Bo Thorsen  <bo@suse.de>
+
+	* low-level-sys-info.tex: __int128 16 bytes aligned.
+
 2001-01-15  Andreas Jaeger  <aj@suse.de>
 
 	* low-level-sys-info.tex: Spelling fixes as suggested by Philipp
