@@ -1,3 +1,10 @@
+2001-02-14  Bo Thorsen  <bo@suse.de>
+
+	* Makefile: Add reloc2.s compilation and linking test.
+	* reloc2.s: Added file to test compilation and linking of relocations.
+	* reloc.c (reloc): Fix the comments to show that this is for now
+	just a compiling and linking test.
+
 2001-02-01  Bo Thorsen  <bo@suse.de>
 
 	* struniargs.c (struniargs): Temporarily disabled union test.

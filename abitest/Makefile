@@ -10,8 +10,8 @@ AUTOCFLAGS = -O2 -Wall
 
 SOURCES = main.c sizal.c scalarargs.c struniargs.c variargs.c reloc.c \
 	bitfields.c $(AUTOSOURCES)
-OBJECTS = ${SOURCES:.c=.o}
-ASMSOURCES = ${SOURCES:.c=.s}
+OBJECTS = ${SOURCES:.c=.o} reloc2.o
+ASMSOURCES = ${SOURCES:.c=.s} ${AUTOSOURCES:.c=.s}
 
 #TARGET = abitest
 TARGET = /usr/local/share/simnow/images/start64.ram
@@ -45,6 +45,8 @@ scalarargs2.c: make_scalarargs2
 make_scalarargs2: make_scalarargs2.c ${TYPELISTSOURCES}
 	gcc $(AUTOCFLAGS) -o make_scalarargs2 make_scalarargs2.c typelist.c
 
+reloc2.o: reloc2.s
+	$(CC) -c reloc2.s
 
 backup:
 	$(MAKE) clean
