@@ -8,7 +8,7 @@
 For file identification in \texttt{e_ident}, the x86-64 architecture
 requires the following values.
 
-\begin{table}[h]
+\begin{table}[H]
   \begin{center}
     \begin{tabular}[t]{l|l}
       \multicolumn{1}{c}{Position} & \multicolumn{1}{c}{Value} \\
@@ -38,7 +38,7 @@ No changes required.
 
 The x86-64 ABI adds one additional field:
 
-\begin{figure}[h]
+\begin{figure}[H]
   \begin{picture}(300,100)
     \put(0,66){\framebox(150, 33){31\hfill\textit{word32}\hfill 0}}
     \put(0,0){\framebox(300, 33){63\hfill\textit{word64}\hfill 0}}
@@ -61,7 +61,7 @@ The x86-64 ABI adds one additional field:
 The x86-64 ABI architectures uses only \texttt{Elf64_Rel} relocation
 entries.
 
-\begin{figure}[h]
+\begin{figure}[H]
   \begin{center}
     \begin{tabular}[t]{l|r|l|l}
       \multicolumn{1}{c}{Name} & 
