@@ -64,8 +64,9 @@ The \xARCH ABI adds one additional field:
                   \xARCH architecture. \\
 \end{tabular*}
 
-The \xARCH ABI architectures uses only \texttt{Elf64_Rel} relocation
-entries.
+The \xARCH ABI architectures uses only \texttt{Elf64_Rela} relocation
+entries with explicit addends.  The \code{r_addend} member serves as
+the relocation addend.
 
 \begin{figure}[H]
 \Hrule
