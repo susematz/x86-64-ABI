@@ -1,3 +1,8 @@
+2001-01-23  Bo Thorsen  <bo@suse.de>
+
+	* bitfields.c: Added test for bitfield structs and unions.
+	* main.c (main): Added bitfield test.
+
 2000-12-17  Bo Thorsen  <bo@suse.de>
 
 	* defines.h: Enabled more tests and added new CHECK_STRUCT_SIZE.

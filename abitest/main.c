@@ -13,6 +13,7 @@
    4: Passing a variable number of args -- variargs()
    5: Relocation types -- reloc()
       Tests all relocation types
+   6: Bitfields -- bitfields()
 
    For more information on the individual tests, see the file named like
    "testfunction.c".  */
@@ -50,6 +51,7 @@ main (int argc, char **argv)
     current_test = 3; struniargs();
     current_test = 4; variargs();
     current_test = 5; reloc();
+    current_test = 6; bitfields();
 
     clear_hardware_registers;
 

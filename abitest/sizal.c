@@ -1,15 +1,12 @@
 #include "defines.h"
 #include "funcs.h"
+#include "macros.h"
 
 /* This is a very boring test. It starts by checking that all basic types
    has the correct size, and then starts checking combinations in structs
    and unions. Last it checks that alignments of all types are correct,
    including combinations in structs.
  */
-
-#define check_size(_t, _size) assert(sizeof(_t) == (_size))
-
-#define check_align(_t, _align) assert(__alignof__(_t) == (_align))
 
 #define check_basic_struct_size_and_align(_type, _size, _align) { \
   struct _str { _type dummy; }; \

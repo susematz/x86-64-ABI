@@ -1,6 +1,7 @@
 CC = x86_64-unknown-linux-gcc
 CFLAGS = -O -Wall
-SOURCES = main.c sizal.c scalarargs.c struniargs.c variargs.c reloc.c
+SOURCES = main.c sizal.c scalarargs.c struniargs.c variargs.c reloc.c \
+	bitfields.c
 OBJECTS = ${SOURCES:.c=.o}
 ASMSOURCES = ${SOURCES:.c=.s}
 AUTOSOURCES = sizal2.c
