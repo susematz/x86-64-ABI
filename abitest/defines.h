@@ -24,8 +24,11 @@
 /* Alignments of arrays with size >= 16.  */
 /* #define CHECK_LARGER_ARRAY_ALIGNMENT */
 
+/* Union passing with not-extremely-simple unions.  */
+/* #define CHECK_LARGER_UNION_PASSING */
+
 /* Variable args.  */
-#define CHECK_VARARGS
+/* #define CHECK_VARARGS */
 
 
 #endif /* DEFINED_DEFINES_H */
