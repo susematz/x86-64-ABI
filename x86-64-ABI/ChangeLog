@@ -1,3 +1,11 @@
+2001-01-26  Geert Bosch  <bosch@gnat.com>
+
+	* low-level-sys-info.tex: (Exception Interface): New subsection.
+	(DWARF Definition): New section.
+	* macros.tex: Update version to 0.11
+	(\RIP): New command.
+	* object-files.tex (Special Sections): New subsection.
+
 2001-02-02  Bo Thorsen  <bo@suse.de>
 
 	* low-level-sys-info.tex: __int128 16 bytes aligned.

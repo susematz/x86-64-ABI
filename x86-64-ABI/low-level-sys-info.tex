@@ -25,7 +25,7 @@ scalar types and the processor's.
     \hline\noalign{\smallskip}
      & &  & \multicolumn{1}{c|}{Alignment} & \multicolumn{1}{c|}{x86-64} \\
     \multicolumn{1}{c|}{Type} & \multicolumn{1}{c|}{C}
-     &  \texttt{sizeof} & (bytes)   
+     &  \texttt{sizeof} & (bytes)
      & \multicolumn{1}{c|}{Architecture}  \\
     \hline
     & \texttt{char}        & 1 & 1 & signed byte \\
@@ -118,8 +118,8 @@ Amend the description of bit-field ranges as follows:
   \begin{center}
     \leavevmode
     \begin{tabular}{l|l|l}
-      \multicolumn{1}{c}{Bit-field Type} 
-         & \multicolumn{1}{c}{Width $w$} 
+      \multicolumn{1}{c}{Bit-field Type}
+         & \multicolumn{1}{c}{Width $w$}
          & \multicolumn{1}{c}{Range} \\
       \hline
       \texttt{signed long} & & $-2^{w - 1}$ to $2^{w-1}-1$ \\
@@ -195,12 +195,12 @@ stack.  This stack grows downwards from high addresses.  Figure
       \code{8n+16(\RBP)} & argument doubleword $n$ \\
       & \dots & Previous \\
       \code{16(\RBP)} & argument doubleword $0$ \\
-      \cline{1-3} 
+      \cline{1-3}
       \code{8(\RBP)} & return address \\ \cline{2-2}
-      \code{0(\RBP)} & previous \RBP value \\ 
+      \code{0(\RBP)} & previous \RBP value \\
       \cline{2-2}
-      \code{-8(\RBP)} & unspecified & Current \\ 
-      & \dots & \\ 
+      \code{-8(\RBP)} & unspecified & Current \\
+      & \dots & \\
       \code{0(\RSP)} & variable size \\
       \cline{2-2}
       \code{128(\RSP)} & red zone\\
@@ -316,7 +316,7 @@ Otherwise, the argument is passed as if it were an argument of type
 
 Otherwise, the doubleword is passed as if it were a single integer
 argument, using the smallest type sufficient to contain the argument.
-Any bytes not used by the value passed have undefined contents.  
+Any bytes not used by the value passed have undefined contents.
 
 If the structure has more than 8 bytes, then the process is repeated
 for the second doubleword.
@@ -394,7 +394,7 @@ In this case, the function also sets \RDI to the value of the original
 address in the callee's area before it returns.  Thus when the caller
 receives control again, the address of the returned object resides in
 register \RDI and can be used to access the object.
-  
+
 If a function returns a structure or union whose size is less than or
 equal to 16 bytes, and, for C++, the structure or union is a POD, then
 the structure is returned in registers.  The registers chosen for a
@@ -406,6 +406,74 @@ For returning, structures and unions are treated the same way as for
 passing them.
 
 \section{Operating System Interface}
+
+\subsection{Exception Interface}
+
+As the \xARCH manuals describe, the processor changes mode to handle
+\emph{\textindex{exceptions},} which may be synchronous, 
+floating-point/coprocessor or asynchronous. 
+Synchronous and floating-point/coprocessor exceptions,
+being caused by instruction execution, can be explicitly generated
+by a process. This section, therefore, specifies those eception types
+with defined behavior. The \xARCH architecture classifies exceptions as
+\emph{faults}, \emph{traps}, and \emph{aborts}. See the \intelabi 
+for more information about their differences.
+
+\subsubsection{Hardware Exception Types}
+The operating system defines the correspondence between hardware
+exceptions and the signals specified by \codeindex{signal}(BA\_OS)
+as shown in table \ref{tab-hw-exceptions}. Contrary to the i386 
+architecture, the \xARCH does not define any instructions that 
+generate a bounds check fault in long mode.
+
+\begin{table}
+\Hrule
+  \caption{Hardware Exceptions and Signals}
+  \label{tab-hw-exceptions}
+  \begin{center}
+    \begin{tabular}[t]{c|l|l}
+      \multicolumn{1}{c}{Number} & \multicolumn{1}{c}{Exception name}
+         & \multicolumn{1}{c}{Signal}\\
+      \hline
+      \texttt{0} & \texttt{divide error fault} & \texttt{SIGFPE} \\
+      \texttt{1} & \texttt{single step trap/fault} & \texttt{SIGTRAP} \\
+      \texttt{2} & \texttt{nonmaskable interrupt} & \texttt{none} \\
+      \texttt{3} & \texttt{breakpoint trap} & \texttt{SIGTRAP} \\
+      \texttt{4} & \texttt{overflow trap} & \texttt{SIGSEGV} \\
+      \texttt{5} & \texttt{(reserved)} &\\
+      \texttt{6} & \texttt{invalid opcode fault} & \texttt{SIGILL} \\
+      \texttt{7} & \texttt{no coprocessor fault} & \texttt{SIGFPE} \\
+      \texttt{8} & \texttt{double fault abort} & \texttt{none} \\
+      \texttt{9} & \texttt{coprocessor overrun abort} & \texttt{SIGSEGV} \\
+      \texttt{10} & \texttt{invalid TSS fault} & \texttt{none} \\
+      \texttt{11} & \texttt{segment no present fault} & \texttt{none} \\
+      \texttt{12} & \texttt{stack exception fault} & \texttt{SIGSEGV} \\
+      \texttt{13} & \texttt{general protection fault/abort}&\texttt{SIGSEGV} \\
+      \texttt{14} & \texttt{page fault} & \texttt{SIGSEGV} \\
+      \texttt{15} & \texttt{(reserved)} &\\
+      \texttt{16} & \texttt{coprocessor error fault} & \texttt{SIGFPE} \\
+      \texttt{other} & \texttt{(unspecified)} & \texttt{SIGILL}
+    \end{tabular}
+  \end{center}
+\Hrule
+\end{table}
+
+\begin{table}
+\Hrule
+  \caption{Floating-point Exceptions}
+  \begin{center}
+    \begin{tabular}[t]{l|l}
+      \multicolumn{1}{c}{Code} & \multicolumn{1}{c}{Reason} \\
+      \hline
+      \texttt{FPE\_FLTDIV} & \texttt{floating-point divide by zero} \\
+      \texttt{FPE\_FLTOVF} & \texttt{floating-point overflow} \\
+      \texttt{FPE\_FLTUND} & \texttt{floating-point underflow} \\
+      \texttt{FPE\_FLTRES} & \texttt{floating-point inexact result} \\
+      \texttt{FPE\_FLTINV} & \texttt{invalid floating-point operation} 
+    \end{tabular}
+  \end{center}
+\Hrule
+\end{table}
 
 \subsection{Virtual Address Space}
 
@@ -449,7 +517,7 @@ In practice, however, several factors limit the size of a process.
   \begin{center}
     \begin{tabular}{r|c|l}
       \noalign{\smallskip}  \cline{2-2}
-      \verb|0xffffffffffffffff| & Reserved system area & End of memory\\ 
+      \verb|0xffffffffffffffff| & Reserved system area & End of memory\\
       & \dots & \\ \cline{2-2}
       & \dots & \\
       \verb|0x80000000000| & Dynamic segments & \\ \cline{2-2}
@@ -472,7 +540,7 @@ arrangement appears in figure \ref{fig-cfg}.
       \cline{2-2}
       & \dots & \\
       \verb|0x80000000000| & Dynamic segments & \\ \cline{2-2}
-      & Stack segment & \\ 
+      & Stack segment & \\
       & \dots & \\ \cline{2-2}
       & \dots & \\
       & Data segments & \\ \cline{2-2}
@@ -513,64 +581,64 @@ size and address range.  We define only a small number of code models
 that are of general interest:
 
 \begin{description}
-\item[\textindex{Small code model}] 
+\item[\textindex{Small code model}]
   The virtual address of code executed is known at link time.
   Additionally all symbols are known to be located in the virtual
   addresses in the range from $0$ to $2^{31}-2^{10} - 1$.
-  
+
   This allows the compiler to encode symbolic references with offsets
   in the range from $-2^{31}$ to $2^{10}$ directly in the sign
   extended immediate operands, with offsets in the range from $0$ to
   $2^{31}+2^{10}$ in the zero extended immediate operands and use
   instruction pointer relative addressing for the symbols wit offsets
   in the range $-2^{10}$ to $2^{10}$.
-  
+
   This is the fastest code model and we expect it to be suitable for
   the vast majority of programs.
 
 \item[\textindex{Kernel code model}]
-  
+
   The kernel of an operating system is usually rather small but runs
   in the negative half of the address space.  So we define all symbols
   to be in the range from $2^{64}-2^{31}$ to $2^{64}-2^{10}$.
-  
+
   This code model has advantages similar to those of the small model,
   but allows encoding of zero extended symbolic references only for
   offsets from $2^{31}$ to $2^{31}+2^{10}$. The range offsets for
   sign extended reference changes to $0$--$2^{31}+2^{10}$.
 
 \item[\textindex{Medium code model}]
-  
+
   The medium code model does not make any assumptions about the range
   of symbolic references to data sections. Size and address of the
   text section have the same limits as the small code model.
-  
+
   This model requires the compiler to use \code{movabs} instructions
   to access static data and to load addresses into register, but keeps
   the advantages of the small code model for manipulation of addresses
   to the text section (specially needed for branches).
 
 \item[\textindex{Large code model}]
-  
+
   The large code model makes no assumptions about addresses and sizes
   of sections.
-  
+
   The compiler is required to use the \code{movabs} instruction, as in
   the medium code model, even for dealing with addresses inside the
   text section.  Additionally, indirect branches are needed when
   branching to addresses whose offset from the current instruction
   pointer is unknown.
-  
+
   It is possible to avoid the limitation for the text section by
   breaking up the program into multiple shared libraries, so we do not
   expect this model to be needed in the foreseeable future.
 
 \item[\textindex{Small position independent code model} (\textindex{PIC})]
-  
+
   Unlike the previous models, the virtual addresses of instructions
   and data are not known until dynamic link time.  So all addresses
   have to be relative to the instruction pointer.
-  
+
   Additionally the maximum distance between a symbol and the end of an
   instruction is limited to $2^{31}-2^{10}-1$, allowing the compiler
   to use instruction pointer relative branches and addressing modes
@@ -579,10 +647,10 @@ that are of general interest:
 
 \item[\textindex{Medium position independent code model}
   (\textindex{PIC})]
-  
+
   This model is like the previous model, but makes no assumptions
   about the distance of symbols to the data section.
-  
+
   In the medium PIC model, the instruction pointer relative addressing
   can not be used directly for accessing static data, since the offset
   can exceed the limitations on the size of the displacement field in
@@ -591,10 +659,10 @@ that are of general interest:
 
 \item[\textindex{Large position independent code model}
   (\textindex{PIC})]
-  
+
   This model is like the previous model, but makes no assumptions
   about the distance of symbols.
-  
+
   The large PIC model implies the same limitation as the medium
   PIC model regarding addressing of static data.  Additionally,
   references to the global offset table and to the procedure linkage
@@ -676,7 +744,8 @@ Only registers that might be used to pass arguments need to be saved.
 Other registers are not accessed and can be used for other purposes.  If a
 function is known to never accept arguments passed in
 registers\footnote{This fact may be determined either by exploring
-  types used by the \code{va_arg} macro, or by the fact that the named
+  types used by the \code{va_arg}
+macro, or by the fact that the named
   arguments already are exhausted the argument registers entirely},
 the register save area may be omitted entirely.
 
@@ -831,7 +900,64 @@ fetch:&movl&(\RAX), \reg{eax}&Load argument\\
 \Hrule
 \end{figure}
 
-%%% Local Variables: 
+\section{DWARF Definition}
+
+This section\footnote{This section is structured in a way similar to the psABI for PowerPC}
+defines the Debug With Arbitrary Record Format (DWARF) debugging
+format for the \xARCH processor family. The \xARCH ABI does not define
+a debug format.  However, all systems that do implement DWARF shall use
+the following definitions.
+
+DWARF is a specification developed for symbolic, source-level debugging.
+The debugging information format does not favor the design of any
+compiler or debugger.  For more information on DWARF,
+see \emph{DWARF Debugging Information Format},
+revision: Version 2.0.0, July 27, 1993, UNIX International,
+Program Languages SIG.
+
+\subsection{DWARF Release Number}
+
+The DWARF definition requires some machine-specific definitions.
+The register number mapping needs to be specified for the \xARCH
+registers. In addition, the DWARF Version 2 specification
+requires processor-specific address class codes to be defined.
+
+\subsection{DWARF Register Number Mapping}
+
+Table \ref{tbl-reg-num-map} outlines the register number mapping
+for the \xARCH processor family.%
+\footnote{This document does not define mappings for priviledged registers.}%
+\footnote{The table defines Return Address to have a register number, even
+though the address is stored in $0($\RSP$)$ and not in a physical register.}
+
+\begin{figure}
+\caption{DWARF Register Number Mapping} \label{tbl-reg-num-map}
+\begin{center}
+\begin{tabular}{|l|r|l|}
+\cline{1-3}
+Register Name&Number&Abbreviation\\
+\cline{1-3}
+General Purpose Register RAX & 0 &\RAX\\
+General Purpose Register RBX & 1 &\RBX\\
+General Purpose Register RCX & 2 &\RCX\\
+General Purpose Register RDX & 3 &\RDX\\
+Frame Pointer Register   RBP & 4 &\RBP\\
+General Purpose Register RSI & 5 &\RSI\\
+General Purpose Register RDI & 6 &\RDI\\
+Stack Pointer Register   RSP & 7 &\RSP\\
+Extended Integer Registers 8-15 & 8-15 &\reg{r8}-\reg{r15}\\
+Return Address RA
+& 17&\\
+SSE Registers 0-7              & 17-24 & \reg{xmm0}-\reg{xmm7} \\
+Extended SSE Registers 8-15    & 25-32 & \reg{xmm8}-\reg{xmm15} \\
+Floating Point Registers 0-7   & 33-40 & \reg{st0}-\reg{st7} \\
+MMX Registers 0-7              & 41-48 & \reg{mm0}-\reg{mm7} \\
+\cline{1-3}
+\end{tabular}
+\end{center}
+\end{figure}
+
+%%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "abi"
-%%% End: 
+%%% End:
