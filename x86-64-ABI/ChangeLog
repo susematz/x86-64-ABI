@@ -1,5 +1,10 @@
 2000-08-18  Andreas Jaeger  <aj@suse.de>
 
+	* macros.tex: Add \xspace for \reg.
+
+	* low-level-sys-info.tex (subsubsection {SSE registers}): Clarify
+	XMM0 usage.
+
 	* conventions.tex: Cleanup and add some index entries.
 
 	* macros.tex: Add new macros for easier indexing.

@@ -156,7 +156,8 @@ This subsection discusses usage of each register.  The registers called
 \emph{global registers} ``belong'' to the calling function and the called function
 is required to preserve their values, while the \emph{temporary registers} may
 be freely clobbered by the called function.
-\editornote{The split to global/temporaries is still subject of change.}
+\editornote{The split to global/temporaries is still subject of change
+  and depends on the different proposals for passing.}
 
 \subsubsection {General Purpose Registers}
 
@@ -182,8 +183,9 @@ be freely clobbered by the called function.
 \subsubsection {SSE registers}
 
 \begin{description}
-  \item [\reg{XMM0}, \reg{XMM1}] Temporary registers used to pass first two SSE arguments
-    and to return first two doublewords of the return value.
+\item [\reg{XMM0}, \reg{XMM1}] Temporary registers used to pass first
+  two SSE arguments. \reg{XMM0} is also used as a return register for
+  two doublewords.
   \item [\reg{XMM2} -- \reg{XMM6}] Temporary registers used to pass 2nd--6th SSE arguments
   \item [\reg{XMM6} -- \reg{XMM13}] Global registers
   \item [\reg{XMM13} -- \reg{XMM15}] Temporary registers
