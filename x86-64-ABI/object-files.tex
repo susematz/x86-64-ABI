@@ -107,11 +107,11 @@ those used for the Intel386 architecture.
   loading the offset into a displacement register; the base plus
   immediate displacement addressing form can be used.}
 
-The \texttt{R_X8664_GOTPC} relocation has different semantics from the
-\texttt{R_I386_GOTPC} relocation.  In particular, because the \xARCH
-architecture has an addressing mode relative to the instruction
+The \texttt{R_X8664_GOTPCREL} relocation has different semantics from
+the \texttt{R_I386_GOTPC} relocation.  In particular, because the
+\xARCH architecture has an addressing mode relative to the instruction
 pointer, it is possible to load an address from the GOT using a single
-instruction.  The calculation done by the \texttt{R_X8664_GOTPC}
+instruction.  The calculation done by the \texttt{R_X8664_GOTPCREL}
 relocation gives the difference between the location in the GOT where
 the symbol's address is given and the location where the relocation is
 applied.

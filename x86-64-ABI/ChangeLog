@@ -1,3 +1,10 @@
+2000-08-13  Mark Mitchell  <mark@codesourcery.com>
+
+	* introduction.tex: Clean up.
+	* low-level-sys-info.tex: Define long double as having x86
+	floating-point format.  Define __float128.  Tidy up.
+	* object-files.tex: Fix typos.
+
 2000-08-11  Andreas Jaeger  <aj@suse.de>
 
 	* Whole document: Make it ready for public draft: Lots of small

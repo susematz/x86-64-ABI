@@ -4,9 +4,12 @@
 
 \subsection{Processor Architecture}
 
-The \xARCH architecture defines a new mode, referred to as 32/64-bit
-mode. See the \xARCH Specification details. All information in this
-document is relevant only to 32/64-bit mode, unless stated otherwise.
+The \xARCH architecture (see
+\texttt{http://www.x86-64.org/documentation}) defines extensions to
+the x86 architecture.  The \xARCH architecture allows the execution of
+32-bit programs in 32-bit mode.  Such programs will continue to make
+use of the Intel386 psABI; this document applies only to programs
+running in ``long'' mode.
 
 \subsection{Data Representation}
 
@@ -58,28 +61,26 @@ scalar types and the processor's.
     \hline
     Floating-& \texttt{float} & 4 & 4 & single (IEEE) \\
     point & \texttt{double} & 8 & 8 & double (IEEE) \\
-    & \texttt{long double} & 16 & 16 & double extended (IEEE) \\
-    & \texttt{__float80} & 12 & 4 & x87 extended\\
+    & \texttt{long double} & 12 & 4 & x87 extended \\
+    & \texttt{__float128} & 16 & 16 & double extended (IEEE) \\
     \hline
     Packed & \texttt{__m64} & 8 & 8 & \MMX{} and \threednow \\
     & \texttt{__m128} & 16 & 16 & SSE and SSE-2 \\
   \end{tabular}
 \end{figure}
 
-The \code{long double} type uses a 15 bits exponent, 113 bits for the
-mantissa (the high order significant bit is implicit) and an exponent
-bias of 16383\footnote{This type needs software emulation.}.  The
-\code{__float80} type correspondends to the \code{long double} type of
-the ia32 ABI.
-
-\editornote{Should we define __int128?}
-
-\editornote{Why do we use 16-byte long doubles instead of 12?}
+The \code{__float128} type uses a 15-bit exponent, a 113-bit mantissa
+(the high order significant bit is implicit) and an exponent bias of
+16383.\footnote{Initial implementations of the \xARCH architecture are
+  expected to support operations on the \texttt{__float128} type only
+  via software emulation.}
 
 A null pointer (for all types) has value zero.
 
-\editornote{Should we explicitly allow misaligned accesses, as in the
-  i386 ABI?}
+Like the Intel386 architecture, the \xARCH architecture does not
+require all data access to be properly aligned.  Accessing misaligned
+data will be slower than accessing properly aligned data, but
+otherwise there is no difference.
 
 \subsubsection{Aggregates And Unions}
 
@@ -87,11 +88,6 @@ An array uses the same alignment as its elements, except that an array
 that requires at least 16 bytes always has alignment of at least 16
 bytes.\footnote{This alignment requirement allows the use of SSE
   operations.}
-
-\editornote{Do we really want to align a 17-byte array of characters
-  on a 16-byte boundary?  This may happen often for a 16-byte
-  fixed-size data-entry field.  Perhaps we should only do this for
-  arrays of types other than \texttt{char}?}
 
 No other changes required.
 
@@ -117,8 +113,10 @@ Amend the description of bit-field ranges as follows:
 \Hrule
 \end{figure}
 
-\editornote{Do we want to allow bitfields of type \texttt{__m64} or
-  \texttt{__m128}?} 
+Properties of bitfields having the type \texttt{__m64} or
+\texttt{__m128} are not defined by the ABI.  Although compilers are
+free to support bitfields with these types, programs making use of
+these features will not conform to the \xARCH ABI.
 
 No other changes required.
 
@@ -128,30 +126,27 @@ This section describes the standard function calling sequence,
 including stack frame layout, register usage, parameter passing and so
 on.
 
-Only global functions must obey the calling conventions specified
-here.  For local functions different (and possibly more effective)
-methods may be used, as long as they conform to the requirements of
-the stack traceback algorithm.  \editornote{Insert link to stack
-  traceback algorithm here.}
-
-\editornote{Do we really want to require that stack traceback
-  algorithms are supported?  That limits optimization.}
+The standard calling sequence requirements apply only to global
+functions.  Local functions that are not reachable from other
+compilation units may use different conventions.  Nevertheless, it is
+recommended that all functions use the standard calling sequence when
+possible.
 
 \subsection{Registers}
 \label{subsec-registers}
 
-The \xARCH architecture provides 16 general purpose registers, each 64
-bits wide. In addition the architecture provides 16 SSE registers,
-each 128 bits wide and 8 x87 floating point registers, each 80 bits
-wide usable as 64 bits wide \MMX/\threednow registers and several special
-purpose registers.
+The \xARCH architecture provides 16 general purpose 64-bit registers.
+In addition the architecture provides 16 SSE registers, each 128 bits
+wide and 8 x87 floating point registers, each 80 bits wide.  Each of
+the x87 floating point registers may be referred to in \MMX/\threednow
+mode as a 64-bit register.  There are several additional
+special-purpose registers.
 
 This subsection discusses usage of each register.  The registers called
 \emph{global registers} ``belong'' to the calling function and the called function
 is required to preserve their values, while the \emph{temporary registers} may
 be freely clobbered by the called function.
 \editornote{The split to global/temporaries is still subject of change.}
-\editornote{Define environment pointer register?}
 
 \subsubsection {General Purpose Registers}
 

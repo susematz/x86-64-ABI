@@ -4,29 +4,27 @@
 Except where otherwise noted, the \xARCH architecture follows the
 conventions described in the Intel386 psABI.  Rather than replicate
 the entire contents of the Intel386 psABI document, this document
-simply indicates the differences from that document.
+simply indicates the differences from that document.  The ABI
+described in this document applies only to the \xARCH architecture
+when it is executing in 32/64-bit mode; when the architecture executes
+in ordinary 32-bit mode the Intel386 psABI conventions apply.
 
-\editornote{The following paragraphs might disappear again - for now
-  they should avoid confusion}.
-The \xARCH architecture defines a new mode, referred to as 32/64-bit
-mode. All information in this document is relevant only to 32/64-bit
-mode, unless stated otherwise.
+As with all psABI documents, no attempt has been made to specify an
+ABI for languages other than C.  However, it is assumed that many
+programming languages will wish to link with code written in C, so
+that the ABI specifications documented here are relevant.\footnote{For
+  C++, a variant of the ABI developed for use on the Intel IA64
+  architecture will likely be used.}
 
-This ABI specifies the language bindings for the C language except
-where noted explicitly.
-\editornote{For C++ we will use ia64 C++ ABI.}
+\section{Differences from the Intel386 psABI}
 
-\section{Major differences to i386 ABI}
-
-The major differences of the \xARCH ABI to the i386 ABI are as
-follows:
+The most fundamental differences from the Intel386 psABI document
+are as follows:
 \begin{itemize}
-\item 64 bit code and data model
-\item No explicit GOT register
-\item Different function calling conventions due to more registers
-\item Usage of SSE/SSE2 for floating point
-\item 128 bit long double floating point type. \editornote{This needs
-    further discussion.}
+\item Changes to sizes of fundamental data types.
+\item Changes to calling conventions.
+\item Changes to the floating-point support.
+\item Removal of the GOT register.
 \end{itemize}
 
 %%% Local Variables: 
