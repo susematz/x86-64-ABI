@@ -15,9 +15,11 @@ all: abi.ps abi.pdf
 
 abi.dvi: $(ALL_FILES)
 	latex abi
+	makeindex abi
+	latex abi
 
-abi.pdf: $(ALL_FILES)
+pdf abi.pdf: $(ALL_FILES)
 	pdflatex abi
 
-abi.ps: abi.dvi
+ps abi.ps: abi.dvi
 	dvips $< -o $@ 
