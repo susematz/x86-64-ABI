@@ -61,18 +61,18 @@ programs and shared objects.
 \begin{center}
 \begin{tabular}{|lll|}
 \hline
-.PLT0: & pushq & GOT+8(\%rip); GOT[1]\\
-& jmp &GOT+16(\%rip) ; GOT[2] \\
+.PLT0: & pushq & GOT+8(\%rip) # GOT[1]\\
+& jmp &*GOT+16(\%rip) # GOT[2] \\
 & nop & \\
 & nop & \\
 & nop & \\
 & nop & \\
-.PLT1: & jmp &*name1@GOTPC(\%rip)\\
+.PLT1: & jmp &*name1@GOTPCREL(\%rip)\\
 & pushq & \$\textit{index} \\
-&jmp &.PLT0@PC \\
-.PLT2: & jmp&*name2@GOTPC(\%rip)\\
+&jmp &.PLT0 \\
+.PLT2: & jmp&*name2@GOTPCREL(\%rip)\\
 &pushq & \$\textit{index} \\
-& jmp & .PLT0@PC \\
+& jmp & .PLT0 \\
 &\dots &\\
 \hline
 \end{tabular}

@@ -1,3 +1,7 @@
+Wed Feb 14 12:16:04 CET 2001  Jan Hubicka  <jh@suse.cz>
+
+	* dl.tex: Fix the PLT figure.
+
 2001-02-12  Andreas Jaeger  <aj@suse.de>
 
 	* low-level-sys-info.tex: Clarify right-to-left order.
