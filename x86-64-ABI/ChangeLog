@@ -1,3 +1,7 @@
+2000-07-27  Mark Mitchell  <mark@codesourcery.com>
+
+	* object-files.tex (Relocation Types): Update GOT relocations.
+
 2000-07-27  Andreas Jaeger  <aj@suse.de>
 
 	* dl.tex (paragraph{Proposal 2: RO-PLT}): Finish section.

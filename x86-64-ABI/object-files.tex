@@ -71,11 +71,10 @@ entries.
       \texttt{R_X8664_GOT32} & 3 & \textit{word32} & \texttt{G + A - P} \\
       \texttt{R_X8664_PLT64} & 4 & \textit{word64} & \texttt{L + A - P} \\
       \texttt{R_X8664_COPY}  & 5 & none            & none \\
-      \texttt{R_X8664_GLOB_DATA} & 6 & \textit{word64} & \texttt{S} \\
+      \texttt{R_X8664_GLOB_DAT} & 6 & \textit{word64} & \texttt{S} \\
       \texttt{R_X8664_JMP_SLOT} & 7 & \textit{word64} & \texttt{S} \\
       \texttt{R_X8664_RELATIVE} & 8 & \textit{word64} & \texttt{B + A} \\
-      \texttt{R_X8664_GOTOFF} & 9 & \textit{word64} & \texttt{S + A - GOT} \\
-      \texttt{R_X8664_GOTPC} & 10 & \textit{word64} & \texttt{GOT + A - P} \\
+      \texttt{R_X8664_GOTPC} & 9 & \textit{word64} & \texttt{G + GOT + A - P} \\
     \end{tabular}
   \end{center}
   \caption{Relocation Types}
@@ -84,18 +83,26 @@ entries.
 The special semantics for these relocation types are identical to
 those used for the Intel386 architecture.
 \footnote{Even though the x86-64 architecture supports IP-relative
-  addressing modes, a GOT is still required since the address from the
+  addressing modes, a GOT is still required since the address from
   a particular instruction to a particular data item cannot be
   known by the static linker.}
-\footnote{Note that the
-  x86-64 architecture assumes that GOT offsets remain 32-bit values.
-  This choice means that a maximum of $2^{32}/8 = 2^{29}$ entries can
-  be placed in the GOT.  However, that should be more than enough for
-  most programs.  In the event that it is not enough, the linker could
-  create multiple GOTs.  Because 32-bit offsets are used, loads of
-  global data do not require loading the offset into a displacement
-  register; the base plus immediate displacement addressing form can
-  be used.}
+\footnote{Note that the x86-64 architecture assumes that offsets into
+  GOT are 32-bit values, not 64-bit values.  This choice means that a
+  maximum of $2^{32}/8 = 2^{29}$ entries can be placed in the GOT.
+  However, that should be more than enough for most programs.  In the
+  event that it is not enough, the linker could create multiple GOTs.
+  Because 32-bit offsets are used, loads of global data do not require
+  loading the offset into a displacement register; the base plus
+  immediate displacement addressing form can be used.}
+
+The \texttt{R_X8664_GOTPC} relocation has different semantics from the
+\texttt{R_I386_GOTPC} relocation.  In particular, because the x86-64
+architecture has an addressing mode relative to the instruction
+pointer, it is possible to load an address from the GOT using a single
+instruction.  The calculation done by the \texttt{R_X8664_GOTPC}
+relocation gives the difference between the location in the GOT where
+the symbol's address is given and the location where the relocation is
+applied.
 
 %%% Local Variables: 
 %%% mode: latex
