@@ -6,7 +6,7 @@
       tests for correct alignment of these.
    2: Passing scalar arguments -- scalarargs()
       Tests that arguments of basic types are passed correctly.
-   3: Passing struct and union arguments -- structargs()
+   3: Passing struct and union arguments -- struniargs()
       Tests that arguments of struct and union types are passed correctly.
       Also tests for mixed struct/union/scalar types
    4: Passing a variable number of args -- variargs()
@@ -46,7 +46,7 @@ main (int argc, char **argv)
 {
     current_test = 1; sizal();
     current_test = 2; scalarargs();
-    current_test = 3; structargs();
+    current_test = 3; struniargs();
     current_test = 4; variargs();
     current_test = 5; reloc();
 

@@ -14,13 +14,18 @@ architechture. It currently tests these things:
       Also tests for mixed struct/union/scalar types
    4: Passing a variable number of args -- variargs()
 
-Relocation types should also be tested but this hasn't been implemented yet.
+These tests will be implemented shortly:
+- bitfields testing
+- union as arguments testing
+- mixed passing of scalars, structs and unions
+- debugging the varargs.
+- relocation types
 
 Questions about the abitest can be directed to discuss@x86-64.org or to
 Bo Thorsen <bo@suse.de>.
 
 
-Documentation (or the lack of it)
+Documentation
 -------------
 
 No setup is being done yet, so if the defaults here doesn't suit your setup,
@@ -34,6 +39,11 @@ should edit the Makefile before `make`ing. To run it then call
 To make it successfully you need to have simnowlink in /opt/x86-64/bin and
 ldscr.lds, ldscr2.lds, libc.a and start64.o in /opt/x86-64/lib. All these
 files can be found in the runtime directory on the x86-64.org cvs server.
+You can use another directory for the x86-64 files by calling make like
+`make X86_64DIR=/dir/with/x86-64/files`.
+
+If you are working on this project, you should do `make dep` to get Makefile
+dependencies working.
 
 
 Makefile targets
@@ -46,9 +56,12 @@ which is used by snippet.bsd for running programs in the simulator.
 If you want to see the assembler source of file.c produced by gcc, just run
 `make file.s`. Note that `make clean` will remove these files.
 
+`make dist-clean` will remove all files that `make clean` does and also
+the generated assembler sources and the Makefile dependency file.
 
-Known bugs in GCC now
----------------------
+
+Known problems in GCC and binutils for now
+------------------------------------------
 
 This is a list of bugs in either GCC or the abi test:
 
@@ -57,8 +70,11 @@ This is a list of bugs in either GCC or the abi test:
 - arrays with total size => 16 should have an alignment of 16 but is aligned
   as the type of the elements
 
-- passing two longs looks wrong and doesn't pass in rdi and rsi as it should
-  see structargs.c
+- passing structs with size >= 16 is broken. Preliminary support will be
+  implemented in GCC for now
 
-- variable number of arguments looks broken
+- variable number of arguments test breaks for some reason. Under ia32 with
+  GCC 2.95.2 this test runs fine. The problem is probably not really about
+  varargs.
 
+- the types __int128, __float128, __m64 and __m128 are not implemented

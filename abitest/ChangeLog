@@ -1,3 +1,14 @@
+2000-12-13  Bo Thorsen  <bo@dsuse.de>
+
+	* variargs.c: Bugfixed; now works with gcc2.95.2 on ia32 but still
+	fails on x86-64. Probably not a varargs related problem any more.
+
+	* make_sizal2.c (main): Implemented union size tests
+	* struniargs.c: Moved structargs.c to struniargs.c and implemented
+	passing of unions.
+
+	* defines.h: Defines for dis-/enabling parts of the test
+
 2000-12-10  Bo Thorsen  <bo@suse.de>
 
 	* Small changes that should have made it for the initial release.

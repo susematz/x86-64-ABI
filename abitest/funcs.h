@@ -4,7 +4,7 @@
 /* Test functions.  */
 void sizal();
 void scalarargs();
-void structargs();
+void struniargs();
 void variargs();
 void reloc();
 
