@@ -27,6 +27,8 @@ This file documents a number of open topics in the ABI:
 
 - sizeof (long double) is 16 - is this still needed?
 
+- Define handling of complex arguments
+
 - Ideas for passing of arguments:
 
    1) we may want to merge "SSE" and "integer" to "SSE" instead of integer,
