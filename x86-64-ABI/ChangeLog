@@ -1,3 +1,8 @@
+2000-08-14  Andreas Jaeger  <aj@suse.de>
+
+	* low-level-sys-info.tex (Processor Architecture): Use \url for
+	URLs.
+
 2000-08-13  Mark Mitchell  <mark@codesourcery.com>
 
 	* introduction.tex: Clean up.
