@@ -264,8 +264,11 @@ and faster prologues and epilogues allowing to allocate and deallocate
 the outgoing arguments area by the same instruction used to
 (de)allocate the \emph{local save area}.
 
-The usage of \RBP{} as a frame pointer may be avoided by using \RSP{}
-instead.  This saves two instructions in the prologue and epilogue and
+The conventional use of \RBP{} as a frame pointer (base pointer) for a stack
+frame may be avoided by using \RSP{} (the stack pointer) to index the
+stack frame in cases where the frame is fixed length.%
+\footnote{This corresponds to the \code{-fomit-frame-pointer} option of GCC}
+This saves two instructions in the prologue and epilogue and
 gives another global general purpose register.  See details about
 stack traceback algorithm for conditions when this optimization is
 allowed.  \editornote{The stack traceback algorithm has not been
