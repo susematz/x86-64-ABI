@@ -3,7 +3,7 @@
 	* dl.tex: Fix relocation name; use pushq for pushing GOT[1] since
 	we need a 64 bit value.
 
-	* object-files.tex: Use EM_x86_64 as this is now the official
+	* object-files.tex: Use EM_X86_64 as this is now the official
 	name.
 
 2000-12-20  Andreas Jaeger  <aj@suse.de>
