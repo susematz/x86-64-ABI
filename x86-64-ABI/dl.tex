@@ -1,7 +1,42 @@
-
 \chapter{Program Loading and Dynamic Linking}
 
-%%% Local Variables: 
+\editornote{Where should the dynamic linker and the libries live?  The
+  ia64 ABI defines new paths, e.g. /usr/lib/ia64l32/ and leaves
+  /usr/lib to ia32.  I'll follow this example and use /usr/lib/x86-64/
+  as path.}
+
+\section{Program Header}
+
+\section{Program Loading}
+
+\begin{figure}
+\caption{Example Executable File}
+\begin{center}
+\begin{tabular}{r|c|l}
+\noalign{\smallskip}
+\multicolumn{1}{l}{\bf File Offset} & \multicolumn{1}{c}{\bf File} &
+\bf Virtual Address \\
+\noalign{\smallskip}  \cline{2-2}
+0 & ELF header & \\ \cline{2-2}
+& Program header table & \\ \cline{2-2}
+& Other information & \\ \cline{2-2}
+0x100 & Text segment & 0x???\\ \cline{2-2}
+& \dots & \\
+& 0x47000 bytes & 0x??? \\ \cline{2-2}
+0x47100& Data segment & 0x??? \\
+& \dots & \\
+& 0x2700 bytes & 0x??? \\ \cline{2-2}
+0x49800& Other information & \\
+& \dots & \\ \cline{2-2}
+\end{tabular}
+\end{center}
+\end{figure}
+
+\section{Dynamic Linking}
+
+
+
+%%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "abi"
-%%% End: 
+%%% End:
