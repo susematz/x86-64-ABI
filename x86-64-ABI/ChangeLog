@@ -1,3 +1,10 @@
+2000-08-02  Andreas Jaeger  <aj@suse.de>
+
+	* dl.tex (subsection{Initialization and Termination Functions}):
+	Added.
+
+	* conventions.tex (section{C++}): Add section.
+
 2000-08-01  Andreas Jaeger  <aj@suse.de>
 
 	* low-level-sys-info.tex: Fix references.

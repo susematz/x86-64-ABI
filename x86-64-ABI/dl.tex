@@ -383,6 +383,19 @@ The name and location of the program interpreter \index{program
 \bigskip
 \path{/usr/lib/ld.so.1}
 
+\subsection{Initialization and Termination Functions}
+
+% copied from ia64
+The implementation is responsible for executing the initialization
+functions specified by \code{DT_INIT}, \code{DT_INIT_ARRAY} , and
+\code{DT_PREINIT_ARRAY} entries in the executable file and shared
+object files for a process, and the termination (or finalization)
+functions specified by \code{DT_FINI} and \code{DT_FINI_ARRAY}, as
+specified by the \textit{System V ABI}.  The user program plays no
+further part in executing the initialization and termination functions
+specified by these dynamic tags.
+
+
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "abi"
