@@ -8,5 +8,6 @@ abi.out
 abi.pdf
 abi.ps
 abi.toc
+abi.cb
 *.aux
 *.log

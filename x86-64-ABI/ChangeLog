@@ -1,3 +1,27 @@
+2004-11-09  Michael Matz  <matz@suse.de>
+
+	* development.tex (table): Rename title.
+	* low-level-sys-info.tex (Conventions): Replace GPREL with GOTPC.
+	* object-files.tex (large model relocations): Replace GOTPC64
+	calculation with the one from GPREL64.  Delete GPREL64.
+
+2004-11-03  Michael Matz  <matz@suse.de>
+
+	* Makefile (clean): Delete *.cb too.
+	* abi.tex (changelog): Describe 0.95.
+	* macros.tex (version): Increase to 0.95.
+	* dl.tex (Procedure Linkage Table): Clarify that it's for small/medium.
+	Add subsubsection "Large Models".
+	* low-level-sys-info.tex (Architectural Constraints): Use 2^24.
+	(Medium Code Model, Large Code Model): Clarify.
+	(Conventions): New section.
+	(PIC Function Prologue): Add descriptions for medium and large models.
+	<Code Examples>: Update.  Add them for medium and large models.
+	(Implementation Advice): New section.
+	* object-files.tex (Section Flags): New.
+	(Special Sections): Add large sections.
+	(Relocation Types): Add medium and large model relocations.
+	
 2004-11-03  Michael Matz  <matz@suse.de>
 
 	* abi.tex (changelog): Describe 0.94.

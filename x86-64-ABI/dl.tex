@@ -1,3 +1,4 @@
+%%% vim:ai:tw=72:
 \chapter{Program Loading and Dynamic Linking}
 
 \section{Program Loading}
@@ -68,7 +69,7 @@ The following \xARCH program header types are defined:
 \begin{description}
  \item[PT_GNU_EH_FRAME and PT_SUNW_UNWIND]
       The segment contains the stack unwind tables.
-      See Section \ref{UNKNOWN} of this document.
+      See Section \ref{sec_eh_frame} of this document.
       \footnote{
 	The value for these program headers have been placed in the
 	{\tt PT_LOOS} and {\tt PT_HIOS} (os specific range) in order to adapt
@@ -86,7 +87,7 @@ Dynamic section entries give information to the dynamic linker. Some
 of this information is processor-specific, including the interpretation
 of some entries in the dynamic structure.
 
-\subsubsection{Global Offset Table}
+\subsubsection{Global Offset Table (GOT)}
 
 Position-independent code cannot, in general, contain absolute virtual
 addresses. Global offset tables hold absolute addresses in private
@@ -115,6 +116,8 @@ memory image. On the \xARCH architecture, entries one and two in the
 global offset table also are reserved. 
 
 The \textindex{global offset table} contains 64-bit addresses.
+
+For the large models the GOT is allowed to be up to 16EB in size.
 
 \begin{figure}[H]
 \Hrule
@@ -178,32 +181,29 @@ redirect the entries without compromising the position-independence
 and shareability of the program's text.  Executable files and shared
 object files have separate procedure linkage tables.  Unlike
 \intelabi, this ABI uses the same procedure linkage table for both
-programs and shared objects.
+programs and shared objects (see figure \ref{small_med_plt}).
 
 \begin{figure}[H]
 \Hrule
-\caption{Procedure Linkage Table}
-\begin{center}
-\code{
-\begin{tabular}{|lll|}
-\hline
-.PLT0: & pushq & GOT+8(\%rip) \# GOT[1]\\
-& jmp &*GOT+16(\%rip) \# GOT[2] \\
-& nop & \\
-& nop & \\
-& nop & \\
-& nop & \\
-.PLT1: & jmp &*name1@GOTPCREL(\%rip)\\
-& pushq & \$\textit{index} \\
-&jmp &.PLT0 \\
-.PLT2: & jmp&*name2@GOTPCREL(\%rip)\\
-&pushq & \$\textit{index} \\
-& jmp & .PLT0 \\
-&\dots &\\
-\hline
-\end{tabular}
-}
-\end{center}
+\caption{Procedure Linkage Table (small and medium models)}
+\label{small_med_plt}
+\begin{footnotesize}
+\begin{verbatim}
+  .PLT0: pushq    GOT+8(%rip)                 # GOT[1]
+         jmp      *GOT+16(%rip)          # GOT[2]
+         nop
+         nop
+         nop
+         nop
+  .PLT1: jmp      *name1@GOTPCREL(%rip)       # 16 bytes from .PLT0
+         pushq    $index1
+         jmp      .PLT0
+  .PLT2: jmp      *name2@GOTPCREL(%rip)       # 16 bytes from .PLT1
+         pushq    $index2
+         jmp      .PLT0
+  .PLT3: ...
+\end{verbatim}%$
+\end{footnotesize}
 \Hrule
 \end{figure}
 
@@ -263,6 +263,77 @@ during process initialization.  Otherwise, the dynamic linker
 evaluates procedure linkage table entries lazily, delaying symbol
 resolution and relocation until the first execution of a table entry.
 \index{procedure linkage table|)}
+
+\subsubsection{Large Models}
+
+In the small and medium code models the size of both the PLT and the GOT
+is limited by the maximum 32-bit displacement size.
+Consequently, the base of the PLT and the
+top of the GOT can be at most 2GB apart.
+
+Therefore, in order to support the available addressing space of 16EB,
+it is necessary to extend both the PLT and the GOT. Moreover, the PLT
+needs to support the GOT being over 2GB away and the GOT can be over
+2GB in size.\footnote{If it is determined that the base of the PLT is
+within 2GB of the top of the GOT, it is also allowed to use the same
+PLT layout for a large code model object as that of the small and
+medium code models.}
+
+The PLT is extended as shown in figure \ref{final_large_plt}
+with the assumption that the GOT address is
+in \code{\%r15}\footnote{See Function Prologue.}.
+
+\begin{figure}[H]
+\Hrule
+\caption{Final large code model PLT} \label{final_large_plt}
+\begin{footnotesize}
+\begin{verbatim}
+.PLT0:  pushq   8(%r15)          # GOT[1]
+        jmpq    *16(%r15)        # GOT[2]
+        rep
+        rep
+        rep
+        nop
+        rep
+        rep
+        rep
+        nop
+.PLT1:  movabs  $name1@GOT,%r11  # 16 bytes from .PLT0
+        jmp     *(%r11,%r15)
+.PLT1a: pushq   $index1          # "call" dynamic linker
+        jmp     .PLT0
+.PLT2:  ...                      # 21 bytes from .PLT1
+.PLTx:  movabs  $namex@GOT,%r11  # 102261125th entry
+        jmp     *(%r11,%r15)
+.PLTxa: pushq   $indexx
+        pushq   8(%r15)          # repeat .PLT0 code
+        jmpq    *16(%r15)
+.PLTy: ...                       # 27 bytes from .PLTx
+\end{verbatim}%$
+\end{footnotesize}
+\end{figure} 
+
+This way, for the first 102261125 entries, each PLT entry besides
+\code{.PLT0} uses only 21 bytes. Afterwards, the PLT entry code changes
+by repeating that of .PLT0, when each PLT entry is 27
+bytes long.  Notice that any alignment consideration is dropped in order
+to keep the PLT size down.
+
+Each extended PLT entry is thus 5 to 11 bytes larger than the small and
+medium code model PLT entries.
+
+The functionality of entry .PLT0 remains unchanged from the small and
+medium code models.
+
+Note that the symbol index is still limited to 32 bits, which would
+allow for up to 4G global and external functions.
+
+Typically, UNIX compilers support two types of PLT, generally through
+the options \code{-fpic} and \code{-fPIC}.  When building position-independent
+objects using the large code model, only \code{-fPIC} is allowed. Using the
+option \code{-fpic} with the large code model remains reserved for future
+use.
+
 
 \subsection{Program Interpreter}
 
