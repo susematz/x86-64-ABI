@@ -1,3 +1,8 @@
+2001-03-07  Andreas Jaeger  <aj@suse.de>, Jan Hubicka <jh@suse.cz>
+
+	* low-level-sys-info.tex: Add section on auxiliary vectors,
+	rewrite register passing conventions.
+
 2001-02-27  Andreas Jaeger  <aj@suse.de>
 
 	* low-level-sys-info.tex: Add *word to the index.
@@ -26,7 +31,7 @@
 	Values of type __m64 will be returned in XMM registers.
 	Values of type long double will be passed on the stack
 	A value of type long double will be returned in %st.
-	
+
 	* dl.tex: Fix LaTeX bug in last patch.
 
 Wed Feb 14 12:16:04 CET 2001  Jan Hubicka  <jh@suse.cz>

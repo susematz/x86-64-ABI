@@ -237,98 +237,117 @@ epilogue.
 \subsection{Parameter Passing}
 
 After the argument values have been computed, they are placed in
-registers, or pushed on the stack.  For the purpose of passing the
-parameters, the arguments are considered from left (first argument) to
-right. The arguments that are pushed on the stack are pushed in
-reverse order.  Since the stack grows downwards, the rightmost
-argument will have the highest address.\footnote{Right-to-left order
-  on the stack makes the handling of functions that take a variable number of
-  arguments simpler.  The location of the first argument can always be
-  computed statically, based on the type of that argument.  It would
-  be difficult to compute the address of the first argument if the
-  arguments were pushed in left-to-right order.}
+registers, or pushed on the stack.  The way how values are passed is
+described in the following sections.
 
-For each argument, the following method is used to determine the
-location in which the argument is passed.  In all cases where a value
-is pushed on the stack, the stack shall be left doubleword-aligned.
-In all cases, the value pushed shall be located on a boundary whose
-alignment is the maximum of 8 (doubleword alignment) and the alignment
-of the type being pushed.  If the value does not consume the entire
-doubleword, the contents of the unused storage located at higher
-numbered addresses within the doubleword is undefined.
+\paragraph{Definitions}
+We first define a number of classes to classify arguments.  The
+classes correspondend to x86-64 register classes and are:
 
-If the argument is a scalar type, other than \code{__long double} or
-\code{__int128}, then it is placed in the next available register
-suitable for its type.  In particular, arguments of integral or
-pointer type are placed in the next available general purpose
-register, taken in the order \RDI, \RSI, \RDX, \RCX, \reg{r8}, and
-\reg{r9}.  \footnote{Note that \reg{r11} is neither required to
-  be preserved, nor is it used to pass arguments.  Making this
-  register available as scratch register means that code in the PLT
-  need not spill any registers when computing the address to which
-  control needs to be transferred.  \RAX is used to indicate the
-  number of SSE arguments passed to a function requiring a variable
-  number of arguments. \reg{r10} is used for passing a function's
-  static chain pointer.}  Arguments of floating point type other than
-\code{long double}, of type
-\code{__m64} and of type \code{__m128}, are placed in the next
-available SSE register, taken in order from \reg{xmm0} to \reg{xmm15}.
-If no registers are available, the values are placed on the stack.
+\begin{description}
+\item[INTEGER] This class consists of integral types that fit into one of
+  the general purpose registers (\RAX--\reg{r15}).
+\item[SSE] The class consists of types that fits into a SSE register.
+\item[SSEUP] The class consists of types that fit into a SSE register and
+  can be passed in the most significant half of it.
+\item[X87, X87UP] These classes consists of types that will be passed via
+  the x87 FPU.
+\item[NO\_CLASS] This class is used as initializer in the algorithms.  It
+  will be used for padding and empty structures and unions.
+\item[MEMORY] This class consists of types that will be passed in memory
+  via the stack.
+\end{description}
 
-Scalar values of type \code{__int128} are handled almost as if they
-consisted of two separate 64-bit arguments of type \code{long}.  The
-64 low-order bits are considered to be the first argument, and
-therefore processed second.\footnote{Thus, if the value is placed on
-  the stack, the low-order bits will be at a lower address, which
-  allows the caller to access the value normally.}  If there are not
-enough registers available to allow passing both arguments in
-registers, then the value is passed on the stack.
 
-Scalar values of type \code{long double} are always placed on the stack.
+\paragraph{Classification}
+The size of each argument gets rounded up to
+doublewords.\footnote{Therefore the stack will always be doubleword aligned.}
 
-Structure or union objects with more than 16 bytes, those that contain
-scalar components of type \code{long double}, or, in C++,
-non-POD\footnote{The term POD is from the ANSI/ISO C++ Standard, and
-  stands for Plain Ol' Data.  Although the exact definition is
-  technical, a POD is essentially a structure or union that could
-  could have been written in C; there cannot be any member functions,
-  or base classes, or similar C++ extensions.}  structure or union
-types,\footnote{A non-POD object cannot be returned in registers
-  because such objects must have well defined addresses; the address
-  at which an object is constructed (by the caller) and the address at
-  which the object is destroyed (by the callee) must be the same.
-  Similar issues apply when returning a non-POD object from a
-  function.} are always passed on the stack.  The stack is aligned as
-required by the alignment of the structure or union type being passed.
-Then, the structure value is copied onto the stack.
+The basic types are assigned their natural classes:
+\begin{itemize}
+\item Arguments of types (signed and unsigned) \code{char},
+  \code{short}, \code{int}, \code{long}, \code{long long}, and
+  pointers are in the INTEGER class.
+\item Arguments of types \code{float}, \code{double} and \code{__m64}
+  are in class SSE.
+\item Arguments of types \code{__float128} and \code{__m128} are split
+  into two halfs.  The least significant ones belong to class SSE, the
+  most significand one to class SSEUP.
+\item The 64-bit mantissa of arguments of type \code{long double}
+  belongs to class X87, the 16-bit exponent plus 6 bytes of padding
+  belongs to class X87UP.
+\item Arguments of type \code{__int128} are in the MEMORY class.
+\end{itemize}
 
-Structure or union objects that contain no more than 16 bytes and, in
-C++, are PODs, are passed in registers, if registers are available.
-If the entire structure cannot be placed in registers as described
-below, then the structure is passed on the stack, as above.
 
-If the structure contains a single scalar component, then it is passed
-as if it were a single argument of that scalar type.
+The classification of aggregate (structures and arrays) and union
+types works as follows:
 
-Otherwise, the first (or only, if the structure has no more than 8
-bytes), doubleword of the structure is passed first.  If there is only
-one component, the argument is passed as if it were an argument of
-that type.  Otherwise, if all scalar components in the first component
-are of floating point type, the first doubleword is passed as if it
-were an argument of floating point type.  If all the components begin
-at the same address, then the component is passed as if it were an
-argument of the longest floating point type used by these components.
-Otherwise, the argument is passed as if it were an argument of type
-\code{__float128}.\footnote{In this case, there will be no padding
-  bits, because this case can only occur if there is a value of type
-  \code{float} in the second word of the doubleword.}
+\begin{enumerate}
+\item If the size of an object is larger than two doublewords, or
+    in C++, is a non-\textindex{POD}%
+\footnote{The term POD is from the ANSI/ISO C++ Standard, and
+    stands for Plain Ol' Data.  Although the exact definition is
+    technical, a POD is essentially a structure or union that could
+    could have been written in C; there cannot be any member
+    functions, or base classes, or similar C++ extensions.} 
+  structure or union type, or contains unaligned fields, it has class
+  MEMORY.%
+   \footnote{A non-POD object cannot be passed in registers
+    because such objects must have well defined addresses; the address
+    at which an object is constructed (by the caller) and the address
+    at which the object is destroyed (by the callee) must be the same.
+    Similar issues apply when returning a non-POD object from a
+    function.}
 
-Otherwise, the doubleword is passed as if it were a single integer
-argument, using the smallest type sufficient to contain the argument.
-Any bytes not used by the value passed have undefined contents.
+\item Both doublewords get initialized to class NO_CLASS.
 
-If the structure has more than 8 bytes, then the process is repeated
-for the second doubleword.
+\item Each field of an object is classified recursively so that always
+   two fields are considered.  The resulting class is calculated
+   according to the classes of the fields in the doubleword:
+   \begin{enumerate}
+   \item
+      If both classes are equal, this is the resulting class.
+   \item If one of the classes is NO_CLASS, the resulting class is the other class.
+   \item If one of the classes is MEMORY, the result is the MEMORY class.
+   \item If one of the classes is INTEGER, the result is the INTEGER.
+   \item If one of the classes is X87 or X87UP class, MEMORY is used as
+      class.
+   \item Otherwise class SSE is used.
+   \end{enumerate}
+\item Then a post merger cleanup is done:
+  \begin{enumerate}
+  \item If one of the classes is MEMORY, the whole argument is passed in memory.
+  \item If SSEUP is not preceeded by SSE, it is converted to SSE.
+  \end{enumerate}
+\end{enumerate}
+
+\paragraph{Passing}
+Once arguments are classified, the registers get assigned (in
+left-to-right order) for passing as follows:
+
+\begin{enumerate}
+\item If the class is MEMORY, pass the argument on the stack.
+
+\item If the class is INTEGER, the next available register of the
+  sequence \RDI, \RSI, \RDX, \RCX, \reg{r8} and \reg{r9} is
+  used\footnote{Note that \reg{r11} is neither required to be
+    preserved, nor is it used to pass arguments.  Making this register
+    available as scratch register means that code in the PLT need not
+    spill any registers when computing the address to which control
+    needs to be transferred.  \RAX is used to indicate the number of
+    SSE arguments passed to a function requiring a variable number of
+    arguments. \reg{r10} is used for passing a function's static chain
+    pointer.}.
+
+\item If the class is SSE, the next available SSE register is used, the
+   registers are taken in the order from \reg{xmm0} to \reg{xmm15}.
+   
+item If the class is SSEUP, the doubleword is passed in the upper
+   half of the least used SSE register.
+
+\item If the class is X87 or X87UP, it is passed in memory.
+\end{enumerate}
 
 \begin{figure}
 \Hrule
@@ -359,7 +378,7 @@ return register & No \\
 \reg{r10} & temporary register, used for passing a function's static
 chain pointer & No \\
 \reg{r11} & temporary register & No\\
-\reg{r12--r15} & callee-saved register & Yes \\
+\reg{r12--r15} & callee-saved registers & Yes \\
 \reg{xmm0}--\reg{xmm1} & used to pass and return floating point
 arguments & No\\
 \reg{xmm2}--\reg{xmm15} & used to pass floating point arguments & No\\
@@ -371,6 +390,53 @@ arguments & No\\
   \end{center}
 \Hrule
 \end{figure}
+
+If there is no register available anymore for any doubleword of an
+argument, the whole argument is passed on the stack. If registers have
+been assigned already for some doublewords of this argument, those
+assignments get reverted.
+
+Once registers are assigned, the arguments passed in memory are pushed
+on the stack in reversed (right-to-left\footnote{Right-to-left order
+  on the stack makes the handling of functions that take a variable
+  number of arguments simpler.  The location of the first argument can
+  always be computed statically, based on the type of that argument.
+  It would be difficult to compute the address of the first argument
+  if the arguments were pushed in left-to-right order.}) order.
+
+For calls that may call functions that use varargs or stdargs
+(prototype-less calls or calls to functions containing ellipsis
+(\dots) in the declaration) \RAX is used as hidden argument to specify
+the number of SSE registers used. The contents of \RAX does not need
+to match exactly the number of registers, but must be an upper bound
+on the number of SSE registers used and is in the range 0--15
+inclusive.
+
+\paragraph{Returning of Values}
+The returning of values is done according to the following algorithm:
+\begin{enumerate}
+\item Classify the return value with the classification algorithm.
+
+\item If the value has class MEMORY, then the caller provides space for
+   the return value and passes the address of this storage in \RDI as
+   if it were the first argument to the function.  In effect, this
+   address becomes a ``hidden'' first argument.
+   
+\item If the class is INTEGER, the next available register of the
+   sequence \RAX, \RDX is used.
+
+\item If the class is SSE, the next available SSE register of the
+   sequence \reg{xmm0}, \reg{xmm1} is used.
+
+\item If the class is SSEUP, the doubleword is passed in the upper half of the
+   least used SSE register.
+
+\item If the class is X87, the value is returned on the X87 stack in
+   \reg{st0} as 80-bit x87 number.
+
+\item If the class is X87UP, the value is returned together with the
+   previous X87 value in \reg{st0}.
+\end{enumerate}
 
 As an example of the register passing conventions, consider the
 declarations and the function call shown in
@@ -415,8 +481,8 @@ func (e, f, s, g, h, ld, l, m, n, i, j, k);\\
 \label{fig_allocation_example}
 \begin{center}
 \begin{tabular}{ll|ll|ll}
-\multicolumn{2}{c}{General Purpose Registers} & 
-\multicolumn{2}{c}{Floating Point Registers} & 
+\multicolumn{2}{c}{General Purpose Registers} &
+\multicolumn{2}{c}{Floating Point Registers} &
 \multicolumn{2}{c}{Stack Frame Offset}\\
 \hline
 \RDI: &\code{e} & \reg{xmm0}: &\code{s.d} &\code{0:}& \code{ld} \\
@@ -431,60 +497,25 @@ func (e, f, s, g, h, ld, l, m, n, i, j, k);\\
 \Hrule
 \end{figure}
 
-
-\subsection{Functions Returning Scalars or No Value}
-
-If a function returns a scalar of type \code{long double}, the value
-is returned in \reg{st0}.  If the function returns a scalar of some
-other type, the value is returned in a register or registers.  The
-register or registers chosen are the same as those that would be
-selected for a value of the same type to be passed to a function
-taking only one argument of that same type, except that the list for
-integral or pointer type scalars consists of \RAX and \RDX.
-
-\subsection{Functions Returning Structures or Unions}
-
-If a function returns a structure or union whose size is greater than
-16 bytes, or, for C++, if the structure or union is a non-POD, then
-the caller provides space for the return value and passes the address
-of this storage in \RDI as if it were the first argument to the
-function.  In effect, this address becomes a ``hidden'' first
-argument.
-
-In this case, the function also sets \RDI to the value of the original
-address in the callee's area before it returns.  Thus when the caller
-receives control again, the address of the returned object resides in
-register \RDI and can be used to access the object.
-
-If a function returns a structure or union whose size is less than or
-equal to 16 bytes, and, for C++, the structure or union is a POD, then
-the structure is returned in registers.  The registers chosen for a
-given structure or union type are the same as those that would be
-selected for a value of the same type to be passed to a function
-taking only one argument of that same structure type, except that the
-list for integral or pointer type scalars consists of \RAX and \RDX.
-For returning, structures and unions are treated the same way as for
-passing them.
-
 \section{Operating System Interface}
 
 \subsection{Exception Interface}
 
 As the \xARCH manuals describe, the processor changes mode to handle
-\emph{\textindex{exceptions},} which may be synchronous, 
-floating-point/coprocessor or asynchronous. 
+\emph{\textindex{exceptions},} which may be synchronous,
+floating-point/coprocessor or asynchronous.
 Synchronous and floating-point/coprocessor exceptions,
 being caused by instruction execution, can be explicitly generated
 by a process. This section, therefore, specifies those exception types
 with defined behavior. The \xARCH architecture classifies exceptions as
-\emph{faults}, \emph{traps}, and \emph{aborts}. See the \intelabi 
+\emph{faults}, \emph{traps}, and \emph{aborts}. See the \intelabi
 for more information about their differences.
 
 \subsubsection{Hardware Exception Types}
 The operating system defines the correspondence between hardware
 exceptions and the signals specified by \codeindex{signal}(BA\_OS)
-as shown in table \ref{tab-hw-exceptions}. Contrary to the i386 
-architecture, the \xARCH does not define any instructions that 
+as shown in table \ref{tab-hw-exceptions}. Contrary to the i386
+architecture, the \xARCH does not define any instructions that
 generate a bounds check fault in long mode.
 
 \begin{table}
@@ -530,7 +561,7 @@ generate a bounds check fault in long mode.
       \texttt{FPE\_FLTOVF} & \texttt{floating-point overflow} \\
       \texttt{FPE\_FLTUND} & \texttt{floating-point underflow} \\
       \texttt{FPE\_FLTRES} & \texttt{floating-point inexact result} \\
-      \texttt{FPE\_FLTINV} & \texttt{invalid floating-point operation} 
+      \texttt{FPE\_FLTINV} & \texttt{invalid floating-point operation}
     \end{tabular}
   \end{center}
 \Hrule
@@ -612,6 +643,62 @@ arrangement appears in figure \ref{fig-cfg}.
   \end{center}
 \Hrule
 \end{figure}
+
+\section{Process Initialization}
+
+\subsection{Auxiliary Vector}
+
+The \xARCH ABI uses the following auxiliary vector types.
+
+\begin{figure}[H]
+\Hrule
+\caption{Auxiliary Vector Types}
+\label{aux-vec}
+\begin{center}
+\begin{tabular}{l|r|l}
+  \multicolumn{1}{c}{Name}
+         & \multicolumn{1}{c}{Value}
+         & \multicolumn{1}{c}{a_un} \\
+      \hline
+\texttt{AT_NULL}& 0 & ignored\\
+\texttt{AT_IGNORE}& 1& ignored\\
+\texttt{AT_EXECFD}& 2& \texttt{a_val}\\
+\texttt{AT_PHDR}& 3& \texttt{a_ptr}\\
+\texttt{AT_PHENT}& 4& \texttt{a_val}\\
+\texttt{AT_PHNUM}& 5& \texttt{a_val}\\
+\texttt{AT_PAGESZ}& 6& \texttt{a_val}\\
+\texttt{AT_BASE}& 7& \texttt{a_ptr}\\
+\texttt{AT_FLAGS}& 8& \texttt{a_val}\\
+\texttt{AT_ENTRY}& 9& \texttt{a_ptr}\\
+\texttt{AT_NOTELF}& 10& \texttt{a_val}\\
+\texttt{AT_UID}& 11& \texttt{a_val}\\
+\texttt{AT_EUID}& 12& \texttt{a_val}\\
+\texttt{AT_GID}& 13& \texttt{a_val}\\
+\texttt{AT_EGID}& 14& \texttt{a_val}\\
+\hline
+    \end{tabular}
+  \end{center}
+\Hrule
+\end{figure}
+
+The entries that are different than in the \intelabi are
+specified as follows:
+
+\begin{description}
+\item[AT_NOTELF] The \code{a_val} member of this entry is non-zero if
+  the program is in another format than ELF.
+\item[AT_UID] The \code{a_val} member of this entry holds the real
+  user id of the process.
+\item[AT_EUID] The \code{a_val} member of this entry holds the
+  effective user id of the process.
+\item[AT_GID] The \code{a_val} member of this entry holds the
+  real group id of the process.
+\item[AT_EGID] The \code{a_val} member of this entry holds the
+  effective group id of the process.
+\item[AT_EUID] The \code{a_val} member of this entry holds the
+  effective user id of the process.
+\end{description}
+
 
 \section{Coding Examples}
 
