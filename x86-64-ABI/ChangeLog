@@ -1,3 +1,7 @@
+2000-07-29  Andreas Jaeger  <aj@suse.de>
+
+	* low-level-sys-info.tex: Fix typo in LaTeX command.
+
 2000-07-28  Mark Mitchell  <mark@codesourcery.com>
 
 	* low-level-sys-info.tex: Tidy up.
