@@ -13,11 +13,32 @@
 \pdfcompresslevel 5
 \fi
 
+% Times is nicer with pdf
 \usepackage{times}
+% American style
 \usepackage[american]{babel}
 
 \usepackage[T1]{fontenc}
 
+% Versionnumber of document - increment occasionally ;-)
+\newcommand{\version}{0.00}
+
+% Print a footer everywhere with current date
+% prelim2e needs \thistime
+\newcount\hours
+\newcount\minutes
+\def\SetTime{\hours=\time
+        \global\divide\hours by 60
+        \minutes=\hours
+        \multiply\minutes by 60
+        \advance\minutes by-\time
+        \global\multiply\minutes by-1 }
+\SetTime
+\def\thistime{\number\hours:\ifnum\minutes<10 0\fi\number\minutes}
+\usepackage[time]{prelim2e}
+\renewcommand{\PrelimWords}{x86-64 ABI Draft \version}
+
+% Some commands:
 \newcommand{\editornote}[1]{(\emph{Editor:}\/ #1)}
 
 % Use Hyperref for PDF support - this should be last
@@ -26,3 +47,8 @@
 \else
 \usepackage[dvips]{hyperref}
 \fi
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "abi"
+%%% End:

@@ -1,3 +1,10 @@
+2000-07-12  Andreas Jaeger  <aj@suse.de>
+
+	* macros.tex: Add Emacs macros and some comments.
+	Add macros to print version and date on every page.
+
+	* sw-installation.tex: Add Emacs macros.
+
 2000-07-07  Andreas Jaeger  <aj@suse.de>
 
 	* Initial checkin of files.
