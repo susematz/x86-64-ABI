@@ -1,3 +1,9 @@
+2000-08-01  Andreas Jaeger  <aj@suse.de>
+
+	* introduction.tex (Introduction}: Add some clarification.
+
+	* Makefile: Add mising files.
+
 2000-08-01  Mark Mitchell  <mark@codesourcery.com>
 
 	* object-files.tex (Machine Information): Set machine id.
