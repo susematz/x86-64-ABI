@@ -10,7 +10,7 @@
 \index{global offset table}
 A basic difference between the i386 ABI and the \xARCH ABI is the
 way the GOT table is found.  The i386 ABI, like (most) other processor
-specific ABIs, uses a dedicated register (\reg{EBX}) to address the
+specific ABIs, uses a dedicated register (\reg{ebx}) to address the
 base of the GOT table.  The function prologue of every function needs
 to set up this register to the correct value.  The \xARCH processor
 family introduces a new IP-relative addressing mode which is used in
@@ -35,7 +35,7 @@ directory.
 
 For the \textindex{C++} ABI we will use the ia64 C++ ABI and instantiate it
 appropriately.  The current draft of that ABI is available at:\\
-\url{http://reality.sgi.com/dehnert_engr/cxx/abi.html}
+\url{http://www.codesourcery.com/cxx-abi/}
 
 
 %%% Local Variables:

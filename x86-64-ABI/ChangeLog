@@ -1,3 +1,8 @@
+2001-03-19  Andreas Jaeger  <aj@suse.de>
+
+	* conventions.tex,low-level-sys-info.tex,object-files.tex: Fix
+	typos.
+
 2001-03-07  Andreas Jaeger  <aj@suse.de>, Jan Hubicka <jh@suse.cz>
 
 	* low-level-sys-info.tex: Add section on auxiliary vectors,
