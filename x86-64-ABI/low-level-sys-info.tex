@@ -73,29 +73,52 @@ bias of 16383\footnote{This type needs software emulation.}  The
 the ia32 ABI.
 
 \editornote{Should we define __int128?}
+
 \editornote{Why do we use 16-byte long doubles instead of 12?}
 
 A null pointer (for all types) has value zero.
 
+\editornote{Should we explicitly allow misaligned accesses, as in the
+  i386 ABI?}
+
 \subsubsection{Aggregates And Unions}
 
-Structure members are ``naturally'' aligned.  Structures and unions assume the
-alignment of the most strictly aligned component (compare with table
-\ref{basic-types}).  The size of aggregates is a multiple of the alignment.
+An array uses the same alignment as its elements, except that an array
+that requires at least 16 bytes always has alignment of at least 16
+bytes.\footnote{This alignment requirement allows the use of SSE
+  operations.}
 
-\subsubsection{Arrays}
+\editornote{Do we really want to align a 17-byte array of characters
+  on a 16-byte boundary?  This may happen often for a 16-byte
+  fixed-size data-entry field.  Perhaps we should only do this for
+  arrays of types other than \texttt{char}?}
 
-Arrays assume the alignment of the most strictly aligned component.
-Additionally arrays greater than 16~bytes are required to be aligned minimally
-to the 16~byte boundary to make usage of SSE packed operations more efficient.
+No other changes required.
 
 \subsubsection{Bit-Fields}
 
-Bit-fields are non-negative values with the range from 1 to 64 bits
-depending on the bit-field type. Bit ordering is equivalent to
-Intel386 specs.
+Amend the description of bit-field ranges as follows:
 
-\editornote{This needs a bit (pun intended) more specificity.}
+\begin{figure}[h]
+  \begin{center}
+    \leavevmode
+    \begin{tabular}{l|l|l}
+      \multicolumn{1}{c}{Bit-field Type} 
+         & \multicolumn{1}{c}{Width $w$} 
+         & \multicolumn{1}{c}{Range} \\
+      \hline
+      \texttt{signed long} & & $-2^{w - 1}$ to $2^{w-1}-1$ \\
+      \texttt{long} & 1 to 64 & 0 to $2^{w}-1$ \\
+      \texttt{unsigned long} & & 0 to $2^{w}-1$ \\
+    \end{tabular}
+  \end{center}
+  \caption{Bit-Field Ranges}
+\end{figure}
+
+\editornote{Do we want to allow bitfields of type \texttt{__m64} or
+  \texttt{__m128}?} 
+
+No other changes required.
 
 \section{Function Calling Sequence}
 
@@ -108,6 +131,9 @@ here.  For local functions the different (and possibly more effective)
 methods may be used, as long as they conform to the requirements of the
 stack traceback algorithm.
 \editornote{link to stack traceback here}
+
+\eidtornote{Do we really want to require that stack traceback
+  algorithms are supported?  That limits optimization.}
 
 \subsection{Registers}
 \label{subsec-registers}
