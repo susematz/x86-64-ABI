@@ -39,6 +39,8 @@ scalar types and the processor's. The \code{__int128},
      &  \texttt{sizeof} & (bytes)
      & \multicolumn{1}{c|}{Architecture}  \\
     \hline
+    & \texttt{_Bool}$^\dagger$ & 1 & 1 & boolean \\
+    \cline{2-5}
     & \texttt{char}        & 1 & 1 & signed byte \\
     & \texttt{signed char} & & \\
     \cline{2-5}
@@ -63,10 +65,10 @@ scalar types and the processor's. The \code{__int128},
     & \texttt{unsigned long} & 8 & 8 & unsigned \eightbyte \\
     & \texttt{unsigned long long} & 8 & 8 & unsigned \eightbyte \\
     \hline
-    & \texttt{__int128}$^\dagger$ & 16 & 16 & signed \sixteenbyte \\
-    & \texttt{signed __int128}$^\dagger$ & 16 & 16 & signed \sixteenbyte \\
+    & \texttt{__int128}${^\dagger\dagger}$ & 16 & 16 & signed \sixteenbyte \\
+    & \texttt{signed __int128}$^{\dagger\dagger}$ & 16 & 16 & signed \sixteenbyte \\
     \hline
-    & \texttt{unsigned __int128}$^\dagger$ & 16 & 16 & unsigned \sixteenbyte \\
+    & \texttt{unsigned __int128}$^{\dagger\dagger}$ & 16 & 16 & unsigned \sixteenbyte \\
     \hline
     Pointer & \texttt{\textit{any-type} *} & 8 & 8 & unsigned \eightbyte \\
     & \texttt{\textit{any-type} (*)()} & & \\
@@ -74,12 +76,15 @@ scalar types and the processor's. The \code{__int128},
     Floating-& \texttt{float} & 4 & 4 & single (IEEE) \\
     point & \texttt{double} & 8 & 8 & double (IEEE) \\
     & \texttt{long double} & 16 & 16 & 80-bit extended (IEEE) \\
-    & \texttt{__float128}$^\dagger$ & 16 & 16 & 128-bit extended (IEEE) \\
+    & \texttt{__float128}$^{\dagger\dagger}$ & 16 & 16 & 128-bit extended (IEEE) \\
     \hline
-    Packed & \texttt{__m64}$^\dagger$ & 8 & 8 & \MMX{} and \threednow \\
+    Packed & \texttt{__m64}$^{\dagger\dagger}$ & 8 & 8 & \MMX{} and \threednow \\
     & \texttt{__m128}$^\dagger$ & 16 & 16 & SSE and SSE-2 \\
 \noalign{\smallskip}
-\cline{1-2}\multicolumn{3}{l}{\small $^\dagger$ These types are optional.}\\
+\cline{1-2}
+\multicolumn{3}{l}{\small $^\dagger$ This type is called \texttt{bool}
+in C++.}\\
+\multicolumn{3}{l}{\small $^{\dagger\dagger}$ These types are optional.}\\
   \end{tabular}
 }
 \end{figure}
@@ -102,6 +107,12 @@ i.e., the 64 low-order bits are stored at a a lower address than the
 64 high-order bits.
 
 A null pointer (for all types) has the value zero.
+
+Booleans\index{boolean}, when stored in a memory object, are stored as
+single byte objects the value of which is always 0 (\code{false}) or 1
+(\code{true}).  When stored in integer registers or passed as
+arguments on the stack, all 8 bytes of the register are significant;
+any nonzero value is considered \code{true}.
 
 Like the Intel386 architecture, the \xARCH architecture does not
 require all data access to be properly aligned.  Accessing misaligned
@@ -274,7 +285,7 @@ The size of each argument gets rounded up to
 
 The basic types are assigned their natural classes:
 \begin{itemize}
-\item Arguments of types (signed and unsigned) \code{char},
+\item Arguments of types (signed and unsigned) \code{_Bool}, \code{char},
   \code{short}, \code{int}, \code{long}, \code{long long}, and
   pointers are in the INTEGER class.
 \item Arguments of types \code{float}, \code{double} and \code{__m64}
@@ -379,7 +390,7 @@ return register & No \\
 \RCX & used to pass 4$^{\rm th}$ integer argument to functions & No \\
 \RDX & used to pass 3$^{\rm rd}$ argument to functions ; 2$^{\rm nd}$ return register & No \\
 \RSP & stack pointer & Yes \\
-\RBP & callee-saved register & Yes \\
+\RBP & callee-saved register; optionally used as frame pointer & Yes \\
 \RSI & used to pass 2$^{\rm nd}$  argument to functions & No \\
 \RDI & used to pass 1$^{\rm st}$  argument to functions & No \\
 \reg{r8} & used to pass 5$^{\rm th}$  argument to functions & No \\
@@ -395,6 +406,7 @@ arguments & No\\
 \reg{mmx0}--\reg{mmx7}& temporary registers & No\\
 \reg{st0} & temporary register; used to return \code{long double} arguments & No \\
 \reg{st1}--\reg{st7} & temporary registers & No \\
+\reg{fs}& Reserved for system use (as thread specific data register) & No\\
     \end{tabular}
 
   \end{center}
@@ -702,7 +714,7 @@ arrangement appears in figure \ref{fig-cfg}.
       & \dots & \\
       & Data segments & \\ \cline{2-2}
       & \dots & \\
-      \verb|0x10000| & Text segments & \\ \cline{2-2}
+      \verb|0x400000| & Text segments & \\ \cline{2-2}
       \verb|0| & Unmapped & \\ \cline{2-2}
     \end{tabular}
   \end{center}

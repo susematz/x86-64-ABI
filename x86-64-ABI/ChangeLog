@@ -1,3 +1,28 @@
+2002-03-26  Andreas Jaeger  <aj@suse.de>
+
+	* low-level-sys-info.tex (paragraph{Passing}): Mention RBX as
+	frame pointer in summary table.
+
+2002-03-08  H. Peter Anvin <hpa@zytor.com>
+
+	* low-level-sys-info.tex: Define the ABI for booleans, and make
+	the handling of sub-64-bit integer types in registers well
+	defined.
+
+2001-12-06  Bo Thorsen  <bo@suse.co.uk>
+
+	* dl.tex (subsection{Program Interpreter}): Set name of Linux
+	dynamic linker.
+
+2001-12-03  Andreas Jaeger  <aj@suse.de>
+
+	* low-level-sys-info.tex (paragraph{Passing}): Mention %fs.
+
+2001-10-15  Andreas Jaeger  <aj@suse.de>
+
+	* low-level-sys-info.tex: Change example so that text segment
+	starts higher.
+
 2001-08-15  Andreas Jaeger  <aj@suse.de>
 
 	* macros.tex: Increment version number.
