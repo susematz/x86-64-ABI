@@ -1,3 +1,8 @@
+Thu Dec  7 19:45:29 MET 2000  Jan Hubicka  <jh@suse.cz>
+
+	* low-level-sys-info.tex: Update for the new register passing
+	sequence and global/local registers split.
+	
 2000-12-06  Andreas Jaeger  <aj@suse.de>
 
 	* libraries.tex (subsection{Global Data Symbols}): New section.
