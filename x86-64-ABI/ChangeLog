@@ -1,8 +1,13 @@
+Mon Dec 11 15:11:21 MET 2000  Jan Hubicka  <jh@suse.cz>
+
+	* low-level-sys-info.tex: Make r11 global; dedicate r10 as static
+	chain pointer.
+
 Thu Dec  7 19:45:29 MET 2000  Jan Hubicka  <jh@suse.cz>
 
 	* low-level-sys-info.tex: Update for the new register passing
 	sequence and global/local registers split.
-	
+
 2000-12-06  Andreas Jaeger  <aj@suse.de>
 
 	* libraries.tex (subsection{Global Data Symbols}): New section.
@@ -25,11 +30,11 @@ Thu Dec  7 19:45:29 MET 2000  Jan Hubicka  <jh@suse.cz>
 	* low-level-sys-info.tex: Fix some typos in the calling
 	conventions.  Document use of R9 in varargs functions.
 	* dl.tex: Make /lib/ld64.so.1 the dynamic linker.
-	
+
 2000-09-25  Mark Mitchell  <mark@codesourcery.com>
 
 	* low-level-sys-info.tex: Make RAX the return register again.
-	
+
 2000-09-25  Mark Mitchell  <mark@codesourcery.com>
 
 	* low-level-sys-info.tex: Tweak register allocation for
@@ -64,7 +69,7 @@ Thu Dec  7 19:45:29 MET 2000  Jan Hubicka  <jh@suse.cz>
 	* macros.tex: Change layout of registers.
 	(\intelabi): New command.
 	* sw-installation.tex: Tidy.
-	
+
 2000-09-01  Mark Mitchell  <mark@codesourcery.com>
 
 	* object-files.tex: Add R_X8664_32S relocation.

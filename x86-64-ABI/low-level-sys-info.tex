@@ -159,7 +159,7 @@ mode as a 64-bit register.  All of these registesr are global to all
 procedures in a running program.
 
 This subsection discusses usage of each register.  Registers \RBP, \RBX and
-\reg{r11} through \reg{r15} ``belong'' to the calling function and the
+\reg{r12} through \reg{r15} ``belong'' to the calling function and the
 called function is required to preserve their values.  In other words,
 a called function must preserve these registers' values for its
 caller.  Remaining registers ``belong'' to the called
@@ -254,13 +254,14 @@ If the argument is a scalar type, other than \code{__m64} or
 suitable for its type.  In particular, arguments of integral or
 pointer type are placed in the next available general purpose
 register, taken in the order \RDI, \RSI, \RDX, \RCX, \reg{r8}, and
-\reg{r9}.  \footnote{Note that \reg{r10} is required to
-  be preserved, nor is used to pass arguments.  Making this
+\reg{r9}.  \footnote{Note that \reg{r11} is neither required to
+  be preserved, nor is it used to pass arguments.  Making this
   register available as scratch register means that code in the PLT
   need not spill any registers when computing the address to which
   control needs to be transferred.  \RAX is used to indicate the
   number of SSE arguments passed to a function requiring a variable
-  number of arguments.}  Arguments of floating point type and of type
+  number of arguments. \reg{r10} is used for passing a function's
+  static chain pointer.}  Arguments of floating point type and of type
 \code{__m128}, are placed in the next available SSE register, taken in
 order from \reg{xmm0} to \reg{xmm15}.  If no registers are available,
 the values are placed on the stack.
