@@ -1,0 +1,34 @@
+
+\chapter{Conventions}
+
+\editornote{This chapter is used to document some features special to
+  the \xARCH ABI.  The different sections might be moved to another
+  place or removed completly.}
+
+
+\section{GOT pointer and IP relative addressing}
+
+\index{global offset table}
+A basic difference between the i386 ABI and the \xARCH ABI is the
+way the GOT table is found.  The i386 ABI, like (most) other processor
+specific ABIs, uses a dedicated register (\reg{EBX}) to address the
+base of the GOT table.  The function prologue of every function needs
+to set up this register to the correct value.  The \xARCH processor
+family introduces a new IP-relative addressing mode which is used in
+this ABI instead of a using a dedicated register.
+
+\section{Execution of 32bit programs}
+
+The \xARCH is able to execute 64 bit \xARCH and also 32 bit ia32
+programs.  Libraries and programs conforming to the \xARCH ABI will
+live in the normal places like \path{/usr/lib} and \path{/usr/bin}.
+Programs following the 32 bit ia32 ABI (known as i386 ABI), will use
+the subdirectories of \path{/usr/ia32}, e.g \path{/usr/ia32/lib} for
+libraries and \path{/usr/ia32/bin} for binaries.  The location of the
+program interpreter for ia32 binaries is not changed.
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "abi"
+%%% End: 

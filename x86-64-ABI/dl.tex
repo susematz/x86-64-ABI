@@ -1,31 +1,10 @@
 \chapter{Program Loading and Dynamic Linking}
 
-\section{Program Header}
 
 \section{Program Loading}
 
-\begin{figure}[H]
-\caption{Example Executable File}
-\begin{center}
-\begin{tabular}{r|c|l}
-\noalign{\smallskip}
-\multicolumn{1}{l}{\bf File Offset} & \multicolumn{1}{c}{\bf File} &
-\bf Virtual Address \\
-\noalign{\smallskip}  \cline{2-2}
-0 & ELF header & \\ \cline{2-2}
-& Program header table & \\ \cline{2-2}
-& Other information & \\ \cline{2-2}
-0x100 & Text segment & 0x???\\ \cline{2-2}
-& \dots & \\
-& 0x47000 bytes & 0x??? \\ \cline{2-2}
-0x47100& Data segment & 0x??? \\
-& \dots & \\
-& 0x2700 bytes & 0x??? \\ \cline{2-2}
-0x49800& Other information & \\
-& \dots & \\ \cline{2-2}
-\end{tabular}
-\end{center}
-\end{figure}
+No changes required.
+
 
 \section{Dynamic Linking}
 
@@ -45,8 +24,52 @@ PLT:
   down.}
 % executable: PIC or not PIC?
 
-\subsection{Proposal 1: RW-PLT}
+\subsubsection{Dynamic Section}
 
+No changes required.
+
+\subsubsection{Global Offset Table}
+
+\index{global offset table}
+
+\editornote{Some minor changes might be required, depending on the
+  proposal.  This will be clarified later.}
+
+\begin{figure}[H]
+\caption{Global Offset Table}
+\begin{center}
+\fbox{\code{extern Elf64_Addr _GLOBAL_OFFSET_TABLE_ [];}}
+\end{center}
+\end{figure}
+
+\subsubsection{Function Addresses}
+
+No changes required.
+
+\subsubsection{Procedure Linkage Table}
+
+\editornote{Either of the three proposals will be implemented.  Some
+  details need to filled in, like the number of reserved entries and
+  the exact algorithm used.}
+
+\paragraph{Proposal 1: RW-PLT}
+
+% This has been copied from the i386 ABI and the SPARC ABI.
+
+Much as the global offset table redirects position-independent address
+calculations to absolute locations, the procedure linkage table
+redirects position-independent function calls to absolute locations.
+The link editor cannot resolve execution transfers (such as function
+calls) from one executable or shared object to another.  Consequently,
+the link editor arranges to have the program transfer control to
+entries in the procedure linkage table.  On the \xARCH architecture,
+procedure linkage tables reside in private data.  The dynamic linker
+determines the destinations' absolute addresses and modifies the the
+procedure linkage table's memory image accordingly.  The dynamic
+linker thus can redirect the entries without compromising the
+position-independence and sharability of the program's text.
+Executable files and shared object files have separate procedure
+linkage tables.
 
 \begin{figure}[H]
 \caption{Position-Independent Direct Function Call}
@@ -113,10 +136,27 @@ ptr = name;               movl ptr@GOTPC(%rip), %rax
   and one direct jmp, giving an overhead of one jump.  The problem is
   that we have self modifying code.}
 
-\subsection{Proposal 2: RO-PLT}
+\paragraph{Proposal 2: RO-PLT}
 
 \editornote{This is ia32 enhanced to 64 bits without an explicit GOT
   register.}
+
+% This has been copied from the i386 ABI.
+Much as the global offset table redirects position-independent address
+calculations to absolute locations, the procedure linkage table
+redirects position-independent function calls to absolute locations.
+The link editor cannot resolve execution transfers (such as function
+calls) from one executable or shared object to another.  Consequently,
+the link editor arranges to have the program transfer control to
+entries in the procedure linkage table.  On the \xARCH architecture,
+procedure linkage tables reside in shared text, but they use address
+in the private global offset table.  The dynamic linker determines the
+destinations' absolute addresses and modifies the global offset
+table's memory image accordingly.  The dynamic linker thus can
+redirect the entries without compromising the position-independence
+and sharability of the program's text.  Executable files and shared
+object files have separate procedure linkage tables.  
+
 
 
 \begin{figure}[H]
@@ -183,13 +223,29 @@ ptr = name;               movl ptr@GOTPC(%rip), %rax
   and one memory indirect jmp, giving an overhead of one jump and one
   memory reference.}
 
-\subsection{Proposol 3: Indirect Calls}
+\paragraph{Proposol 3: Indirect Calls}
 
 %\editornote{This was suggested to me by Wayne Meretsky}
 
 \editornote{Since we only relocate the GOT entries, we have a
   read-only PLT.  The disadvantage of this proposal is that
   executables need to be compiled as PIC.}
+
+% This has been copied from the i386 ABI.
+Much as the global offset table redirects position-independent address
+calculations to absolute locations, the procedure linkage table
+redirects position-independent function calls to absolute locations.
+The link editor cannot resolve execution transfers (such as function
+calls) from one executable or shared object to another.  Consequently,
+the link editor arranges to have the program transfer control to
+entries in the procedure linkage table.  On the \xARCH architecture,
+procedure linkage tables reside in shared text, but they use address
+in the private global offset table.  The dynamic linker determines the
+destinations' absolute addresses and modifies the global offset
+table's memory image accordingly.  The dynamic linker thus can
+redirect the entries without compromising the position-independence
+and sharability of the program's text.  Executable files and shared
+object files have separate procedure linkage tables.  
 
 \begin{figure}[H]
 \caption{Position-Independent Direct Function Call}
@@ -236,11 +292,38 @@ ptr = name;               movl ptr@GOTPC(%rip), %rax
 \editornote{The costs for a call are (after fixing the PLT): one
   memory indirect call, giving an overhead of one memory reference.}
 
+\paragraph{Comparison of Proposals}
+
+\begin{figure}
+\caption{Comparison of Different PLT Proposals}
+
+\begin{center}
+\begin{tabular}{llll}
+    \hline\noalign{\smallskip}
+&RW-PLT & RO-PLT & Indirect Calls \\
+    \noalign{\smallskip}\hline\noalign{\smallskip}
+PLT location & private data & shared text & shared text \\
+Address location & PLT & GOT & GOT \\
+Overhead after relocation & 1 jump & 1 memory ref. & 1 memory ref.\\
+&&and 1 jump &  \\
+Self modifying code? & Yes &  No & No\\
+Executable is PIC? & No & No & Yes \\
+Other ABIs & Sparc & i386 & None? \\
+\end{tabular}
+\end{center}
+\end{figure}
+                                
+
 % common stuff
 \subsection{Programm Interpreter}
 
-The name and location of the program interpreter is:
-/usr/lib/ld.so.1
+The name and location of the program interpreter \index{program
+  interpreter} is%
+\footnote{Every Operating System will change this.
+  For example Linux will use \path{/lib/ld-linux-x86-64.so.1}.}:
+
+\bigskip
+\path{/usr/lib/ld.so.1}
 
 %%% Local Variables:
 %%% mode: latex

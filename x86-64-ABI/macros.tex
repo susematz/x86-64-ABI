@@ -20,6 +20,9 @@
 
 \usepackage[T1]{fontenc}
 
+% To make typsetting easier
+\usepackage{xspace}
+
 % Generate an index
 \usepackage{makeidx}
 \makeindex
@@ -49,7 +52,7 @@
 \newcommand{\editornote}[1]{(\emph{Editor:}\/ #1)}
 
 %Typesetting of registers
-\newcommand{\reg}[1]{{\tt{#1}}}
+\newcommand{\reg}[1]{{\texttt{#1}}}
 \newcommand{\RAX}{\reg{RAX}}
 \newcommand{\RBX}{\reg{RBX}}
 \newcommand{\RCX}{\reg{RCX}}
@@ -60,10 +63,17 @@
 \newcommand{\RSP}{\reg{RSP}}
 
 %Typesetting of opcodes
-\newcommand{\op}[1]{{\tt{#1}}}
+\newcommand{\op}[1]{\texttt{#1}}
 
 %Typesetting common names
 \newcommand{\MMX}{\emph{MMX}}
+\newcommand{\xARCH}{\textsf{x86-64}\xspace}
+
+% Typesetting paths and files
+\newcommand{\path}[1]{\texttt{#1}\xspace}
+
+% Typesetting program code
+\newcommand{\code}[1]{\texttt{#1}\xspace}
 
 % Use Hyperref for PDF support - this should be last
 \ifpdf

@@ -1,3 +1,13 @@
+2000-07-25  Andreas Jaeger  <aj@suse.de>
+
+	* dl.tex: Further explain proposals.
+
+	* macros.tex: Added some more commands, use xspace.
+
+	* conventions.tex: New chapter.
+
+	* abi.tex: Include conventions.
+
 Mon Jul 24 21:33:42 CEST 2000  Jan Hubicka  <jh@suse.cz>
 
 	* low-level-sys-info.tex: Increase alignment of arrays
