@@ -1,3 +1,7 @@
+2000-07-31  Andreas Jaeger  <aj@suse.de>
+
+	* dl.tex (Proposal 1: RW-PLT): Rewrite.
+
 2000-07-29  Andreas Jaeger  <aj@suse.de>
 
 	* low-level-sys-info.tex: Fix typo in LaTeX command.

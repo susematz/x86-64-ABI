@@ -74,70 +74,69 @@ position-independence and shareability of the program's text.
 Executable files and shared object files have separate procedure
 linkage tables.
 
-\begin{figure}[H]
-\caption{Position-Independent Direct Function Call}
-\begin{verbatim}
-extern void function ();  .globl function
-function ();              call function@PLT
-\end{verbatim}
-\end{figure}
+%\begin{figure}[H]
+%\caption{Position-Independent Direct Function Call}
+%\begin{verbatim}
+%extern void function ();  .globl function
+%function ();              call function@PLT
+%\end{verbatim}
+%\end{figure}
+%
+%\begin{figure}[H]
+%\caption{Position-Independent Indirect Function Call}
+%\begin{verbatim}
+%extern void (*ptr) ();    .globl ptr, name
+%extern void name ();
+%ptr = name;               movl ptr@GOTPC(%rip), %rax
+%                          movl name@GOTPC(%rip), %rdx
+%                          movl %rdx, (%rax)
+%
+%(*ptr)();                 movl ptr@GOTPC(%rip), %rax
+%                          call *(%rax)
+%\end{verbatim}
+%\end{figure}
 
-\begin{figure}[H]
-\caption{Position-Independent Indirect Function Call}
-\begin{verbatim}
-extern void (*ptr) ();    .globl ptr, name
-extern void name ();
-ptr = name;               movl ptr@GOTPC(%rip), %rax
-                          movl name@GOTPC(%rip), %rdx
-                          movl %rdx, (%rax)
 
-(*ptr)();                 movl ptr@GOTPC(%rip), %rax
-                          call *(%rax)
-\end{verbatim}
-\end{figure}
-
-\begin{figure}[H]
-\caption{Absolute Procedure Linkage Table}
-\begin{tabular}{lll}
-.PLT0: & pushl & got\_plus\_8; GOT[1]\\
-& jmp &got\_plus\_16 ; GOT[2] \\
-& nop & \\
-& nop & \\
-& nop & \\
-& nop & \\
-.PLT1: & jmp & .PLT1a \\
-.PLT1a& pushl & \$offset \\
-&jmp &.PLT0@PC \\
-.PLT2: & jmp& name2\\
-&pushl & \$offset \\
-& jmp & .PLT0@PC \\
-&\dots\\
-\end{tabular}
-\end{figure}
-
+\editornote{The proposal needs serious discussing and feasibility
+  checking.   The PLT entries should also be aligned.  The proposal
+  should work with 8 byte atomic moves.}
 
 \begin{figure}[H]
 \caption{Position-Independent Procedure Linkage Table}
-\begin{tabular}{lll}
-.PLT0: & pushl & GOT+8(\%rip); GOT[1]\\
-& jmp &GOT+16(\%rip) ; GOT[2] \\
-& nop & \\
-& nop & \\
-& nop & \\
-& nop & \\
-.PLT1: & jmp & PLT1a\\
-.PLT1a& pushl & \$offset \\
-&jmp &.PLT0@PC \\
-.PLT2: & jmp& name2\\
-&pushl & \$offset \\
-& jmp & .PLT0@PC \\
-&\dots\\
+\begin{center}
+\begin{tabular}{lll|lll}
+\multicolumn{3}{c}{Object File} & \multicolumn{3}{c}{Memory Segment} \\
+\hline
+.PLT0: &  && .PLT0: &\\
+& \dots &  \\
+.PLT1: & nop &&.PLT1:& .dword& identification \\
+& \dots & \\
+&\dots && \dots \\
+.PLT10: & mv & R9, index  & .PLT10: & nop;nop;\\
+ &  &   &  & nop;nop\\
+ &  &   &  & nop;nop\\
+& jmp & .PLT0 && mv & R9, address \\
+& nop;nop &&& jmp & *(R9)  \\
+& nop;nop && & \\
+& nop;nop && & \\
+& nop;nop && & \\
+&\dots && \dots \\
 \end{tabular}
+\end{center}
+
+% NOP is 1 byte
+%
 \end{figure}
 
-\editornote{The costs for a call are (after fixing the PLT): one call
-  and one direct jmp, giving an overhead of one jump.  The problem is
-  that we have self modifying code.}
+\editornote{R9 is a temporary register and can therefore be
+  overwritten --- any other temporary register can be used instead and
+  we should consider using one of the ``normal'' registers so that we
+  do not need a prefix.}
+
+
+\editornote{The costs for a call are (after fixing the PLT): one call;
+  one load and one direct jmp, giving an overhead of one load and one
+  jump.  The problem is that we have self modifying code.}
 
 \bigskip\hrule
 
@@ -345,9 +344,13 @@ ptr = name;               movl ptr@GOTPC(%rip), %rax
 \editornote{The costs for a call are (after fixing the PLT): one
   memory indirect call, giving an overhead of one memory reference.}
 
+\bigskip\hrule
+
 \paragraph{Comparison of Proposals}
 
-\begin{figure}
+The following table compares the proposals for PLT/GOT usage:
+
+\begin{figure}[H]
 \caption{Comparison of Different PLT Proposals}
 
 \begin{center}
@@ -357,8 +360,8 @@ ptr = name;               movl ptr@GOTPC(%rip), %rax
     \noalign{\smallskip}\hline\noalign{\smallskip}
 PLT location & private data & shared text & shared text \\
 Address location & PLT & GOT & GOT \\
-Overhead after relocation & 1 jump & 1 memory ref. & 1 memory ref.\\
-&&and 1 jump &  \\
+Overhead after relocation & 1 memory ref. & 1 memory ref. & 1 memory ref.\\
+&and 1 jump &and 1 jump &  \\
 Self modifying code? & Yes &  No & No\\
 Executable is PIC? & No & No & Yes \\
 Other ABIs & Sparc & i386 & None? \\
