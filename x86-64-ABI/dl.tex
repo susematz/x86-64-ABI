@@ -98,7 +98,7 @@ linkage table and the global offset table.
   transfers control to the label \code{.PLT1}.
 \item The first instruction jumps to the address in the global offset
   table entry for \code{name1}.  Initially the global offset table
-  holds the address of the following \code{pushl} instruction, not the
+  holds the address of the following \code{pushq} instruction, not the
   real address of \code{name1}.
 \item Now the program pushes a relocation index (\textit{index}) on
   the stack. The relocation index is a 32-bit, non-negative index into
@@ -113,7 +113,7 @@ linkage table and the global offset table.
 % 2^29 entries (see chapter 4), this is no problem.
 \item After pushing the relocation index, the program then jumps to
   \code{.PLT0}, the first entry in the procedure linkage table.  The
-  \code{pushl} instruction places the value of the second global
+  \code{pushq} instruction places the value of the second global
   offset table entry (GOT+8) on the stack, thus giving the dynamic
   linker one word of identifying information.  The program then jumps
   to the address in the third global offset table entry (GOT+16),
@@ -126,7 +126,7 @@ linkage table and the global offset table.
   transfer directly to \code{name1}, without calling the dynamic
   linker a second time.  That is, the \code{jmp} instruction at
   \code{.PLT1} will transfer to \code{name1}, instead of ``falling
-  through'' to the \code{pushl} instruction.
+  through'' to the \code{pushq} instruction.
 \end{enumerate}
 
 The \code{LD_BIND_NOW} environment variable can change the dynamic
