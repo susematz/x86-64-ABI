@@ -78,3 +78,5 @@ This is a list of bugs in either GCC or the abi test:
   varargs.
 
 - the types __int128, __float128, __m64 and __m128 are not implemented
+
+- passing of unions is not working completely 
