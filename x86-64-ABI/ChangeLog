@@ -1,3 +1,7 @@
+Sun Jan 14 13:58:08 MET 2001  Jan hubicka  <jh@suse.cz>
+
+	* low-level-sys-info.tex: Document va_* machinery.
+
 2001-01-12  Andreas Jaeger  <aj@suse.de>
 
 	* low-level-sys-info.tex: Fix typo, reported by Philipp Thomas

@@ -660,10 +660,164 @@ registers.  Portable C programs must use the header files
 \code{<stdarg.h>} or \code{<varargs.h>} in order to handle variable
 argument lists.
 
-When a function taking variable-arguments is called, \reg{r9} must be
+When a function taking variable-arguments is called, \reg{rax} must be
 set to the eight times the number of floating point parameters passed
-to the function in SSE registers.  The callee can use the contents of
-\reg{r9} to allocate stack space in which to save the values.
+to the function in SSE registers.
+
+\subsubsection{The \textindex{register save area}}
+
+The prologue of function taking variable argument list and known to call macro
+\code{va_start} is expected to save argument registers to the \emph{register
+save area}.  Each argument register has fixed offset in the register save area
+as defined in the figure \ref{fig-reg-save}.
+
+Only registers possibly used by argument passed as
+variable arguments needs to be saved.  Other fields may not be accessed and can
+be used for other purposes
+\footnote{For example compiler may determine fact, that function never accepts
+argument passed in the XMM registers and omit the upper half of the area
+entirely.} In the case function is known to never accept argument passed
+in the register\footnote{This fact may be determined eighter by exploring types
+used by \code{va_arg} macro, or by fact that the named arguments already
+exhausted the argument registers entirely},
+the register save area may be omitted entirely.
+
+The prologue should use
+\RAX to avoid saving of unnecesary XMM registers.  This is especially important
+to avoid integer only programs from initialiing XMM unit.
+
+
+\begin{figure}[H]
+\Hrule
+\caption{register save area}
+\label{fig-reg-save}
+\begin{center}
+\begin{tabular}{|l|l|}
+\cline{1-2}
+register&offset\\
+\cline{1-2}
+\RDI & $0$ \\
+\RSI & $8$ \\
+\RDX & $16$ \\
+\RCX & $24$ \\
+\reg{r8} & $32$ \\
+\reg{r9} & $40$ \\
+\reg{xmm0} & $48$ \\
+\reg{xmm1} & $64$ \\
+\dots &  \\
+\reg{xmm15} & $288$ \\
+\cline{1-2}
+\end{tabular}
+\end{center}
+\Hrule
+\end{figure}
+\subsubsection{The \codeindex{va_list} type}
+The \code{va_list} type is an array containing single element of struture
+containing neccesary information to implement \code{va_arg} macro. The C
+definition of \code{va_list} type is in the figure \ref{fig-va_list}.
+
+\begin{figure}[H]
+\Hrule
+\caption{\code{va_list} type declaration}
+\label{fig-va_list}
+\begin{center}
+\begin{tabular}{|l|}
+\cline{1-1}
+typedef struct \{\\
+    unsigned int gp_offset;\\
+    unsigned int fp_offset;\\
+    void *overflow_arg_area;\\
+    void *reg_save_area;\\
+  \} va_list[1];\\
+\cline{1-1}
+\end{tabular}
+\end{center}
+\Hrule
+\end{figure}
+
+
+\subsubsection{The \codeindex{va_start} macro}
+The \code{va_start} macro initializes structure as follows:
+\begin{description}
+\item [reg_save_area]
+points to the start of register save area.
+\item [overflow_arg_area]
+pointer used to fetch arguments passed on the stack.  Initialized to the
+address of first argument passed on the stack, if any, and then always updated
+to the end of last fetched stack argument.
+\item [gp_offset]
+offset in bytes from \code{reg_save_area} to place where next available general purpose
+argument register were saved.  In case all argument registers has been exhausted,
+set to value 48 ($6*8$).
+\item [fp_offset]
+offset in bytes from \code{reg_save_area} to place where next available floating point
+argument register were saved.  In case all argument registers has been exhausted,
+set to value 304 ($6*8+16*16$).
+\end{description}
+
+\subsubsection{The \codeindex{va_arg} macro}
+The algorithm of generic \code{va_arg(l,type)} implmentation is defined as follows:
+\begin{enumerate}
+\item
+Determine whether \code{type} may be passed in the registers.  If not go to step \ref{stack}.
+\item
+Compute \code{num_gp} to hold number of general purpose registers needed to pass \code{type}
+and \code{num_fp} to hold number of floating point registers needed.
+\item
+Verify whether argument fits into registers.
+In case:
+$$\code{l->gp_offset} > 48 - \code{num_gp} * 8$$ or $$\code{l->fp_offset} > 304 - \code{num_fp} * 16$$
+go to step \ref{stack}.
+\item
+Fetch \code{type} from \code{l->reg_save_area} offsetted by \code{l->gp_offset} and/or \code{l->fp_offset}.  This may require copying to temporary location in
+case parameter is passed in different register classes or requires alignment greater than 8 for general purpose registers
+and 16 for XMM registers.
+\item
+Set:
+$$\code{l->gp_offset} = \code{l->gp_offset} + \code{num_gp} * 8$$
+$$\code{l->fp_offset} = \code{l->fp_offset} + \code{num_fp} * 16$$.
+\item
+Return fetched \code{type}.
+\item
+\label{stack}
+Align \code{l->overflow_arg_area} upwards to the 16 byte boundary if alignment needed by \code{type} exceeds 8 byte boundary.
+\item
+Fetch \code{type} from \code{l->overflow_arg_area}.
+\item
+Set \code{l->overflow_arg_area} to:
+$$\code{l->overflow_arg_area} + sizeof (\code{type})$$
+\item
+Align \code{l->overflow_arg_area} upwards to 8 byte boundary.
+\item
+Return fetched \code{type}.
+\end{enumerate}
+
+The \code{va_arg} is usually implemented as compiler builtin and expand in
+simplified forms for each particular type.  Figure \reg{fig-va_arg} is in same
+implementation of \code{va_arg} macro.
+\begin{figure}[H]
+\Hrule
+\label{fig-va_arg}
+\caption{Sample implementation of \code{va_arg(l,int)}}
+\begin{center}
+\begin{tabular}{|llll|}
+\cline{1-4}
+&movl&\code{l->gp_offset}, \reg{eax}&\\
+&cmpl&\$48, \reg{eax}&Is regiser available?\\
+&jae&stack&If not, use stack\\
+&leal&\$8(\RAX), \reg{edx}&Next available register\\
+&addq&\code{l->reg_save_area}, \RAX&Address of saved register\\
+&movl&\reg{edx}, \code{l->gp_offset}&Update \code{gp_offset}\\
+&jmp&fetch&\\
+stack:&movq&\code{l->overflow_arg_area}, \RAX&Address of stack slot\\
+&leaq&8(\RAX), \RDX&Next available stack slot\\
+&movq&\RDX,\code{l->overflow_arg_area}&Update.\\
+fetch:&movl&(\RAX), \reg{eax}&load argument\\
+\cline{1-4}
+\end{tabular}
+\end{center}
+\Hrule
+\end{figure}
 
 %%% Local Variables: 
 %%% mode: latex
