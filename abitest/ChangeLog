@@ -1,3 +1,14 @@
+2001-05-16  Bo Thorsen  <bo@suse.co.uk>
+
+	* abitest: Tests which can not run when optimized can now with
+	a comment make sure not to be run with certain optimization levels.
+	Also, -O3 levels have been removed. Inlining doesn't make sense for
+	most tests.
+	* test_passing_structs.c: Removed test from optimization levels -O1
+	and -O2.
+	* test_passing_unions.c: Likewise.
+	* test_passing_structs_and_unions.c: Likewise.
+
 2001-05-15  Bo Thorsen  <bo@suse.co.uk>
 
 	* Nearly all files: Complete reorganization to run tests

@@ -1,5 +1,9 @@
 /* This tests passing of structs. Only integers are tested.  */
 
+/* Don't test optimization levels -O1 and -O2.  See test_passing_structs.c
+   for an explanation.  */
+
+
 #include "defines.h"
 #include "args.h"
 

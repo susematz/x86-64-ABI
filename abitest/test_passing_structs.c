@@ -1,5 +1,11 @@
 /* This tests passing of structs. Only integers are tested.  */
 
+/* Don't test optimization levels -O1 and -O2.  With optimization the
+   test for passing the struct on the stack can't be run because the
+   optimization removes the stackpointer setup normally done in a
+   function.  */
+
+
 #include "defines.h"
 #include "args.h"
 
