@@ -97,14 +97,14 @@ otherwise there is no difference.
 
 \subsubsection{Aggregates and Unions}
 
-An array uses the same alignment as its elements, except that an array
-that requires at least 16 bytes, or a C99 variable-length array,
-always has alignment of at least 16 bytes.\footnote{The alignment
-  requirement allows the use of SSE instructions when operating on the
-  array.  The compiler cannot in general calculate the size of a
-  variable-length array, but it is expected that most VLAs will
-  require at least 16 bytes, so it is logical to mandate that VLAs
-  have at least a 16-byte alignment.}
+An array uses the same alignment as its elements, except that a local
+or global array variable that requires at least 16 bytes, or a C99
+local or global variable-length array variable, always has alignment
+of at least 16 bytes.\footnote{The alignment requirement allows the
+  use of SSE instructions when operating on the array.  The compiler
+  cannot in general calculate the size of a variable-length array, but
+  it is expected that most VLAs will require at least 16 bytes, so it
+  is logical to mandate that VLAs have at least a 16-byte alignment.}
 
 No other changes required.
 
