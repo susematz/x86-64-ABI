@@ -1,4 +1,12 @@
+2000-08-11  Andreas Jaeger  <aj@suse.de>
+
+	* Whole document: Make it ready for public draft: Lots of small
+	corrections, clarifications and formatting fixes.
+
 2000-08-10  Andreas Jaeger  <aj@suse.de>
+
+	* introduction.tex (Major differences to i386 ABI): New
+	section added.
 
 	* macros.tex: Added Hrule command.
 
