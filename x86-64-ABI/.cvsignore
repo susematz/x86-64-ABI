@@ -1,8 +1,11 @@
-abi.out
-abi.toc
-abi.lot
 abi.dvi
-abi.ps
+abi.idx
+abi.ilg
+abi.ind
+abi.lot
+abi.out
 abi.pdf
+abi.ps
+abi.toc
 *.aux
 *.log
