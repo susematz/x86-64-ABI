@@ -1,5 +1,7 @@
 2000-08-15  Andreas Jaeger  <aj@suse.de>
 
+	* low-level-sys-info.tex: Lots of minor fixes to language.
+
 	* conventions.tex: Add label.
 
 	* low-level-sys-info.tex: Shrink too large Scalar Types table.

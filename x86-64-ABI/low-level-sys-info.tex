@@ -251,8 +251,8 @@ all called functions that use the standard calling convention. The
 frames of functions with local calling conventions may or may not obey
 this rule so algorithms for stack unwinding cannot rely on it.
 
-At any point of program execution, the stack pointer, \RSP, shall point to
-the end of  latest allocated stack frame.
+At any point of program execution, the stack pointer, \RSP, shall
+point to the end of the latest allocated stack frame.
 
 The organization of the \emph{local save area} is implementation
 specific. Usual practice is to save clobbered global registers in the
@@ -285,27 +285,29 @@ assigned its own class. To assign the class of doubleword \emph{X} the
 first matching rule of the following is used.
 \begin{enumerate}
   \item (Aggregates only) In case the doubleword \emph{X} contains upper half field of
-    \verb|__m128| type, the class is \emph{SSE2}.
+    \verb|__m128| type, the class is \emph{SSE}.
+    
+  \item In case all fields of an aggregate (or all subtypes of a
+    union) crossing the word \emph{X} have the same class \emph{Y},
+    the class is \emph{Y}.
+    
+  \item In case all fields of an aggregate (or all subtypes of a
+    union) crossing the word \emph{X} have the same class \emph{SSE}
+    or \emph{SSE2}, the class is \emph{SSE}.
 
-  \item In case all fields of aggregate (or all subtypes of union) crossing the
-    word \emph{X} have the same class \emph{Y}, the class is \emph{Y}.
-
-  \item In case all fields of aggregate (or all subtypes of union) crossing the
-    word \emph{X} have the same class \emph{SSE} or \emph{SSE2}, the class
-    is \emph{SSE}.
-
-  \item If nothing matches, use class \emph{Int}.
+  \item If nothing matches, use class is \emph{Int}.
 \end{enumerate}
 
 Doubleword \emph{X} of an aggregate gets assigned class \emph{Y} if and only
 if all the fields crossing doubleword \emph{X} belongs to same class \emph{Y}.  If
 no field crosses the given doubleword, its type is \emph{None}. When no class fits
 the rules above, class \emph{Int} is used.  Exception is also 
-\editornote{Honza, something is missing here.}
+\editornote{Jan, something is missing here --- please fill in the rest
+  of the sentence.}
 
-Similarly doubleword \emph{X} of union gets assigned class \emph{Y} if and only if
-each type in the union either does not cross \emph{X} or its class for doubleword
-\emph{X} is \emph{Y}.
+Similarly doubleword \emph{X} of a union gets assigned class \emph{Y}
+if and only if each type in the union either does not cross \emph{X}
+or its class for doubleword \emph{X} is \emph{Y}.
 
 \subsection{Parameter Passing Conventions}
 
@@ -317,10 +319,12 @@ after function call.  The number of registers implemented in the
 processor architecture naturally limits the number of arguments passed
 in this manner.
 
-For \xARCH up to six general purpose registers and six SSE registers are used
-for parameter passing.  If fewer (or no) arguments are passed, the unneeded registers
-will contain undefined value at the entry of function.
-\editornote{The number of registers is subject to change.}
+For \xARCH up to six general purpose registers and six SSE registers
+are used for parameter passing.  If fewer (or no) arguments are
+passed, the unneeded registers will contain undefined value at the
+entry of function.  
+\editornote{The number of registers used for passing is subject to
+  change.}
 
 \MMX{} registers are not used to pass \verb|__mm64| type, since \MMX{}
 usage is depreached and doing so simplifies functions with variable
@@ -330,23 +334,24 @@ passed on the runtime stack.
 
 The aggregates and unions shorter than 16~bytes are passed directly
 using registers, while others by reference.  The caller is expected to
-make a copy of the object so callee is allowed to freely modify the
-contents.  Caller may not copy the object in case it is known to be
-unused after function call, it does have proper alignment and no
-aliases. The aggregate or union, when passed in registers is
+make a copy of the object so the callee is allowed to freely modify
+the contents.  The caller may not copy the object in case it is known
+to be unused after a function call, it does have proper alignment and
+no aliases. The aggregate or union, when passed in registers is
 represented equally as if it were passed at the stack slot.
 
 The following algorithm is used to determine where data is passed for
 C language.  For this purpose consider arguments as ordered from left
 (first argument) to right (last arguments), although the order of
-evaluation is unspecified. In this algorithm \verb|sr| contains first
-available SSE register and \verb|gr| contains the next available
-general purpose register and \verb|ap| is used as pointer to ``output
-argument area'' on the stack.  As written, the algorithm is not
-directly applicable, since it fills the stack in opposite direction.
-In reality a two pass algorithm is required.  The first pass computes
-positions for output arguments and the second pass actually pushes the
-arguments onto the stack and/or loads them into registers.
+evaluation is unspecified. In this algorithm \verb|sr| contains the
+first available SSE register and \verb|gr| contains the next available
+general purpose register and \verb|ap| is used as a pointer to the
+``output argument area'' on the stack.  As written, the algorithm is
+not directly applicable, since it fills the stack in the opposite
+direction.  In reality a two pass algorithm is required.  The first
+pass computes positions for output arguments and the second pass
+actually pushes the arguments onto the stack and/or loads them into
+registers.
 
 
 \subsubsection {Proposal 1: ``Smart'' mapping of structures}
@@ -358,93 +363,95 @@ arguments onto the stack and/or loads them into registers.
 
   \item[Scan:]
     If there are no more arguments, go to ``terminate''. Otherwise select one of the
-    following depending on the type of the next argument:
+    following rules depending on the type of the next argument:
       \begin{description}
         \item[Simple integer argument:]
-          Simple integer argument is one of the following:
+          A simple integer argument is one of the following:
           \begin{itemize}
-            \item One of simple integer types, maximally 64~bits long.
-            \item Pointer
-            \item Aggregates and unions greater than 16~bytes should be treated as
-              pointer to object, or copy of the objects where necessary to enforce
-              call-by-value semantics.
-            \item Aggregates and unions maximally 8~bytes long with class \emph{Int}
+            \item One of the simple integer types, maximal 64~bits long.
+            \item A pointer.
+            \item Aggregates and unions greater than 16 bytes should
+              be treated as pointer to object, or pointer to a copy of
+              the objects if necessary to enforce call-by-value
+              semantics.
+            \item Aggregates and unions maximal 8 bytes long with
+              class \emph{Int}.
           \end{itemize}
-        If $\verb|gr| >= 6$ go to other, otherwise pick \verb|gr|-th register from
-        the sequence:\RAX, \RDX, \RCX, \RBX, \RSI, \RDI{} and assign it to the current
+        If $\verb|gr| >= 6$ go to other, otherwise pick the \verb|gr|-th register from
+        the sequence: \RAX, \RDX, \RCX, \RBX, \RSI, \RDI{} and assign it to the current
         argument. Set \verb|gr| to $\verb|gr|+1$.
 
 
     \item[Simple SSE argument:]
-      Simple SSE argument is one of the following:
+      A simple SSE argument is one of the following:
       \begin{itemize}
-        \item One of simple floating point types.
-        \item Argument of type \verb|__m128|
-        \item Aggregates and unions maximally 8~bytes long with class \emph{SSE}
+        \item One of the simple floating point types.
+        \item An argument of type \verb|__m128|.
+        \item Aggregates and unions maximal 8 bytes long with class \emph{SSE}.
         \item Aggregates and unions greater than 8 bytes and smaller
-          than 17 bytes with class of first doubleword \emph{SSE}
-          and class \emph{SSE2} of the second doubleword.
+          than 17 bytes with class  \emph{SSE} of the first doubleword
+          and class \emph{SSE} of the second doubleword.
       \end{itemize}
-      If $\verb|sr| >= 6$ go to other, otherwise pick \verb|sr|-th register from
-      the sequence:\reg{XMM0}, \reg{XMM1}, \reg{XMM2}, \reg{XMM3}, \reg{XMM4}, \reg{XMM5}, \reg{XMM6}
-      and assign it to the current argument.
-      Set \verb|sr| to $\verb|sr|+1$.
+      If $\verb|sr| >= 6$ go to other, otherwise pick the \verb|sr|-th
+      register from the sequence: \reg{XMM0}, \reg{XMM1}, \reg{XMM2},
+      \reg{XMM3}, \reg{XMM4}, \reg{XMM5}, \reg{XMM6} and assign it to
+      the current argument.  Set \verb|sr| to $\verb|sr|+1$.
 
     \item[Double integer argument]
-      Double integer argument is one of the following:
+      A double integer argument is one of the following:
       \begin{itemize}
-        \item Argument of type \verb|__int128|
-        \item Aggregates and unions greater than 8~bytes and smaller
-          than 17 bytes with class of both doublewords \emph{Int}
+        \item An argument of type \verb|__int128|.
+        \item Aggregates and unions greater than 8 bytes and smaller
+          than 17 bytes with class \emph{Int} for both doublewords.
       \end{itemize}
-      If $\verb|gr| >= 5$ go to other, otherwise pick \verb|gr|-th register from
+      If $\verb|gr| >= 5$ go to other, otherwise pick the \verb|gr|-th register from
       the sequence: \RAX, \RDX, \RCX, \RBX, \RSI, \RDI{} and assign it together with the
       next register to the current argument.
       Set \verb|gr| to $\verb|gr|+2$.
 
     \item[Double SSE argument]
-      Double SSE argument is one of the following:
+      A double SSE argument is one of the following:
       \begin{itemize}
-        \item Aggregates and unions greater than 8~bytes and smaller
-          than 17 bytes with class of both doublewords \emph{SSE}
+        \item Aggregates and unions greater than 8 bytes and smaller
+          than 17 bytes with class \emph{SSE} for both doublewords.
       \end{itemize}
-      If $\verb|sr| >= 5$ go to other, otherwise pick \verb|sr|-th
+      If $\verb|sr| >= 5$ go to other, otherwise pick the \verb|sr|-th
       register from the sequence: \reg{XMM0}, \reg{XMM1}, \reg{XMM2},
       \reg{XMM3}, \reg{XMM4}, \reg{XMM5}, \reg{XMM6} and assign it
       together with the next register to the current argument.  Set
       \verb|sr| to $\verb|sr|+2$.
 
     \item[Integer-SSE type argument]
-      Integer-SSE type argument is one of the following:
+      An Integer-SSE type argument is one of the following:
       \begin{itemize}
-        \item Aggregates and unions greater than 8~bytes and smaller
-          than 17 bytes with class of first doubleword \emph{Int}
-          and second doubleword \emph{SSE}
+        \item Aggregates and unions greater than 8 bytes and smaller
+          than 17 bytes with class \emph{Int} for the first doubleword
+          and \emph{SSE} for the second doubleword.
       \end{itemize}
       If $\verb|sr| >= 6$ or $\verb|gr| >= 6$ go to other, otherwise
-      pick \verb|gr|-th register from the sequence: \RAX, \RDX, \RCX,
-      \RBX, \RSI, \RDI{} and assign it the first doubleword of current
-      argument and pick \verb|sr|-th register from the sequence:
-      \reg{XMM0}, \reg{XMM1}, \reg{XMM2}, \reg{XMM3}, \reg{XMM4},
-      \reg{XMM5}, \reg{XMM6} and assign it the second doubleword of current
-      argument.  Set \verb|gr| to $\verb|gr|+1$ and set \verb|sr| to
-      $\verb|sr|+1$.
+      pick the \verb|gr|-th register from the sequence: \RAX, \RDX,
+      \RCX, \RBX, \RSI, \RDI{} and assign it the first doubleword of
+      the current argument and pick the \verb|sr|-th register from the
+      sequence: \reg{XMM0}, \reg{XMM1}, \reg{XMM2}, \reg{XMM3},
+      \reg{XMM4}, \reg{XMM5}, \reg{XMM6} and assign it the second
+      doubleword of the current argument.  Set \verb|gr| to
+      $\verb|gr|+1$ and set \verb|sr| to $\verb|sr|+1$.
 
     \item[SSE-Integer type argument]
-      SSE-Integer type argument is one of the following:
+      An SSE-Integer type argument is one of the following:
       \begin{itemize}
-        \item Aggregates and unions greater than 8~bytes and smaller
-          than 17 bytes with class of first doubleword \emph{SSE}
-          and second doubleword \emph{Int}
+      \item Aggregates and unions greater than 8 bytes and smaller
+        than 17 bytes with class \emph{SSe} for the first doubleword
+        and \emph{Int} for the second doubleword.
       \end{itemize}
       If $\verb|sr| >= 6$ or $\verb|gr| >= 6$ go to other, otherwise
-      pick \verb|sr|-th register from the sequence: \reg{XMM0},
+      pick the \verb|sr|-th register from the sequence: \reg{XMM0},
       \reg{XMM1}, \reg{XMM2}, \reg{XMM3}, \reg{XMM4}, \reg{XMM5},
-      \reg{XMM6} and assign it the first doubleword of current argument and
-      pick \verb|gr|-th register from the sequence: \RAX, \RDX, \RCX,
-      \RBX, \RSI, \RDI{} and assign it the second doubleword of current
-      argument.  Set \verb|gr| to $\verb|gr|+1$ and set \verb|sr| to
-      $\verb|sr|+1$.
+      \reg{XMM6} and assign it the first doubleword of the current
+      argument and pick the \verb|gr|-th register from the sequence:
+      \RAX, \RDX, \RCX, \RBX, \RSI, \RDI{} and assign it the second
+      doubleword of the current argument.  Set \verb|gr| to
+      $\verb|gr|+1$ and set \verb|sr| to $\verb|sr|+1$.
 
    \end{description}
    Go to ``Scan''.
@@ -452,14 +459,14 @@ arguments onto the stack and/or loads them into registers.
   \item[Other:]
 
     Arguments not handled otherwise are passed at stack frame. \RSP{} is the
-    pointer to end of outgoing argument area and we do expect \RSP{} to be
-    aligned to a 16~byte boundary and the outgoing area large enough to fit all
+    pointer to the end of the outgoing argument area and we do expect \RSP{} to be
+    aligned to a 16 byte boundary and the outgoing area large enough to fit all
     the arguments (this means the value \verb|ap| bytes for the final value of
     \verb|ap| once algorithm terminates).  To compute the address of a given argument,
     round \verb|ap| to the nearest multiple of the operand's alignment in bytes
-    (minimally to 8~bytes) and
-    store assign location $\verb|ap|+\RSP$ to the argument and increase \verb|ap| by
-    the size of argument in bytes.
+    (minimally to 8 bytes) and
+    assign location $\verb|ap|+\RSP$ to the argument and increase \verb|ap| by
+    the size of the argument in bytes.
     Go to ``Scan''.
 
   \item[Terminate:]
@@ -506,47 +513,47 @@ The results of register allocation for parameter passing is shown in table \ref{
 
   \item[Scan:]
     If there are no more arguments, go to ``terminate''. Otherwise select one of the
-    following depending on the type of the next argument:
+    following rules depending on the type of the next argument:
       \begin{description}
         \item[Simple integer argument:]
-          Simple integer argument is one of the following:
+          A simple integer argument is one of the following:
           \begin{itemize}
-            \item One of simple integer types, maximally 64~bits long.
-            \item Pointer
-            \item Aggregates and unions greater than 16~bytes should be treated as
-              pointer to object, or copy of the objects where necessary to enforce
+            \item One of the simple integer types, maximal 64 bits long.
+            \item A pointer.
+            \item Aggregates and unions greater than 16 bytes should be treated as
+              pointer to object, or pointer to a copy of the objects if necessary to enforce
               call-by-value semantics.
-            \item Aggregates and unions maximally 8~bytes long with class \emph{Int}
+            \item Aggregates and unions maximal 8 bytes long with class \emph{Int}.
           \end{itemize}
-        If $\verb|gr| >= 6$ go to other, otherwise pick \verb|gr|-th register from
+        If $\verb|gr| >= 6$ go to other, otherwise pick the \verb|gr|-th register from
         the sequence: \RAX, \RDX, \RCX, \RBX, \RSI, \RDI{} and assign it to the current
         argument. Set \verb|gr| to $\verb|gr|+1$.
 
 
     \item[Simple SSE argument:]
-      Simple SSE argument is one of the following:
+      A simple SSE argument is one of the following:
       \begin{itemize}
-        \item One of simple floating point types.
-        \item Argument of type \verb|__m128|
-        \item Aggregates and unions maximally 8~bytes long with class \emph{SSE}
-        \item Aggregates and unions greater than 8~bytes and smaller
-          than 17 bytes with class of first doubleword \emph{SSE}
-          and class \emph{SSE2} of the second doubleword.
+        \item One of the simple floating point types.
+        \item An argument of type \verb|__m128|.
+        \item Aggregates and unions maximal 8 bytes long with class \emph{SSE}.
+        \item Aggregates and unions greater than 8 bytes and smaller
+          than 17 bytes with class \emph{SSE} for the first doubleword
+          and class \emph{SSE2} for the second doubleword.
       \end{itemize}
-      If $\verb|sr| >= 6$ go to other, otherwise pick \verb|sr|-th
+      If $\verb|sr| >= 6$ go to other, otherwise pick the \verb|sr|-th
       register from the sequence: \reg{XMM0}, \reg{XMM1}, \reg{XMM2},
       \reg{XMM3}, \reg{XMM4}, \reg{XMM5}, \reg{XMM6} and assign it to
       the current argument.
       Set \verb|sr| to $\verb|sr|+1$.
 
     \item[Double integer argument]
-      Double integer argument is one of the following:
+      A double integer argument is one of the following:
       \begin{itemize}
-        \item Argument of type \verb|__int128|
-        \item Aggregates and unions greater than 8~bytes and smaller
+        \item An argument of type \verb|__int128|.
+        \item Aggregates and unions greater than 8 bytes and smaller
           than 17 bytes.
       \end{itemize}
-      If $\verb|gr| >= 5$ go to other, otherwise pick \verb|gr|-th register from
+      If $\verb|gr| >= 5$ go to other, otherwise pick the \verb|gr|-th register from
       the sequence: \RAX, \RDX, \RCX, \RBX, \RSI, \RDI{} and assign it together with the
       next register to the current argument.
       Set \verb|gr| to $\verb|gr|+2$.
@@ -556,14 +563,14 @@ The results of register allocation for parameter passing is shown in table \ref{
   \item[Other:]
 
     Arguments not handled otherwise are passed at stack frame. \RSP{} is the
-    pointer to end of outgoing argument area and we do expect \RSP{} to be
-    aligned to a 16~byte boundary and the outgoing area space large enough to fit all
+    pointer to the end of outgoing argument area and we do expect \RSP{} to be
+    aligned to a 16 byte boundary and the outgoing area space large enough to fit all
     the arguments (this means the value \verb|ap| bytes for the final value of
-    \verb|ap| once algorithm terminates).  To compute address of given argument,
+    \verb|ap| once algorithm terminates).  To compute the address of a given argument,
     round \verb|ap| to the nearest multiple of the operand's alignment in bytes
-    (minimally to 8~bytes) and
-    store assign location $\verb|ap|+\RSP$ to the argument and increase \verb|ap| by
-    the size of argument in bytes.
+    (minimal to 8 bytes) and
+    assign location $\verb|ap|+\RSP$ to the argument and increase \verb|ap| by
+    the size of the argument in bytes.
     Go to ``Scan''.
 
   \item[Terminate:]
@@ -603,6 +610,7 @@ The results of register allocation for parameter passing is shown in table \ref{
 
 
 \subsection{Variable Argument Lists}
+
 Some otherwise portable C programs depend on the argument passing scheme,
 implicitly assuming that 1) all arguments are passed on the stack, and 2)
 arguments appear in increasing order on the stack. Programs that make these
@@ -624,15 +632,15 @@ assigned to a given value and then the relevant registers are used as
 discussed in subsection \ref{subsec-registers} leaving the rest of
 registers undefined.
 
-The scalar values are returned in a single register. One of the
-registers \RAX, \reg{XMM0} and \reg{MM0} is chosen according to its
-class.  \verb|__int128| is returned in \RDX:\RAX.
+Scalar values are returned in a single register. One of the registers
+\RAX, \reg{XMM0} and \reg{MM0} is chosen according to its class.
+\verb|__int128| is returned in \RDX:\RAX.
 
-The first doubleword of unions, aggregates and real part of complex values
-not exceeding 8 bytes is returned in the same way as simple scalar
-registers.  The second doubleword (when available) is returned in one of
+The first doubleword of unions, aggregates and real part of complex
+values not exceeding 8 bytes is returned the same way as simple scalar
+registers.  The second doubleword (if available) is returned in one of
 the following registers: \RAX, \reg{XMM0} and \reg{MM1} depending on
-their class.  Class \emph{SSE-2} is returned in the upper half of
+their class.  Class \emph{SSE} is returned in the upper half of
 register \reg{XMM0}.
 
 Complex numbers, aggregates and unions exceeding 16 bytes are stored
@@ -645,9 +653,9 @@ left undefined.
 \subsubsection {Proposal 2: Integer-only mapping of structures}
 
 The \verb|__mm64| type is returned using \reg{MM0}.  Complex numbers,
-aggregates and unions exceeding 16 bytes are stored in an area prepared by the
-caller and passed to the function as ``hidden'' first parameter.  The contents
-of all return registers is left undefined.
+aggregates and unions exceeding 16 bytes are stored in an area
+prepared by the caller and passed to the function as ``hidden'' first
+parameter.  The contents of all return registers is left undefined.
 
 Other values are returned as if they were passed as first argument to
 the function.
@@ -675,8 +683,8 @@ No other changes required.
 Conceptually processes have the full address space available.
 In practice, however, several factors limit the size of a process.
 \begin{itemize}
-  \item The system reserves configuration dependent amount of virtual space.
-  \item The system reserves configuration dependent amount of space per
+  \item The system reserves a configuration dependent amount of virtual space.
+  \item The system reserves a configuration dependent amount of space per
     process.
   \item
     A process whose size exceeds the system's available combined physical
@@ -685,7 +693,7 @@ In practice, however, several factors limit the size of a process.
     are bigger than physical memory, paging them to and from secondary storage.
     Nonetheless, both physical memory and secondary storage are
     shared resources. System load, which can vary from one program execution
-    to the next, affects the available amounts.
+    to the next, affects the available amount.
 \end{itemize}
 
 \begin{figure}[H]
