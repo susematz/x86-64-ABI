@@ -1,3 +1,9 @@
+2000-08-14  Mark Mitchell  <mark@codesourcery.com>
+
+	* low-level-sys-info.tex: Tidy up.
+	
+	* dl.tex: CHange name of program interpreter.
+
 2000-08-14  Andreas Jaeger  <aj@suse.de>
 
 	* low-level-sys-info.tex (Processor Architecture): Use \url for

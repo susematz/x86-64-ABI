@@ -152,13 +152,11 @@ resolution and relocation until the first execution of a table entry.
 
 \subsection{Program Interpreter}
 
-The name and location of the program interpreter \index{program
-  interpreter} is%
-\footnote{Every Operating System will change this.
-  For example Linux will use \path{/lib/ld-linux-x86-64.so.1}.}:
+There is one valid program interpreter \index{program interpreter} for
+programs conforming to the \xARCH ABI:
 
 \bigskip
-\path{/usr/lib/ld.so.1}
+\path{/usr/lib/ld64.so.1}
 
 \subsection{Initialization and Termination Functions}
 

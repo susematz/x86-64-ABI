@@ -645,35 +645,23 @@ the function.
 
 \subsection{Virtual Address Space}
 
-The \xARCH architecture provides 64 bits of virtual space, but an
-implementation is allowed to support less. The processes are allowed
-to require only 48 bits of address space, as supported by the initial
-implementation.  It is expected that the address space grows
-monotonically in the future.
+Although the \xARCH architecture uses 64-bit pointers, implementations
+are only required to handle 48-bit addresses.  Therefore, conforming
+processes may only use addresses from \texttt{0x0000000000000000} to
+\texttt{0x0000ffffffffffff}.
 
-According to the \emph{canonical address form}, as defined by the
-\xARCH architecture, every byte of virtual space has two addresses
-unless the implementation supports the full 64 bit address space.  The
-applications may not depend on this behavior and should address the
-data using only a single address.
-
-Memory management translates virtual address to physical address,
-hiding physical addressing and letting a process run anywhere in the
-system's real memory. Processes typically begin with three logical
-segments called ``text'', ``data'' and ``stack''. An object file may
-contain more segments (for example for debugger use), and a process
-also creates additional segments for itself with system services.
+No other changes required.
 
 \subsection{Page Size}
 
-Memory is organized by pages, which are the system's smallest units of
-memory allocation. The page size can vary from one system to another.
-Processes may call \verb|sysconf|(\verb|BA_OS|) to determine the
-current page size.  This ABI allows system to cluster memory to
-logical power-of-two page sizes up to 65536 bytes.
+Systems are permitted to use any page size between 4KB and 64KB,
+inclusive.
+
+No other changes required.
 
 \subsection{Virtual Address Assignments}
-Conceptually processes have full (minimally) 48-bit address space available.
+
+Conceptually processes have the full 48-bit address space available.
 In practice, however, several factors limit the size of a process.
 \begin{itemize}
   \item The system reserves configuration dependent amount of virtual space.
@@ -706,27 +694,6 @@ In practice, however, several factors limit the size of a process.
   \end{center}
 \Hrule
 \end{figure}
-
-Figure \ref{fig-address} shows the virtual address configuration on the \xARCH
-architecture.  The segments with different properties are typically grouped in
-different areas of the address space:
-
-\begin{description}
-  \item [Process segments]
-    Processes loadable segments and stack may begin at 0. The exact addresses
-    depend on the executable file format. Processes can control the amount
-    of virtual memory allocated for stack space, as described below.
-  \item [Dynamic segments]
-    A process's dynamic segment resides below the reserved area.
-  \item [Reserved] A reserved area resides at the top of virtual space.
-\end{description}
-
-As the figure shows, the system reserves the high end of virtual address space,
-with a process's dynamic segments below that. Although the exact boundary
-between the reserved area and a process depends on the system's configuration,
-the reserved area shall not consume more than 1 GB of the address space.
-Individual systems may reserve less space, increasing processes  virtual memory
-range.
 
 Although applications may control their memory assignments, the typical
 arrangement appears in figure \ref{fig-cfg}.
@@ -763,21 +730,7 @@ offset table address since it does not have an explicit GOT pointer.
 
 \subsection{Data Objects}
 
-Not finished yet.
-
-\begin{figure}[H]
-\Hrule
-\caption{Position-Independent Direct Function Call}
-\begin{center}
-\begin{tabular}{|l|c|l|}
-\cline{1-1}\cline{3-3}
-extern void function ();  &&.globl function\\
-function ();              &&call function@PLT\\
-\cline{1-1}\cline{3-3}
-\end{tabular}
-\end{center}
-\Hrule
-\end{figure}
+Not done yet.
 
 \subsection{Function Calls}
 
@@ -803,11 +756,11 @@ function ();              &&call function@PLT\\
 \cline{1-1}\cline{3-3}
 extern void (*ptr) ();    &&.globl ptr, name\\
 extern void name ();      && \\
-ptr = name;               &&movl ptr@GOTPC(\%rip), \%rax  \\
-                          &&movl name@GOTPC(\%rip), \%rdx  \\
+ptr = name;               &&movl ptr@GOTPCREL(\%rip), \%rax  \\
+                          &&movl name@GOTPCREL(\%rip), \%rdx  \\
                           &&movl \%rdx, (\%rax)  \\
                           &&  \\
-(*ptr)();                 &&movl ptr@GOTPC(\%rip), \%rax  \\
+(*ptr)();                 &&movl ptr@GOTPCREL(\%rip), \%rax  \\
                           &&call *(\%rax)  \\
 \cline{1-1}\cline{3-3}
 \end{tabular}
