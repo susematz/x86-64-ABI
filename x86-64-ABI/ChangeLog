@@ -1,5 +1,7 @@
 2000-07-15  Andreas Jaeger  <aj@suse.de>
 
+	* low-level-sys-info.tex: Fixed some typos.
+
 	* abi.tex: Generate list of figures.
 
 	* dl.tex: Added section headers and a first figure.

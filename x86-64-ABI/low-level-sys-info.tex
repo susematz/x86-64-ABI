@@ -75,7 +75,7 @@ A null pointer (for all types) has value zero.
 
 \subsubsection{Aggregates And Unions}
 
-Structure members are "`naturally"' aligned.  Structures, arrays and
+Structure members are ``naturally'' aligned.  Structures, arrays and
 unions assume the alignment of the most strictly aligned component
 (compare with Table \ref{tab-basic-types}). The size of aggregates is
 a multiple of the alignment.
@@ -90,23 +90,28 @@ Intel386 specs.
 
 
 \section{Function Calling Sequence}
-This section describes the standard function calling sequence, including stack frame
-layout, register usage, parameter pasing and so on.
 
-Only global functions must obey the calling conventions specified here.  For local
-functions the different (and possibly more effective) methods may be used, as long as they
-conform the requirements of the stack traceback algorithm.
+This section describes the standard function calling sequence,
+including stack frame layout, register usage, parameter passing and so
+on.
+
+Only global functions must obey the calling conventions specified
+here.  For local functions the different (and possibly more effective)
+methods may be used, as long as they conform to the requirements of the
+stack traceback algorithm.
 \editornote{link to stack traceback here}
 
 \subsection{Registers}
 \label{subsec-registers}
-The x86-64 architecture provides 16 general purpose registers, each 64 bits
-wide. In addition the architecture provides 16 SSE registers, each 128 bits
-wide and 8 x87 floating point registers, each 80 bits wide useable as 64bits
-wide MMX/3dNOW! registers and several special purpose registers.
+
+The x86-64 architecture provides 16 general purpose registers, each 64
+bits wide. In addition the architecture provides 16 SSE registers,
+each 128 bits wide and 8 x87 floating point registers, each 80 bits
+wide useable as 64 bits wide MMX/3dNOW! registers and several special
+purpose registers.
 
 This subsection discusses usage of each register.  The registers called
-\emph{global registers} ``belong'' to the calling function and called function
+\emph{global registers} ``belong'' to the calling function and the called function
 is required to preserve their values, while the \emph{temporary registers} may
 be freely clobbered by the called function.
 \editornote{The split to global/temporaries is still subject of change.}
@@ -131,14 +136,14 @@ Temporary register used to pass fifth qword of argument area.
 \item [RDI] 
 Temporary register used to pass sixth qword of argument area.
 \item [R8, R9] Temporary registers.
-\item [R10 - R15] Global registers.
+\item [R10 -- R15] Global registers.
 \end{description}
 
 
 \subsubsection {SSE registers}
 \begin{description}
-\item [XMM0, XMM1] Temporary registers used to pass first two qwords of argument area and
-to return first two qwords of the return value.
+\item [XMM0, XMM1] Temporary registers used to pass first two qwords
+  of argument area and to return first two qwords of the return value.
 \item [XMM2 -- XMM6] Temporary registers used to pass qwords 2-6 of argument area
 \item [XMM6 -- XMM13] Global registers
 \item [XMM13 -- XMM15] Temporary registers
@@ -147,14 +152,14 @@ to return first two qwords of the return value.
 
 \subsubsection {MMX/3dNOW! and x87 registers}
 Since the usage of SSE instruction set if prefered over the x87, the CPU is in
-``MMX'' mode across the function calls. Every function that uses x87 register
+``MMX'' mode across function calls. Every function that uses x87 register
 stack is required to convert the registers properly using EMMS or FEMMS
-instructions and thus x87 registers can not be used to hold values across the
+instructions and thus x87 registers cannot be used to hold values across a
 function call.  To make usage of x87 easier, all MMX registers are temporaries,
 so the FEMMS instruction may be used.
 \begin{description}
-\item [MM0, MM1] Temporary registers used to pass first two qwords of argument area and
-to return first two qwords of the return value.
+\item [MM0, MM1] Temporary registers used to pass first two qwords of
+  argument area and to return first two qwords of the return value.
 \item [MM2 -- MM6] Temporary registers used to pass qwords 2-6 of argument area
 \item [MM7 -- MM8] Temporary registers
 \item [st(0) -- st(8)] Temporary registers not available across function calls
@@ -165,15 +170,15 @@ to return first two qwords of the return value.
 All special purpose registers should be handled as global registers with
 the exception of the direction flag in EFLAGS register.  The value of direction
 flag must be clear at the entry of function.
-\editornote{do we want to define values of fpu and SSE control words?}
+\editornote{Do we want to define values of fpu and SSE control words?}
 
 \subsection{The Stack Frame}
-In addition to registers, each function has frame on a run-time stack.  This
+In addition to registers, each function has a frame on the run-time stack.  This
 stack grows downward from high addresses, table \ref{tab-stack-frame} shows the
 stack organization.
 
 \begin{table}
-\caption{the stack frame}
+\caption{Stack Frame}
 \label{tab-stack-frame}
 \begin{center}
 \begin{tabular}{l|l|l|l}
@@ -185,7 +190,7 @@ Position & Contents & Frame & Size (bytes) \\
 & Argument area qword 7 & & 8 \\
 \hline
 & Return address & Current & 8\\
-RBP (optinally) & Previous RBP value & & 0 or 8\\
+RBP (optionally) & Previous RBP value & & 0 or 8\\
 & Function frame & & unspecified\\
 & Outgoing argument area & & unspecified\\
 RSP & End of current frame & & 0\\
@@ -194,47 +199,50 @@ RSP & End of current frame & & 0\\
 \end{center}
 \end{table}
 
-Function may expect the end of input argument area to be aligned to 16 byte
-boundary - this means that $RSP - 8$ is always multiple of 8 at the entry
-point. This alignment must be preserved to all called functions that does use
-standard calling convention. The frames of functions with local calling
-conventions may or may not obey this rule so algorithms for stack unwinding
-can't rely on it.
+Functions may expect the end of the input argument area to be aligned
+to a 16 byte boundary --- this means that $RSP - 8$ is always a
+multiple of 8 at the entry point. This alignment must be preserved to
+all called functions that use the standard calling convention. The
+frames of functions with local calling conventions may or may not obey
+this rule so algorithms for stack unwinding cannot rely on it.
 
 At any point of program execution, the stack pointer (RSP) shall point to
 the end of latest allocated stack frame.
 
 \subsection{Classes}
-The x86-64 CPU has three register classes available for parameter and return
-value passing convention - the integer (general purpose) registers, SSE
-registers and MMX registers.  All integral types and pointer belongs to the
-class \emph{int}, all floating point values (including the 128bit type) and
-type \verb|_m128| belongs to the class \emph{SSE} and finally the type
-\verb|_mm64| to class \emph{MMX}.
 
-Agregate and union types are split to qwords and each qword has assigned it's
-own class. To assign class of qword \emph{X} first matching rule of the following
-is used.
+The x86-64 CPU has three register classes available for parameter and
+return value passing convention --- the integer (general purpose)
+registers, SSE registers and MMX registers.  All integral types and
+pointer belong to the class \emph{int}, all floating point values
+(including the 128bit type) and type \verb|_m128| belongs to the class
+\emph{SSE} and finally the type \verb|_mm64| to class \emph{MMX}.
+
+Agregate and union types are split to qwords and each qword has
+assigned its own class. To assign the class of qword \emph{X} the
+first matching rule of the following is used.
 \begin{enumerate}
 \item (Aggregates only) In case the qword \emph{X} contains upper half field of
-\verb|__m128| type, the class is \emph{SSE2}
+\verb|__m128| type, the class is \emph{SSE2}.
 
-\item In case all fields of aggreagate (or all subtypes of union) crossing the
-word \emph{X} have same class \emph{Y}, the class is \emph{Y}.
+\item In case all fields of aggregate (or all subtypes of union) crossing the
+word \emph{X} have the same class \emph{Y}, the class is \emph{Y}.
 
-\item In case all fields of aggreagate (or all subtypes of union) crossing the
-word \emph{X} have same class \emph{SSE} or \emph{SSE2}, the class is \emph{SSE}.
+\item In case all fields of aggregate (or all subtypes of union) crossing the
+word \emph{X} have the same class \emph{SSE} or \emph{SSE2}, the class
+is \emph{SSE}.
 
 \item If nothing matches, use class \emph{Int}.
 \end{enumerate}
 
 Qword \emph{X} of aggregate gets assigned class \emph{Y} if and only
-if all the fields crossing qword \emph{X} belongs to same class \emph{Y}.  When
-no field crosses the given Qword, it's type is \emph{None}. When no class fits
-the rules above, class \emph{Int} is used.  Exception is also
+if all the fields crossing qword \emph{X} belongs to same class \emph{Y}.  If
+no field crosses the given Qword, its type is \emph{None}. When no class fits
+the rules above, class \emph{Int} is used.  Exception is also 
+% Honza, something is missing here.
 
 Similary qword \emph{X} of union gets assigned class \emph{Y} if and only if
-each type in the union eighter do not cross \emph{X} or it's class for qword
+each type in the union eigther does not cross \emph{X} or its class for qword
 \emph{X} is \emph{Y}.
 
 \subsection{Parameter passing conventions}
@@ -247,16 +255,20 @@ value are returned directly.  First one or two classes are assigned to given
 value and then relevant registers are used as discussed in the subsection
 \ref{subsec-registers} leaving rest of registers undefined.
 
-The scalar values, aggregates and unions exceeding 8 bytes that belongs to
-class \emph{SSE} are not split to two registers and register XMM0 is used to
-return both qwords.  Complex values are always returned in two separate parts.
-The first register contains real part, while second register imaginary. The
-qword of type \emph{SSE2} is passed in upper half of XMM0 instead of the XMM1.
+The scalar values, aggregates and unions exceeding 8 bytes that
+belongs to class \emph{SSE} are not split to two registers and
+register XMM0 is used to return both qwords.  Complex values are
+always returned in two separate parts.  The first register contains
+the real part, while the second register the imaginary one. The qword
+of type \emph{SSE2} is passed in the upper half of XMM0 instead of
+XMM1.
 
-Complex numbers, aggregates and unions exceeding 16 bytes are stored to area
-prepared by caller and passed to the function as ``hidden'' first parameter.
-The conents of all the return registers is left undefined.  \editornote{i386
-abi returns the pointer to the area to simplify caller.  Is that good idea?}
+Complex numbers, aggregates and unions exceeding 16 bytes are stored
+in an area prepared by the caller and passed to the function as
+``hidden'' first parameter.  The contents of all return registers is
+left undefined.
+\editornote{i386 abi returns the pointer to the area to simplify
+  caller.  Is that good idea?}
 
 
 
