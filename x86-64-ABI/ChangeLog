@@ -1,3 +1,9 @@
+Mon Jul 24 21:33:42 CEST 2000  Jan Hubicka  <jh@suse.cz>
+
+	* low-level-sys-info.tex: Increase alignment of arrays
+	to 16 bytes; fix some formating problems;
+	new integer-only passing scheme proposal.
+
 2000-07-20  Andreas Jaeger  <aj@suse.de>
 
 	* dl.tex: Added lots of tables for dynamic linking.

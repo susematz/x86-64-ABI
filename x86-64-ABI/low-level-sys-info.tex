@@ -26,42 +26,42 @@ The basic types are specified in Table \ref{tab-basic-types}.  The
 \verb|__int128| and \verb|__mm64| types are optional.
 
 \begin{table}
-\caption{Basic Types}\label{tab-basic-types}
-\begin{tabular}{lrllr}
-\hline\noalign{\smallskip}
-% multicolumn is used to shrink the table
-&sizeof & type			&\multicolumn{2}{l}{C type\hfill alignment} \\
-\noalign{\smallskip}\hline\noalign{\smallskip}
-Integral:
-&1	& signed byte		&        char, signed char		& 1 \\
-&1	& unsigned byte		&        unsigned char, bool		& 1 \\
-&2	& signed word		&        short, singed short		& 2 \\
-&2	& unsigned word		&        unsigned short			& 2 \\
-&4	& signed dword		&        int, signed int, wchar		& 4 \\
-&4	& unsigned dword	&        unsigned int,	& 4 \\
-&       &                       &        unsigned wchar & \\
-&8	& signed qword		&        long, signed long, 	& 8 \\
-&        &                       &       long long, 		&  \\
-&        &                       &       signed long long		&  \\
-&8	& unsigned qword	&                unsigned long,		&	8 \\
-&        &                       &          unsigned long long		& \\
-&16	& signed tword		&        \verb|__int128|, & 16 \\
-&	& 		        &        signed \verb|__int128|	&  \\
-&16	& unsigned oword	&                unsigned \verb|__int128|	&	16 \\
-\hline
-Packed:
-&8	& \MMX{} and 3DNOW		&	\verb|__mm64|				& 8 \\
-&16	& SSE and SSE-2		&	\verb|__m128|				& 16 \\
-\hline
-Pointer:
-&8	& unsigned qword	&		any type *		& 8 \\
-\hline
-Floating-
-&4	& single-precision (IEEE) &	float				& 4 \\
-point:&8	& double-precision (IEEE) &	double				& 8 \\
-&16	& extended-precision (IEEE) & 	long double			& 16 \\
-\hline
-\end{tabular}
+  \caption{Basic Types}\label{tab-basic-types}
+  \begin{tabular}{lrllr}
+    \hline\noalign{\smallskip}
+    % multicolumn is used to shrink the table
+    &sizeof & type			&\multicolumn{2}{l}{C type\hfill alignment} \\
+    \noalign{\smallskip}\hline\noalign{\smallskip}
+    Integral:
+    &1	& signed byte		& char, signed char		& 1 \\
+    &1	& unsigned byte		& unsigned char, bool		& 1 \\
+    &2	& signed word		& short, singed short		& 2 \\
+    &2	& unsigned word		& unsigned short		& 2 \\
+    &4	& signed dword		& int, signed int, wchar	& 4 \\
+    &4	& unsigned dword	& unsigned int,			& 4 \\
+    &	&                       & unsigned wchar		& \\
+    &8	& signed qword		& long, signed long, 		& 8 \\
+    &	&                       & long long, 			& \\
+    &	&                       & signed long long		& \\
+    &8	& unsigned qword	& unsigned long,		& 8 \\
+    &	&                       & unsigned long long		& \\
+    &16	& signed tword		& \verb|__int128|, 		& 16 \\
+    &	& 		        & signed \verb|__int128|	&  \\
+    &16	& unsigned oword	& unsigned \verb|__int128|&	16 \\
+    \hline
+    Packed:
+    &8	& \MMX{} and 3DNOW	& \verb|__mm64|			& 8 \\
+    &16	& SSE and SSE-2		& \verb|__m128|			& 16 \\
+    \hline
+    Pointer:
+    &8	& unsigned qword	& any type *			& 8 \\
+    \hline
+    Floating-
+    &4	& single-precision (IEEE) & float			& 4 \\
+    point:&8	& double-precision (IEEE) & double		& 8 \\
+    &16	& extended-precision (IEEE) & long double		& 16 \\
+    \hline
+  \end{tabular}
 \end{table}
 
 The IEEE extended-precision type uses a 15 bits exponent, 113 bits for
@@ -75,10 +75,15 @@ A null pointer (for all types) has value zero.
 
 \subsubsection{Aggregates And Unions}
 
-Structure members are ``naturally'' aligned.  Structures, arrays and
-unions assume the alignment of the most strictly aligned component
-(compare with Table \ref{tab-basic-types}). The size of aggregates is
-a multiple of the alignment.
+Structure members are ``naturally'' aligned.  Structures and unions assume the
+alignment of the most strictly aligned component (compare with Table
+\ref{tab-basic-types}).  The size of aggregates is a multiple of the alignment.
+
+\subsubsection{Arrays}
+
+Arrays assume the alignment of the most strictly aligned component.
+Aditionally arrays greater than 16~bytes are required to be aligned minimally
+to the 16~byte boundary to make usage of SSE packed operations more efecient.
 
 \subsubsection{Bit-Fields}
 
@@ -87,7 +92,6 @@ depending on the bit-field type. Bit ordering is equivalent to
 Intel386 specs.
 
 \editornote{This needs a bit (pun intended) more specificity.}
-
 
 \section{Function Calling Sequence}
 
@@ -118,47 +122,48 @@ be freely clobbered by the called function.
 \editornote{Define environment pointer register?}
 
 \subsubsection {General Purpose Registers}
-\begin{description}
-\item [\RAX]
-Temporary register used to pass first integer argument and to return
-first qword of the return value.
-\item [\RDX]
-Temporary register used to pass second integer argument
-and to return second qword of the return value.
-\item [\RCX] Temporary register used to pass third integer argument.
-\item [\RBX] Temporary register used to pass fourth integer argument.
-\item [\RBP] Global register optionally used as frame pointer.
-\item [\RSP] The stack pointer.
-\item [\RSI]
-Temporary register used to pass fifth qword of argument area.
-\item [\RDI] 
-Temporary register used to pass sixth qword of argument area.
-\item [\reg{R8}, \reg{R9}] Temporary registers.
-\item [\reg{R10} -- \reg{R15}] Global registers.
-\end{description}
 
+\begin{description}
+  \item [\RAX]
+    Temporary register used to pass first integer argument and to return
+    first qword of the return value.
+  \item [\RDX]
+    Temporary register used to pass second integer argument
+    and to return second qword of the return value.
+  \item [\RCX] Temporary register used to pass third integer argument.
+  \item [\RBX] Temporary register used to pass fourth integer argument.
+  \item [\RBP] Global register optionally used as frame pointer.
+  \item [\RSP] The stack pointer.
+  \item [\RSI]
+    Temporary register used to pass fifth qword of argument area.
+  \item [\RDI] 
+    Temporary register used to pass sixth qword of argument area.
+  \item [\reg{R8}, \reg{R9}] Temporary registers.
+  \item [\reg{R10} -- \reg{R15}] Global registers.
+\end{description}
 
 \subsubsection {SSE registers}
+
 \begin{description}
-\item [\reg{XMM0}, \reg{XMM1}] Temporary registers used to pass first two SSE arguments
-  and to return first two qwords of the return value.
-\item [\reg{XMM2} -- \reg{XMM6}] Temporary registers used to pass 2nd--6th SSE arguments
-\item [\reg{XMM6} -- \reg{XMM13}] Global registers
-\item [\reg{XMM13} -- \reg{XMM15}] Temporary registers
+  \item [\reg{XMM0}, \reg{XMM1}] Temporary registers used to pass first two SSE arguments
+    and to return first two qwords of the return value.
+  \item [\reg{XMM2} -- \reg{XMM6}] Temporary registers used to pass 2nd--6th SSE arguments
+  \item [\reg{XMM6} -- \reg{XMM13}] Global registers
+  \item [\reg{XMM13} -- \reg{XMM15}] Temporary registers
 \end{description}
 
-
 \subsubsection {\MMX/3dNOW! and x87 registers}
+
 Since the usage of SSE instruction set if prefered over the x87, the CPU is in
 ``\MMX'' mode across function calls. Every function that uses x87 register
 stack is required to convert the registers properly using \op{emms} or \op{femms}
 instructions and thus x87 registers cannot be used to hold values across a
-function call.  To make usage of x87 easier, all \MMX registers are temporaries,
+function call.  To make usage of x87 easier, all \MMX{} registers are temporaries,
 so the FEMMS instruction may be used.
 \begin{description}
-\item [\reg{MM0}, \reg{MM1}] Temporary registers used to return first two qwords of the return value.
-\item [\reg{MM2} -- \reg{MM8}] Temporary registers.
-\item [\reg{st(0)} -- \reg{st(8)}] Temporary registers not available across function calls
+  \item [\reg{MM0}, \reg{MM1}] Temporary registers used to return first two qwords of the return value.
+  \item [\reg{MM2} -- \reg{MM8}] Temporary registers.
+  \item [\reg{st(0)} -- \reg{st(8)}] Temporary registers not available across function calls
 \end{description}
 
 
@@ -175,28 +180,28 @@ stack organization.
 
 
 \begin{figure}
-\caption{Stack Frame}
-\label{fig-stack-frame}
-\begin{center}
-\begin{tabular}{r|cl|l}
-\noalign{\smallskip}
-\multicolumn{1}{l}{\bf Frame} &
-\multicolumn{1}{c}{\bf Contents} &
-\multicolumn{1}{l}{\bf Size} &
-\multicolumn{1}{l}{\bf Address} \\
-\noalign{\smallskip}  \cline{2-3}
-& incoming arguments qword $n$ & 8 bytes & $\RBP+16+8n$ \\
-& \dots & & \\
-Previous& incoming arguments qword $0$ & 8 bytes & $\RBP+16$ \\ \cline{1-4} 
-Current & return address & 8 bytes & $\RBP+8$\\ \cline{2-3}
-& previous \RBP{} value & 8 bytes & $\RBP$ \\ \cline{2-3}
-& local save area & unspecified & $\RBP-8$\\ 
-& \dots & & \\ \cline {2-3}
-& outgoing arguments qword $0$ & 8 bytes &\\
-& \dots & & \\
-& outgoing arguments qword $n$ & 8 bytes & $\RSP$ \\ \cline{2-3}
-\end{tabular}
-\end{center}
+  \caption{Stack Frame}
+  \label{fig-stack-frame}
+  \begin{center}
+    \begin{tabular}{r|cl|l}
+      \noalign{\smallskip}
+      \multicolumn{1}{l}{\bf Frame} &
+      \multicolumn{1}{c}{\bf Contents} &
+      \multicolumn{1}{l}{\bf Size} &
+      \multicolumn{1}{l}{\bf Address} \\
+      \noalign{\smallskip}  \cline{2-3}
+      & incoming arguments qword $n$ & 8 bytes & $\RBP+16+8n$ \\
+      & \dots & & \\
+      Previous& incoming arguments qword $0$ & 8 bytes & $\RBP+16$ \\ \cline{1-4} 
+      Current & return address & 8 bytes & $\RBP+8$\\ \cline{2-3}
+      & previous \RBP{} value & 8 bytes & $\RBP$ \\ \cline{2-3}
+      & local save area & unspecified & $\RBP-8$\\ 
+      & \dots & & \\ \cline {2-3}
+      & outgoing arguments qword $0$ & 8 bytes &\\
+      & \dots & & \\
+      & outgoing arguments qword $n$ & 8 bytes & $\RSP$ \\ \cline{2-3}
+    \end{tabular}
+  \end{center}
 \end{figure}
 
 
@@ -228,7 +233,7 @@ when this optimization is allowed.
 
 The x86-64 CPU has three register classes available for parameter and
 return value passing convention --- the integer (general purpose)
-registers, SSE registers and \MMX registers.  All integral types and
+registers, SSE registers and \MMX{} registers.  All integral types and
 pointer belong to the class \emph{Int}, all floating point values
 (including the 128bit type) and type \verb|_m128| belongs to the class
 \emph{SSE} and finally the type \verb|_mm64| to class \emph{MMX}.
@@ -237,17 +242,17 @@ Aggregate and union types are split to qwords and each qword has
 assigned its own class. To assign the class of qword \emph{X} the
 first matching rule of the following is used.
 \begin{enumerate}
-\item (Aggregates only) In case the qword \emph{X} contains upper half field of
-\verb|__m128| type, the class is \emph{SSE2}.
+  \item (Aggregates only) In case the qword \emph{X} contains upper half field of
+    \verb|__m128| type, the class is \emph{SSE2}.
 
-\item In case all fields of aggregate (or all subtypes of union) crossing the
-word \emph{X} have the same class \emph{Y}, the class is \emph{Y}.
+  \item In case all fields of aggregate (or all subtypes of union) crossing the
+    word \emph{X} have the same class \emph{Y}, the class is \emph{Y}.
 
-\item In case all fields of aggregate (or all subtypes of union) crossing the
-word \emph{X} have the same class \emph{SSE} or \emph{SSE2}, the class
-is \emph{SSE}.
+  \item In case all fields of aggregate (or all subtypes of union) crossing the
+    word \emph{X} have the same class \emph{SSE} or \emph{SSE2}, the class
+    is \emph{SSE}.
 
-\item If nothing matches, use class \emph{Int}.
+  \item If nothing matches, use class \emph{Int}.
 \end{enumerate}
 
 Qword \emph{X} of an aggregate gets assigned class \emph{Y} if and only
@@ -274,7 +279,7 @@ for parameter passing.  If fewer (or no) arguments are passed, the unneeded regi
 will contain undefined value at the entry of function.
 \editornote{The number of registers is subject to change.}
 
-\MMX registers are not used to pass \verb|__mm64| type, since \MMX
+\MMX{} registers are not used to pass \verb|__mm64| type, since \MMX{}
 usage is depreached and doing so simplifies functions with variable
 number of arguments.  Instead all arguments of type \verb|__mm64| as
 well as arguments that do not fit into the available registers are
@@ -299,107 +304,110 @@ In reality a two pass algorithm is required.  The first pass computes
 positions for output arguments and the second pass actually pushes the
 arguments onto the stack and/or loads them into registers.
 
+
+\subsubsection {Proposal 1: ``smart'' mapping of structures}
+
 \begin{description}
-\item[Initialize:]
-Set $\verb|sr|=1$, $\verb|gr|=1$, $\verb|ap|=0$
+  \item[Initialize:]
+    Set $\verb|sr|=1$, $\verb|gr|=1$, $\verb|ap|=0$
 
 
-\item[Scan:]
-If there are no more arguments, go to ``terminate''. Otherwise select one of the
-following depending on the type of the next argument:
-\begin{description}
-\item[Simple integer argument:]
-Simple integer argument is one of the following:
-\begin{itemize}
-\item One of simple integer types, maximally 64~bits long.
-\item Pointer
-\item Aggregates and unions greater than 16~bytes should be treated as
-pointer to object, or copy of the objects where necessary to enforce
-call-by-value semantics.
-\item Aggregates and unions maximally 8~bytes long with class \emph{Int}
-\end{itemize}
-If $\verb|gr| >= 6$ go to other, otherwise pick \verb|gr|-th register from
-the sequence:\RAX, \RDX, \RCX, \RBX, \RSI, \RDI and assign it to the current
-argument. Set \verb|gr| to $\verb|gr|+1$.
+  \item[Scan:]
+    If there are no more arguments, go to ``terminate''. Otherwise select one of the
+    following depending on the type of the next argument:
+      \begin{description}
+        \item[Simple integer argument:]
+          Simple integer argument is one of the following:
+          \begin{itemize}
+            \item One of simple integer types, maximally 64~bits long.
+            \item Pointer
+            \item Aggregates and unions greater than 16~bytes should be treated as
+              pointer to object, or copy of the objects where necessary to enforce
+              call-by-value semantics.
+            \item Aggregates and unions maximally 8~bytes long with class \emph{Int}
+          \end{itemize}
+        If $\verb|gr| >= 6$ go to other, otherwise pick \verb|gr|-th register from
+        the sequence:\RAX, \RDX, \RCX, \RBX, \RSI, \RDI{} and assign it to the current
+        argument. Set \verb|gr| to $\verb|gr|+1$.
 
 
-\item[Simple SSE argument:]
-Simple SSE argument is one of the following:
-\begin{itemize}
-\item One of simple floating point types.
-\item Argument of type \verb|__m128|
-\item Aggregates and unions maximally 8~bytes long with class \emph{SSE}
-\item Aggregates and unions greater than 8~bytes and smaller than 17~bytes with class of first qword \emph{SSE}
-and class \emph{SSE2} of the second qword.
-\end{itemize}
-If $\verb|sr| >= 6$ go to other, otherwise pick \verb|sr|-th register from
-the sequence:\reg{XMM0}, \reg{XMM1}, \reg{XMM2}, \reg{XMM3}, \reg{XMM4}, \reg{XMM5}, \reg{XMM6}
-and assign it to the current argument.
-Set \verb|gr| to $\verb|gr|+1$.
+    \item[Simple SSE argument:]
+      Simple SSE argument is one of the following:
+      \begin{itemize}
+        \item One of simple floating point types.
+        \item Argument of type \verb|__m128|
+        \item Aggregates and unions maximally 8~bytes long with class \emph{SSE}
+        \item Aggregates and unions greater than 8~bytes and smaller than 17~bytes with class of first qword \emph{SSE}
+          and class \emph{SSE2} of the second qword.
+      \end{itemize}
+      If $\verb|sr| >= 6$ go to other, otherwise pick \verb|sr|-th register from
+      the sequence:\reg{XMM0}, \reg{XMM1}, \reg{XMM2}, \reg{XMM3}, \reg{XMM4}, \reg{XMM5}, \reg{XMM6}
+      and assign it to the current argument.
+      Set \verb|gr| to $\verb|gr|+1$.
 
-\item[Double integer argument]
-Double integer argument is one of the following:
-\begin{itemize}
-\item Argument of type \verb|__int128|
-\item Aggregates and unions greater than 8~bytes and smaller than 17~bytes with class of both qwords \emph{Int}
-\end{itemize}
-If $\verb|gr| >= 5$ go to other, otherwise pick \verb|gr|-th register from
-the sequence:\RAX, \RDX, \RCX, \RBX, \RSI, \RDI and assign it together with the
-next register to the current argument.
+    \item[Double integer argument]
+      Double integer argument is one of the following:
+      \begin{itemize}
+        \item Argument of type \verb|__int128|
+        \item Aggregates and unions greater than 8~bytes and smaller than 17~bytes with class of both qwords \emph{Int}
+      \end{itemize}
+      If $\verb|gr| >= 5$ go to other, otherwise pick \verb|gr|-th register from
+      the sequence:\RAX, \RDX, \RCX, \RBX, \RSI, \RDI{} and assign it together with the
+      next register to the current argument.
 
-\item[Double SSE argument]
-Double SSE argument is one of the following:
-\begin{itemize}
-\item Aggregates and unions greater than 8~bytes and smaller than 17~bytes with class of both qwords \emph{SSE}
-\end{itemize}
-If $\verb|sr| >= 5$ go to other, otherwise pick \verb|sr|-th register from
-the sequence: \reg{XMM0}, \reg{XMM1}, \reg{XMM2}, \reg{XMM3}, \reg{XMM4}, \reg{XMM5}, \reg{XMM6}
-and assign it together with the
-next register to the current argument.
+    \item[Double SSE argument]
+      Double SSE argument is one of the following:
+      \begin{itemize}
+        \item Aggregates and unions greater than 8~bytes and smaller than 17~bytes with class of both qwords \emph{SSE}
+      \end{itemize}
+      If $\verb|sr| >= 5$ go to other, otherwise pick \verb|sr|-th register from
+      the sequence: \reg{XMM0}, \reg{XMM1}, \reg{XMM2}, \reg{XMM3}, \reg{XMM4}, \reg{XMM5}, \reg{XMM6}
+      and assign it together with the
+      next register to the current argument.
 
-\item[Integer-SSE type argument]
-Integer-SSE type argument is one of the following:
-\begin{itemize}
-\item Aggregates and unions greater than 8~bytes and smaller than 17~bytes with class of first qword \emph{Int}
-and second qword \emph{SSE}
-\end{itemize}
-If $\verb|sr| >= 6$ or $\verb|gr| >= 6$ go to other, otherwise pick \verb|gr|-th register from
-the sequence: \RAX, \RDX, \RCX, \RBX, \RSI, \RDI 
-and assign it the second first qword of current argument and pick \verb|sr|-th register from
-the sequence: \reg{XMM0}, \reg{XMM1}, \reg{XMM2}, \reg{XMM3}, \reg{XMM4}, \reg{XMM5}, \reg{XMM6}
-and assign it the second qword of current argument.
+    \item[Integer-SSE type argument]
+      Integer-SSE type argument is one of the following:
+      \begin{itemize}
+        \item Aggregates and unions greater than 8~bytes and smaller than 17~bytes with class of first qword \emph{Int}
+          and second qword \emph{SSE}
+      \end{itemize}
+      If $\verb|sr| >= 6$ or $\verb|gr| >= 6$ go to other, otherwise pick \verb|gr|-th register from
+      the sequence: \RAX, \RDX, \RCX, \RBX, \RSI, \RDI{} 
+      and assign it the second first qword of current argument and pick \verb|sr|-th register from
+      the sequence: \reg{XMM0}, \reg{XMM1}, \reg{XMM2}, \reg{XMM3}, \reg{XMM4}, \reg{XMM5}, \reg{XMM6}
+      and assign it the second qword of current argument.
 
-\item[SSE-Integer type argument]
-SSE-Integer type argument is one of the following:
-\begin{itemize}
-\item Aggregates and unions greater than 8~bytes and smaller than 17~bytes with class of first qword \emph{SSE}
-and second qword \emph{Int}
-\end{itemize}
-If $\verb|sr| >= 6$ or $\verb|gr| >= 6$ go to other, otherwise pick \verb|sr|-th register from
-the sequence:
-\reg{XMM0}, \reg{XMM1}, \reg{XMM2}, \reg{XMM3}, \reg{XMM4}, \reg{XMM5}, \reg{XMM6}
-and assign it the second first qword of current argument and pick \verb|gr|-th register from
-the sequence:
-\RAX, \RDX, \RCX, \RBX, \RSI, \RDI 
-and assign it the second qword of current argument.
-\end{description}
-Go to ``Scan''.
+    \item[SSE-Integer type argument]
+      SSE-Integer type argument is one of the following:
+      \begin{itemize}
+	\item Aggregates and unions greater than 8~bytes and smaller than 17~bytes with class of first qword \emph{SSE}
+	  and second qword \emph{Int}
+      \end{itemize}
+      If $\verb|sr| >= 6$ or $\verb|gr| >= 6$ go to other, otherwise pick \verb|sr|-th register from
+      the sequence:
+      \reg{XMM0}, \reg{XMM1}, \reg{XMM2}, \reg{XMM3}, \reg{XMM4}, \reg{XMM5}, \reg{XMM6}
+      and assign it the second first qword of current argument and pick \verb|gr|-th register from
+      the sequence:
+      \RAX, \RDX, \RCX, \RBX, \RSI, \RDI{} 
+      and assign it the second qword of current argument.
+   \end{description}
+   Go to ``Scan''.
 
-\item[Other:]
+  \item[Other:]
 
-Arguments not handled otherwise are passed at stack frame. \RSP{} is the
-pointer to end of outgoing argument area and we do expect \RSP{} to be
-aligned to a 16~byte boundary and the outgoing area space large enough to fit all
-the arguments (this means the value \verb|ap| bytes for the final value of
-\verb|ap| once algorithm terminates).  To compute address of given argument,
-round \verb|ap| to the nearest multiple of the operand's alignment in bytes
-(minimally to 8~bytes) and
-store assign location $\verb|ap|+\RSP$ to the argument and increase \verb|ap| by
-the size of argument in bytes.
-Go to ``Scan''.
+    Arguments not handled otherwise are passed at stack frame. \RSP{} is the
+    pointer to end of outgoing argument area and we do expect \RSP{} to be
+    aligned to a 16~byte boundary and the outgoing area space large enough to fit all
+    the arguments (this means the value \verb|ap| bytes for the final value of
+    \verb|ap| once algorithm terminates).  To compute address of given argument,
+    round \verb|ap| to the nearest multiple of the operand's alignment in bytes
+    (minimally to 8~bytes) and
+    store assign location $\verb|ap|+\RSP$ to the argument and increase \verb|ap| by
+    the size of argument in bytes.
+    Go to ``Scan''.
 
-\item[Terminate:]
-Round \verb|ap| up to a multiple of 16. Terminate the algorithm.
+  \item[Terminate:]
+    Round \verb|ap| up to a multiple of 16. Terminate the algorithm.
 \end{description}
 
 As an example assume the function call as shown below:
@@ -418,19 +426,119 @@ func (small, large, mm, a, b, c, d, e, A, B, C, D, E);
 The results of register allocation for parameter passing is shown in table \ref{tab-passing}.
 
 \begin{table}
-\caption{Register Allocation For Parameter Passing.}\label{tab-passing}
-\begin{tabular}{rlrlrl}
-\hline\noalign{\smallskip}
-integer register & contents & SSE register & contents & stack slot & contents\\
-\noalign{\smallskip}\hline\noalign{\smallskip}
-\RAX & \verb|small.a| & \reg{XMM0} & \verb|small.b| & $\RSP$ & \verb|mm|\\
-\RDX & \verb|&large| & \reg{XMM1} & \verb|A| & $\RSP+8$ & \verb|e|\\
-\RCX & \verb|a| & \reg{XMM2} & \verb|B| &  & \\
-\RBX & \verb|b| & \reg{XMM3} & \verb|C| &  & \\
-\RSI & \verb|c| & \reg{XMM4} & \verb|D| &  & \\
-\RDI & \verb|d| & \reg{XMM5} & \verb|E| &  & \\
-\hline
-\end{tabular}
+  \caption{Register Allocation For Parameter Passing.}\label{tab-passing}
+  \begin{tabular}{rlrlrl}
+    \hline\noalign{\smallskip}
+    integer register & contents & SSE register & contents & stack slot & contents\\
+    \noalign{\smallskip}\hline\noalign{\smallskip}
+    \RAX & \verb|small.a| & \reg{XMM0} & \verb|small.b| & $\RSP$ & \verb|mm|\\
+    \RDX & \verb|&large| & \reg{XMM1} & \verb|A| & $\RSP+8$ & \verb|e|\\
+    \RCX & \verb|a| & \reg{XMM2} & \verb|B| &  & \\
+    \RBX & \verb|b| & \reg{XMM3} & \verb|C| &  & \\
+    \RSI & \verb|c| & \reg{XMM4} & \verb|D| &  & \\
+    \RDI & \verb|d| & \reg{XMM5} & \verb|E| &  & \\
+    \hline
+  \end{tabular}
+\end{table}
+
+\subsubsection {Proposal 2: structures always mapped to the integers}
+
+\begin{description}
+  \item[Initialize:]
+    Set $\verb|sr|=1$, $\verb|gr|=1$, $\verb|ap|=0$
+
+
+  \item[Scan:]
+    If there are no more arguments, go to ``terminate''. Otherwise select one of the
+    following depending on the type of the next argument:
+      \begin{description}
+        \item[Simple integer argument:]
+          Simple integer argument is one of the following:
+          \begin{itemize}
+            \item One of simple integer types, maximally 64~bits long.
+            \item Pointer
+            \item Aggregates and unions greater than 16~bytes should be treated as
+              pointer to object, or copy of the objects where necessary to enforce
+              call-by-value semantics.
+            \item Aggregates and unions maximally 8~bytes long with class \emph{Int}
+          \end{itemize}
+        If $\verb|gr| >= 6$ go to other, otherwise pick \verb|gr|-th register from
+        the sequence:\RAX, \RDX, \RCX, \RBX, \RSI, \RDI{} and assign it to the current
+        argument. Set \verb|gr| to $\verb|gr|+1$.
+
+
+    \item[Simple SSE argument:]
+      Simple SSE argument is one of the following:
+      \begin{itemize}
+        \item One of simple floating point types.
+        \item Argument of type \verb|__m128|
+        \item Aggregates and unions maximally 8~bytes long with class \emph{SSE}
+        \item Aggregates and unions greater than 8~bytes and smaller than 17~bytes with class of first qword \emph{SSE}
+          and class \emph{SSE2} of the second qword.
+      \end{itemize}
+      If $\verb|sr| >= 6$ go to other, otherwise pick \verb|sr|-th register from
+      the sequence:\reg{XMM0}, \reg{XMM1}, \reg{XMM2}, \reg{XMM3}, \reg{XMM4}, \reg{XMM5}, \reg{XMM6}
+      and assign it to the current argument.
+      Set \verb|gr| to $\verb|gr|+1$.
+
+    \item[Double integer argument]
+      Double integer argument is one of the following:
+      \begin{itemize}
+        \item Argument of type \verb|__int128|
+        \item Aggregates and unions greater than 8~bytes and smaller than 17~bytes.
+      \end{itemize}
+      If $\verb|gr| >= 5$ go to other, otherwise pick \verb|gr|-th register from
+      the sequence:\RAX, \RDX, \RCX, \RBX, \RSI, \RDI{} and assign it together with the
+      next register to the current argument.
+   \end{description}
+   Go to ``Scan''.
+
+  \item[Other:]
+
+    Arguments not handled otherwise are passed at stack frame. \RSP{} is the
+    pointer to end of outgoing argument area and we do expect \RSP{} to be
+    aligned to a 16~byte boundary and the outgoing area space large enough to fit all
+    the arguments (this means the value \verb|ap| bytes for the final value of
+    \verb|ap| once algorithm terminates).  To compute address of given argument,
+    round \verb|ap| to the nearest multiple of the operand's alignment in bytes
+    (minimally to 8~bytes) and
+    store assign location $\verb|ap|+\RSP$ to the argument and increase \verb|ap| by
+    the size of argument in bytes.
+    Go to ``Scan''.
+
+  \item[Terminate:]
+    Round \verb|ap| up to a multiple of 16. Terminate the algorithm.
+\end{description}
+
+As an example assume the function call as shown below:
+
+\begin{verbatim}
+int a,b,c,d,e;
+float A,B;
+double C,D;
+long double E;
+__mm64 mm;
+struct small {long a; double b;} small;
+struct large {int a,b,c,d,e,f;} small;
+func (small, large, mm, a, b, c, d, e, A, B, C, D, E);
+\end{verbatim}
+
+The results of register allocation for parameter passing is shown in table \ref{tab-passing}.
+
+\begin{table}
+  \caption{Register Allocation For Parameter Passing.}\label{tab-passing}
+  \begin{tabular}{rlrlrl}
+    \hline\noalign{\smallskip}
+    integer register & contents & SSE register & contents & stack slot & contents\\
+    \noalign{\smallskip}\hline\noalign{\smallskip}
+    \RAX & \verb|small.a| & \reg{XMM0} & \verb|A| & $\RSP$ & \verb|mm|\\
+    \RDX & \verb|small.b| & \reg{XMM1} & \verb|B| & $\RSP+8$ & \verb|e|\\
+    \RCX & \verb|&large| & \reg{XMM2} & \verb|C| &$\RSP+16$& \verb|d| \\
+    \RBX & \verb|a| & \reg{XMM3} & \verb|D| &  & \\
+    \RSI & \verb|b| & \reg{XMM4} & \verb|E| &  & \\
+    \RDI & \verb|c| & \reg{XMM5} & undefined &  & \\
+    \hline
+  \end{tabular}
 \end{table}
 
 
@@ -448,18 +556,21 @@ on x86-64 and other machines as well.
 
 \subsection{Return Values}
 
+\subsubsection {Proposal 1: ``smart'' mapping of structures}
 Scalars, complex numbers, aggregates and unions not exceeding 16 bytes or no
 value are returned directly.  First one or two classes are assigned to given
 value and then relevant registers are used as discussed in subsection
 \ref{subsec-registers} leaving rest of registers undefined.
 
-The scalar values, aggregates and unions exceeding 8 bytes that
-belong to class \emph{SSE} are not split to two registers and
-register XMM0 is used to return both qwords.  Complex values are
-always returned in two separate parts.  The first register contains
-the real part, while the second register the imaginary one. The qword
-of type \emph{SSE2} is passed in the upper half of XMM0 instead of
-XMM1.
+The scalar values are returned in single register. One of the
+\RAX, \reg{XMM0} and \reg{MM0} are choosen according to their class.
+\verb|__int128| is returned in \RDX:\RAX.
+
+First oword of unions, aggregates and real part of complex values not exceeding
+8 bytes is returned in same way as simple scalar registers.  Second oword
+(when available) is returned in one of the following: \RAX, \reg{XMM0} and
+\reg{MM1} depending on their class.  Class \emph{SSE-2} is returned in upper
+half of register \reg{XMM0}.
 
 Complex numbers, aggregates and unions exceeding 16 bytes are stored
 in an area prepared by the caller and passed to the function as
@@ -468,8 +579,119 @@ left undefined.
 \editornote{i386 abi returns the pointer to the area to simplify
   caller.  Is that good idea?}
 
+\subsubsection {Proposal 2: integer-only mapping of structures}
 
+The \verb|__mm64| type is returned using \reg{MM0}.  Complex numbers,
+aggregates and unions exceeding 16 bytes are stored in an area prepared by the
+caller and passed to the function as ``hidden'' first parameter.  The contents
+of all return registers is left undefined.
 
+Other values are returned as if they were passed as first argument to
+the function.
+
+\section{Operating System Interface}
+
+\subsection{Virtual Address Space}
+
+The x86-64 architecture provides 64~bits of virtual space, but implementation
+is allowed to support less. The processes are allowed to require only 48~bits
+of address space, as supported by the initial implementation.  It is expected
+the address space to monotonically grow in the future.
+
+According the \emph{canonical address form} as defined by the x86-64
+architecture, every byte of virtual space is having two addresses unless the
+implementation support full 64~bit address space.  The applications may not
+depend on this behaviour and address the data only using single address.
+
+Memory management translates virtual address to physical address, hyding
+physical addressing and letting a process run anywhere in the system's real
+memory. Process typically begin with three logical segments called ``text'',
+``data'' and ``stack''. An object file may contain more segments (for example.
+for debugger use), and a process also creates additional segments for itself
+with system services.
+
+\subsection{Page Size}
+Memory is organized by pages, which are the system's smallest units of
+memory allocation. Page size can vary from one system to another.
+Process may call \verb|sysconf|(\verb|BA_OS|) to determine current page size.
+This ABI allows system to cluster memory to logical power-of-two page
+sizes up to 65536 bytes.
+
+\subsection{Virtual Address Assignments}
+Conceptually process have full (minimally) 48-bit address space available.
+In practice, however, several factors limit the size of a process.
+\begin{itemize}
+  \item The system reserves configuration dependent amount of virutal space.
+  \item The system reserves configuration dependent amount of space per
+    process.
+  \item
+    A process whose size exceeds the system's available combined physical
+    memory and secondary storage cannot run. Although some physical memory
+    must be present to run any process, the system can execute processes that
+    are bigger than physical memory, paging them to and from secondary storage.
+    Nonetheless, both physical memory and secondary storage are
+    shared resources. System load, which can vary from one program execution
+    to the next, affects the available amounts.
+\end{itemize}
+
+\begin{figure}[H]
+  \caption{Virtual Address Configuration}
+  \label{fig-address}
+  \begin{center}
+    \begin{tabular}{r|c|l}
+      \noalign{\smallskip}  \cline{2-2}
+      \verb|0xffffffffffffffff| & Reserved system area & End of memory\\ 
+      & \dots & \\ \cline{2-2}
+      & \dots & \\
+      \verb|0x80000000000| & Dynamic segments & \\ \cline{2-2}
+      & \dots & \\
+      \verb|0| & Process segments & Beggining of memory\\ \cline{2-2}
+    \end{tabular}
+  \end{center}
+\end{figure}
+
+Figure \ref{fig-address} shows the virtual address configuration on the x86-64
+Architecture.  The segments with different properties are typically grouped in
+different areas of the address space:
+
+\begin{description}
+  \item [Process segments]
+    Processese loadable segments and stack may begin at 0. The exact addresses
+    depend on the executable file format. Processes can control the amount
+    of virtual memory allotted for stack space, as described below.
+  \item [Dynamic segments]
+    A processes dynamic segments reside below the reserved area.
+  \item [Reserved] A reserved area resides at the top of virtual space.
+\end{description}
+
+As the figure shows, the system reserves the high end of virtual address space,
+with a processss dynamic segments below that. Although the exact boundary
+between the reserved area and a process depends on the systemas configuration,
+the reserved area shall not consume more than 1 GB of the address space.
+Individual systems may reserve less space, increasing processes  virtual memory
+range.
+
+Although applications may control their memory assignments, the typical
+arrangement appears in figure \ref{fig-cfg}
+
+\begin{figure}[H]
+  \caption{Conventional Segment Arrangements}
+  \label{fig-cfg}
+  \begin{center}
+    \begin{tabular}{r|c|l}
+      \cline{2-2}
+      & \dots & \\
+      \verb|0x80000000000| & Dynamic segments & \\ \cline{2-2}
+      & Stack segment & \\ 
+      & \dots & \\ \cline{2-2}
+      & \dots & \\
+      & Data segments & \\ \cline{2-2}
+      & \dots & \\
+      \verb|0x10000| & Text segments & \\ \cline{2-2}
+      \verb|0| & Unmapped & \\ \cline{2-2}
+    \end{tabular}
+  \end{center}
+\end{figure}
 %%% Local Variables: 
 %%% mode: latex
 %%% TeX-master: "abi"
