@@ -1,4 +1,3 @@
-
 \chapter{Low Level System Information}
 
 \section{Machine Interface}
@@ -9,8 +8,6 @@ The \xARCH architecture defines a new mode, referred to as 32/64-bit
 mode. See the \xARCH Specification details. All information in this
 document is relevant only to 32/64-bit mode, unless stated otherwise.
 
-\editornote{Is this correct?}
-
 \subsection{Data Representation}
 
 Within this specification, the term \emph{halfword} refers to a 16-bit
@@ -20,7 +17,7 @@ object, the term \emph{word} refers to a 32-bit object, the term
 
 \subsubsection{Fundamental Types}
 
-Figure~\ref{basic-types} shows the correspondence between ANSI C's
+Figure~\ref{basic-types} shows the correspondence between ISO C's
 scalar types and the processor's.
 
 \begin{figure}
@@ -63,12 +60,14 @@ scalar types and the processor's.
     point & \texttt{double} & 8 & 8 & double (IEEE) \\
     & \texttt{long double} & 16 & 16 & double extended (IEEE) \\
     \hline
-    Packed & \texttt{__m64} & 8 & 8 & \MMX{} and 3DNow! \\
+    Packed & \texttt{__m64} & 8 & 8 & \MMX{} and \threednow \\
     & \texttt{__m128} & 16 & 16 & SSE and SSE-2 \\
   \end{tabular}
 \end{figure}
+
 \editornote{Should we define __int128?}
 \editornote{Why do we use 16-byte long doubles instead of 12?}
+\editornote{Define 80bit x87 double extended type.}
 
 A null pointer (for all types) has value zero.
 
@@ -76,7 +75,7 @@ A null pointer (for all types) has value zero.
 
 Structure members are ``naturally'' aligned.  Structures and unions assume the
 alignment of the most strictly aligned component (compare with table
-\ref{tab-basic-types}).  The size of aggregates is a multiple of the alignment.
+\ref{basic-types}).  The size of aggregates is a multiple of the alignment.
 
 \subsubsection{Arrays}
 
@@ -110,7 +109,7 @@ stack traceback algorithm.
 The \xARCH architecture provides 16 general purpose registers, each 64
 bits wide. In addition the architecture provides 16 SSE registers,
 each 128 bits wide and 8 x87 floating point registers, each 80 bits
-wide usable as 64 bits wide \MMX/3dNOW! registers and several special
+wide usable as 64 bits wide \MMX/\threednow registers and several special
 purpose registers.
 
 This subsection discusses usage of each register.  The registers called
@@ -151,7 +150,7 @@ be freely clobbered by the called function.
   \item [\reg{XMM13} -- \reg{XMM15}] Temporary registers
 \end{description}
 
-\subsubsection {\MMX/3dNOW! and x87 registers}
+\subsubsection {\MMX/\threednow and x87 registers}
 
 Since the usage of SSE instruction set if prefered over the x87, the CPU is in
 ``\MMX'' mode across function calls. Every function that uses x87 register

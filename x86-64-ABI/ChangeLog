@@ -1,7 +1,12 @@
 2000-07-28  Andreas Jaeger  <aj@suse.de>
 
+	* abi-index.tex: Don't make it a chapter.
+
+	* Makefile (INCLUDES): Add new files.
+
 	* low-level-sys-info.tex (Fundamental Types): Make table a bit
 	smaller.
+	Some minor cleanup.
 
 2000-07-27  Mark Mitchell  <mark@codesourcery.com>
 
