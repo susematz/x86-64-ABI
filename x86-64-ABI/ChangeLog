@@ -1,5 +1,9 @@
 2000-08-15  Andreas Jaeger  <aj@suse.de>
 
+	* conventions.tex: Fix typos.
+
+	* introduction.tex: Mention C++ section.
+
 	* low-level-sys-info.tex: Lots of minor fixes to language.
 
 	* conventions.tex: Add label.
