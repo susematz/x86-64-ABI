@@ -45,6 +45,23 @@
 % Some commands:
 \newcommand{\editornote}[1]{(\emph{Editor:}\/ #1)}
 
+%Typesetting of registers
+\newcommand{\reg}[1]{{\tt{#1}}}
+\newcommand{\RAX}{\reg{RAX}}
+\newcommand{\RBX}{\reg{RBX}}
+\newcommand{\RCX}{\reg{RCX}}
+\newcommand{\RDX}{\reg{RDX}}
+\newcommand{\RSI}{\reg{RSI}}
+\newcommand{\RDI}{\reg{RDI}}
+\newcommand{\RBP}{\reg{RBP}}
+\newcommand{\RSP}{\reg{RSP}}
+
+%Typesetting of opcodes
+\newcommand{\op}[1]{{\tt{#1}}}
+
+%Typesetting common names
+\newcommand{\MMX}{\emph{MMX}}
+
 % Use Hyperref for PDF support - this should be last
 \ifpdf
 \usepackage[pdftex]{hyperref}

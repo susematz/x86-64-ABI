@@ -1,3 +1,13 @@
+Tue Jul 18 20:33:36 CEST 2000  Jan Hubicka  <jh@suse.cz>
+
+	* macros.tex (\reg, \RAX, \RBX, \RCX, \RDX, \RSI, \RDI, \RBP, \RSP,
+	\op): New.
+	* low-level-sys-info.tex: (Registers): MMX registers are no longer
+	used to pass arguments.
+	(The Stack Frame): Rewrite.
+	(Parameter Passing Conventions): Rewrite.
+	(Variable Argument List): New.
+
 2000-07-15  Andreas Jaeger  <aj@suse.de>
 
 	* low-level-sys-info.tex: Fixed some typos.
