@@ -667,7 +667,8 @@ the function.
 Although the \xARCH architecture uses 64-bit pointers, implementations
 are only required to handle 48-bit addresses.  Therefore, conforming
 processes may only use addresses from \texttt{0x0000000000000000} to
-\texttt{0x0000ffffffffffff}.
+\texttt{0x00007fffffffffff}\footnote{0x0000ffffffffffff is not a
+  canoncial address and cannot be used.}.
 
 No other changes required.
 
