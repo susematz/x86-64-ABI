@@ -1,3 +1,7 @@
+2000-11-13  Andreas Jaeger  <aj@suse.de>
+
+	* low-level-sys-info.tex: Fix typos, clarify return registers.
+
 2000-10-18  Andreas Jaeger  <aj@suse.de>
 
 	* object-files.tex: Use R_X86_64 instead of R_X8664.

@@ -172,7 +172,7 @@ The CPU shall be in MMX mode upon entry to a function.  Therefore,
 every function that uses the x87 register stack is required to issue
 an \op{emms} or \op{femms} instruction before accessing the x87
 register stack.\footnote{All \MMX{} registers are caller-saved, so
-  callees that make use of the x87 register stack may use the fsater
+  callees that make use of the x87 register stack may use the faster
   \op{femms} instruction.}  The direction flag in the \reg{eflags}
 register must be clear on function entry, and on function return.
 
@@ -271,8 +271,8 @@ consisted of two separate 64-bit arguments of type \code{long}.  The
 therefore processed second.\footnote{Thus, if the value is placed on
   the stack, the low-order bits will be at a lower address, which
   allows the caller to access the value normally.}  If there are not
-sufficiently manly registers available to allow passing both arguments
-in registers, then the value is passed on the stack.
+enough registers available to allow passing both arguments in
+registers, then the value is passed on the stack.
 
 Scalar values of type \code{__m64} are always placed on the stack.
 
@@ -301,7 +301,7 @@ If the structure contains a single scalar component, then it is passed
 as if it were a single argument of that scalar type.
 
 Otherwise, the first (or only, if the structure has no more than 8
-bytes), doubleword of the sturcture is passed first.  If there is only
+bytes), doubleword of the structure is passed first.  If there is only
 one component, the argument is passed as if it were an argument of
 that type.  Otherwise, if all scalar components in the first component
 are of floating point type, the first doubleword is passed as if it
@@ -325,10 +325,12 @@ for the second doubleword.
 If a function returns a scalar of type \code{__m64}, the value is
 returned in \reg{mm0}.  If the function returns a scalar of some other
 type, the value is returned in a register or registers.  The register
-or registers chosen are the same as those that would be selected were
+or registers chosen are the same as those that would be selected for
 a value of the same type to be passed to a function taking only one
 argument of that same type, except that \RAX is added at the beginning
-of the list of available registers.
+of the list of available registers.\footnote{This implies that only
+  \RAX, \RBX, \reg{mm0} and \reg{xmm0} will be used as return
+  registers.}
 
 \subsection{Functions Returning Structures or Unions}
 
@@ -340,7 +342,7 @@ function.  In effect, this address becomes a ``hidden'' first
 argument.
 
 In this case, the function also sets \RAX to the value of the original
-address in the calle's area before it returns.  Thus when the caller
+address in the callee's area before it returns.  Thus when the caller
 receives control again, the address of the returned object resides in
 register \RAX and can be used to access the object.
   
@@ -348,7 +350,7 @@ If a function returns a structure or union whose size is less than or
 equal to 16 bytes, and, for C++, the structure or union is a POD, then
 the structure is returned in registers.  The registers chosen for a
 given structure or union type are the same as those that would be
-selected were a value of the same type to be passed to a function
+selected for a value of the same type to be passed to a function
 taking only one argument of that same structure type, except that \RAX
 is added at the beginning of the list of available registers.
 
