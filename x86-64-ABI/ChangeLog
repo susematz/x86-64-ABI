@@ -1,7 +1,10 @@
 2000-08-17  Andreas Jaeger  <aj@suse.de>
 
-	* low-level-sys-info.tex (subsection{The Stack Frame}): Clarify
-	RBP/RSP usage as suggested by Robert Dewar.
+	* conventions.tex (Execution of 32bit programs): Libraries go to
+	/lib64.
+
+	* low-level-sys-info.tex (The Stack Frame): Clarify RBP/RSP usage
+	as suggested by Robert Dewar.
 
 2000-08-16  Andreas Jaeger  <aj@suse.de>
 
