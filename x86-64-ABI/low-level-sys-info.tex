@@ -14,7 +14,8 @@ object, the term \emph{word} refers to a 32-bit object, the term
 \subsubsection{Fundamental Types}
 
 Figure~\ref{basic-types} shows the correspondence between ISO C's
-scalar types and the processor's.
+scalar types and the processor's. The \code{__int128},
+\code{__float128}, \code{__m64} and \code{__m128} types are optional.
 
 \begin{figure}
   \caption{Scalar Types}\label{basic-types}
@@ -52,10 +53,10 @@ scalar types and the processor's.
     & \texttt{unsigned long} & 8 & 8 & unsigned doubleword \\
     & \texttt{unsigned long long} & 8 & 8 & unsigned doubleword \\
     \hline
-    & \texttt{__int128} & 16 & 16 & signed quadword \\
-    & \texttt{signed __int128} & 16 & 16 & signed quadword \\
+    & \texttt{__int128}$^*$ & 16 & 16 & signed quadword \\
+    & \texttt{signed __int128}$^*$ & 16 & 16 & signed quadword \\
     \hline
-    & \texttt{unsigned __int128} & 16 & 16 & unsigned quadword \\
+    & \texttt{unsigned __int128}$^*$ & 16 & 16 & unsigned quadword \\
     \hline
     Pointer & \texttt{\textit{any-type} *} & 8 & 8 & unsigned doubleword \\
     & \texttt{\textit{any-type} (*)()} & & \\
@@ -63,10 +64,12 @@ scalar types and the processor's.
     Floating-& \texttt{float} & 4 & 4 & single (IEEE) \\
     point & \texttt{double} & 8 & 8 & double (IEEE) \\
     & \texttt{long double} & 16 & 16 & 80-bit extended (IEEE) \\
-    & \texttt{__float128} & 16 & 16 & 128-bit extended (IEEE) \\
+    & \texttt{__float128}$^*$ & 16 & 16 & 128-bit extended (IEEE) \\
     \hline
-    Packed & \texttt{__m64} & 8 & 8 & \MMX{} and \threednow \\
-    & \texttt{__m128} & 16 & 16 & SSE and SSE-2 \\
+    Packed & \texttt{__m64}$^*$ & 8 & 8 & \MMX{} and \threednow \\
+    & \texttt{__m128}$^*$ & 16 & 16 & SSE and SSE-2 \\
+\noalign{\smallskip}
+\cline{1-2}\multicolumn{3}{l}{\small $^*$ These types are optional.}\\
   \end{tabular}
 }
 \end{figure}
@@ -78,8 +81,8 @@ bias of 16383.\footnote{Initial implementations of the \xARCH
   \texttt{__float128} type only via software emulation.}
 
 The \code{long double} type uses a 15 bit exponent, a 64-bit mantissa
-with an explicit high order significand bit and an exponent bias of
-16383.\footnote{This type is the x87 double extented precision data
+with an explicit high order significant bit and an exponent bias of
+16383.\footnote{This type is the x87 double extended precision data
   type.}  Although a \code{long double} requires 16 bytes of storage,
 only the first 10 bytes are significant.  The remaining six bytes are
 tail padding, and the contents of these bytes are undefined.
@@ -102,7 +105,7 @@ or global array variable that requires at least 16 bytes, or a C99
 local or global variable-length array variable, always has alignment
 of at least 16 bytes.\footnote{The alignment requirement allows the
   use of SSE instructions when operating on the array.  The compiler
-  cannot in general calculate the size of a variable-length array, but
+  cannot in general calculate the size of a variable-length array (VLA), but
   it is expected that most VLAs will require at least 16 bytes, so it
   is logical to mandate that VLAs have at least a 16-byte alignment.}
 
@@ -155,7 +158,7 @@ The \xARCH architecture provides 16 general purpose 64-bit registers.
 In addition the architecture provides 16 SSE registers, each 128 bits
 wide and 8 x87 floating point registers, each 80 bits wide.  Each of
 the x87 floating point registers may be referred to in \MMX/\threednow
-mode as a 64-bit register.  All of these registesr are global to all
+mode as a 64-bit register.  All of these registers are global to all
 procedures in a running program.
 
 This subsection discusses usage of each register.  Registers \RBP, \RBX and
@@ -168,11 +171,11 @@ function.\footnote{Note that in contrast to the \intelabi, \RDI,
 calling function wants to preserve such a register value across a
 function call, it must save the value in its local stack frame.
 
-The CPU shall be in MMX mode upon entry to a function.  Therefore,
-every function that uses the x87 register stack is required to issue
-an \op{emms} or \op{femms} instruction before accessing the x87
-register stack.\footnote{All \MMX{} registers are caller-saved, so
-  callees that make use of the x87 register stack may use the faster
+The CPU shall be in x87 mode upon entry to a function.  Therefore,
+every function that uses the \MMX registers is required to issue
+an \op{emms} or \op{femms} instruction before accessing the \MMX
+registers.\footnote{All x87 registers are caller-saved, so
+  callees that make use of the \MMX registers may use the faster
   \op{femms} instruction.}  The direction flag in the \reg{eflags}
 register must be clear on function entry, and on function return.
 
@@ -188,10 +191,10 @@ stack.  This stack grows downwards from high addresses.  Figure
   \begin{center}
     \begin{tabular}{r|c|l}
       \noalign{\smallskip}
-      \multicolumn{1}{l}{\bf Position} &
-      \multicolumn{1}{c}{\bf Contents} &
-      \multicolumn{1}{l}{\bf Frame} \\
-      \noalign{\smallskip}  \cline{2-3}
+      \multicolumn{1}{l}{Position} &
+      \multicolumn{1}{c}{Contents} &
+      \multicolumn{1}{l}{Frame} \\
+      \noalign{\smallskip}  \cline{1-3}
       \code{8n+16(\RBP)} & argument doubleword $n$ \\
       & \dots & Previous \\
       \code{16(\RBP)} & argument doubleword $0$ \\
@@ -251,7 +254,7 @@ of the type being pushed.  If the value does not consume the entire
 doubleword, the contents of the unused storage located at higher
 numbered addresses within the doubleword is undefined.
 
-If the argument is a scalar type, other than \code{__m64} or
+If the argument is a scalar type, other than \code{__long double} or
 \code{__int128}, then it is placed in the next available register
 suitable for its type.  In particular, arguments of integral or
 pointer type are placed in the next available general purpose
@@ -263,10 +266,11 @@ register, taken in the order \RDI, \RSI, \RDX, \RCX, \reg{r8}, and
   control needs to be transferred.  \RAX is used to indicate the
   number of SSE arguments passed to a function requiring a variable
   number of arguments. \reg{r10} is used for passing a function's
-  static chain pointer.}  Arguments of floating point type and of type
-\code{__m128}, are placed in the next available SSE register, taken in
-order from \reg{xmm0} to \reg{xmm15}.  If no registers are available,
-the values are placed on the stack.
+  static chain pointer.}  Arguments of floating point type other than
+\code{long double}, of type
+\code{__m64} and of type \code{__m128}, are placed in the next
+available SSE register, taken in order from \reg{xmm0} to \reg{xmm15}.
+If no registers are available, the values are placed on the stack.
 
 Scalar values of type \code{__int128} are handled almost as if they
 consisted of two separate 64-bit arguments of type \code{long}.  The
@@ -277,10 +281,10 @@ therefore processed second.\footnote{Thus, if the value is placed on
 enough registers available to allow passing both arguments in
 registers, then the value is passed on the stack.
 
-Scalar values of type \code{__m64} are always placed on the stack.
+Scalar values of type \code{long double} are always placed on the stack.
 
 Structure or union objects with more than 16 bytes, those that contain
-scalar components of type \code{__m64}, or, in C++,
+scalar components of type \code{long double}, or, in C++,
 non-POD\footnote{The term POD is from the ANSI/ISO C++ Standard, and
   stands for Plain Ol' Data.  Although the exact definition is
   technical, a POD is essentially a structure or union that could
@@ -325,19 +329,18 @@ for the second doubleword.
 
 \begin{figure}
 \Hrule
-  \caption{Generic Register Usage}
+  \caption{Register Usage}
   \label{fig-reg-usage}
   \begin{center}
-    \begin{tabular}{l|p{8cm}|l}
+    \begin{tabular}{l|p{6cm}|l}
       \noalign{\smallskip}
       \multicolumn{1}{c}{} &
       \multicolumn{1}{c}{}&
-      \multicolumn{1}{l}{\bf Preserved across} \\
-      \multicolumn{1}{c}{\bf Register} &
-      \multicolumn{1}{c}{\bf Usage}&
-      \multicolumn{1}{l}{\bf function calls} \\
+      \multicolumn{1}{l}{Preserved across}\\
+      \multicolumn{1}{c}{Register} &
+      \multicolumn{1}{c}{Usage}&
+      \multicolumn{1}{l}{function calls}\\
       \hline
-      \noalign{\smallskip}
 \RAX & temporary register; with variable arguments passes
 information about the number of SSE registers used; 1$^{\rm st}$
 return register & No \\
@@ -353,17 +356,13 @@ return register & No \\
 \reg{r10} & temporary register, used for passing a function's static
 chain pointer & No \\
 \reg{r11} & temporary register & No\\
-\reg{r12} & callee-saved register & Yes \\
-\reg{r13} & callee-saved register & Yes \\
-\reg{r14} & callee-saved register & Yes \\
-\reg{r15} & callee-saved register & Yes \\
+\reg{r12--r15} & callee-saved register & Yes \\
 \reg{xmm0}--\reg{xmm1} & used to pass and return floating point
 arguments & No\\
 \reg{xmm2}--\reg{xmm15} & used to pass floating point arguments & No\\
-\reg{mmx0}--\reg{mmx1},&&\\
-\reg{st0}--\reg{st1} & temporary registers; used to return MMX arguments & No \\
-\reg{mmx2}--\reg{mmx8},&&\\
-\reg{st2}--\reg{st8} & temporary registers & No \\
+\reg{mmx0}--\reg{mmx7}& temporary registers & No\\
+\reg{st0} & temporary register; used to return \code{long double} arguments & No \\
+\reg{st1}--\reg{st7} & temporary registers & No \\
     \end{tabular}
 
   \end{center}
@@ -373,7 +372,8 @@ arguments & No\\
 As an example of the register passing conventions, consider the
 declarations and the function call shown in
 Figure \ref{fig_passing_example}.  The corresponding register
-allocation is given in Figure \ref{fig_allocation_example}.
+allocation is given in Figure \ref{fig_allocation_example}, the stack
+frame offset given shows the frame before calling the function.
 
 \begin{figure}[H]
 \Hrule
@@ -416,10 +416,10 @@ func (e, f, s, g, h, ld, l, m, n, i, j, k);\\
 \multicolumn{2}{c}{Floating Point Registers} & 
 \multicolumn{2}{c}{Stack Frame Offset}\\
 \hline
-\RDI: &\code{e} & \reg{xmm0}: &\code{s.d} &\code{8:}& \code{j} \\
-\RSI: &\code{f} & \reg{xmm1}: &\code{ld}& \code{12:}& \code{k} \\
-\RDX: &\code{s.a,s.b} & \reg{xmm2}: &\code{m}&& \\
-\RCX: &\code{g} & \reg{xmm3}: &\code{n}& & \\
+\RDI: &\code{e} & \reg{xmm0}: &\code{s.d} &\code{0:}& \code{ld} \\
+\RSI: &\code{f} & \reg{xmm1}: &\code{m}& \code{16:}& \code{j} \\
+\RDX: &\code{s.a,s.b} & \reg{xmm2}: &\code{n}&\code{24:}& \code{k} \\
+\RCX: &\code{g} & & & \\
 \reg{r8}:&\code{h} & && & \\
 \reg{r9}:&\code{i} & && & \\
 \end{tabular}
@@ -431,13 +431,13 @@ func (e, f, s, g, h, ld, l, m, n, i, j, k);\\
 
 \subsection{Functions Returning Scalars or No Value}
 
-If a function returns a scalar of type \code{__m64}, the value is
-returned in \reg{mm0}.  If the function returns a scalar of some other
-type, the value is returned in a register or registers.  The register
-or registers chosen are the same as those that would be selected for a
-value of the same type to be passed to a function taking only one
-argument of that same type, except that the list for integral or
-pointer type scalars consists of \RAX and \RDX.
+If a function returns a scalar of type \code{long double}, the value
+is returned in \reg{st0}.  If the function returns a scalar of some
+other type, the value is returned in a register or registers.  The
+register or registers chosen are the same as those that would be
+selected for a value of the same type to be passed to a function
+taking only one argument of that same type, except that the list for
+integral or pointer type scalars consists of \RAX and \RDX.
 
 \subsection{Functions Returning Structures or Unions}
 
@@ -472,7 +472,7 @@ As the \xARCH manuals describe, the processor changes mode to handle
 floating-point/coprocessor or asynchronous. 
 Synchronous and floating-point/coprocessor exceptions,
 being caused by instruction execution, can be explicitly generated
-by a process. This section, therefore, specifies those eception types
+by a process. This section, therefore, specifies those exception types
 with defined behavior. The \xARCH architecture classifies exceptions as
 \emph{faults}, \emph{traps}, and \emph{aborts}. See the \intelabi 
 for more information about their differences.
@@ -539,7 +539,7 @@ Although the \xARCH architecture uses 64-bit pointers, implementations
 are only required to handle 48-bit addresses.  Therefore, conforming
 processes may only use addresses from \texttt{0x0000000000000000} to
 \texttt{0x00007fffffffffff}\footnote{0x0000ffffffffffff is not a
-  canoncial address and cannot be used.}.
+  canonical address and cannot be used.}.
 
 No other changes required.
 
@@ -724,12 +724,12 @@ that are of general interest:
   The large PIC model implies the same limitation as the medium
   PIC model regarding addressing of static data.  Additionally,
   references to the global offset table and to the procedure linkage
-  table and branch destiniations need to be calculated in a similar
+  table and branch destinations need to be calculated in a similar
   way.
 
 \end{description}
 
-\subsection{Position-Independend Function Prologue}
+\subsection{Position-Independent Function Prologue}
 
 \xARCH does not need any function prologue for calculating the global
 offset table address since it does not have an explicit GOT pointer.
@@ -804,7 +804,7 @@ function is known to never accept arguments passed in
 registers\footnote{This fact may be determined either by exploring
   types used by the \code{va_arg}
 macro, or by the fact that the named
-  arguments already are exhausted the argument registers entirely},
+  arguments already are exhausted the argument registers entirely.},
 the register save area may be omitted entirely.
 
 The prologue should use \RAX to avoid unnecessarily saving XMM
@@ -817,10 +817,9 @@ prevent the initialization of the XMM unit.
 \caption{Register Save Area}
 \label{fig-reg-save}
 \begin{center}
-\begin{tabular}{|l|r|}
-\cline{1-2}
-register&offset\\
-\cline{1-2}
+\begin{tabular}{l|r}
+\multicolumn{1}{c}{Register}&\multicolumn{1}{c}{Offset}\\
+\hline
 \RDI & $0$ \\
 \RSI & $8$ \\
 \RDX & $16$ \\
@@ -831,7 +830,6 @@ register&offset\\
 \reg{xmm1} & $64$ \\
 \dots &  \\
 \reg{xmm15} & $288$ \\
-\cline{1-2}
 \end{tabular}
 \end{center}
 \Hrule
@@ -932,12 +930,12 @@ Return the fetched \code{type}.
 \end{enumerate}
 
 The \code{va_arg} macro is usually implemented as a compiler builtin and expanded in
-simplified forms for each particular type.  Figure \reg{fig-va_arg} is a sample
+simplified forms for each particular type.  Figure \ref{fig-va_arg} is a sample
 implementation of the \code{va_arg} macro.
 \begin{figure}[H]
 \Hrule
-\label{fig-va_arg}
 \caption{Sample Implementation of \code{va_arg(l, int)}}
+\label{fig-va_arg}
 \begin{center}
 \begin{tabular}{|llll|}
 \cline{1-4}
@@ -984,17 +982,16 @@ requires processor-specific address class codes to be defined.
 
 Table \ref{tbl-reg-num-map} outlines the register number mapping
 for the \xARCH processor family.%
-\footnote{This document does not define mappings for priviledged registers.}%
+\footnote{This document does not define mappings for privileged registers.}%
 \footnote{The table defines Return Address to have a register number, even
 though the address is stored in $0($\RSP$)$ and not in a physical register.}
 
 \begin{figure}
 \caption{DWARF Register Number Mapping} \label{tbl-reg-num-map}
 \begin{center}
-\begin{tabular}{|l|r|l|}
-\cline{1-3}
-Register Name&Number&Abbreviation\\
-\cline{1-3}
+\begin{tabular}{l|r|l}
+\multicolumn{1}{c}{Register Name}&\multicolumn{1}{c}{Number}&\multicolumn{1}{c}{Abbreviation}\\
+\hline
 General Purpose Register RAX & 0 &\RAX\\
 General Purpose Register RBX & 1 &\RBX\\
 General Purpose Register RCX & 2 &\RCX\\
@@ -1003,14 +1000,13 @@ Frame Pointer Register   RBP & 4 &\RBP\\
 General Purpose Register RSI & 5 &\RSI\\
 General Purpose Register RDI & 6 &\RDI\\
 Stack Pointer Register   RSP & 7 &\RSP\\
-Extended Integer Registers 8-15 & 8-15 &\reg{r8}-\reg{r15}\\
+Extended Integer Registers 8-15 & 8-15 &\reg{r8}--\reg{r15}\\
 Return Address RA
 & 17&\\
-SSE Registers 0-7              & 17-24 & \reg{xmm0}-\reg{xmm7} \\
-Extended SSE Registers 8-15    & 25-32 & \reg{xmm8}-\reg{xmm15} \\
-Floating Point Registers 0-7   & 33-40 & \reg{st0}-\reg{st7} \\
-MMX Registers 0-7              & 41-48 & \reg{mm0}-\reg{mm7} \\
-\cline{1-3}
+SSE Registers 0--7              & 17-24 & \reg{xmm0}--\reg{xmm7} \\
+Extended SSE Registers 8--15    & 25-32 & \reg{xmm8}--\reg{xmm15} \\
+Floating Point Registers 0--7   & 33-40 & \reg{st0}--\reg{st7} \\
+MMX Registers 0--7              & 41-48 & \reg{mm0}--\reg{mm7} \\
 \end{tabular}
 \end{center}
 \end{figure}

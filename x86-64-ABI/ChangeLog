@@ -1,5 +1,19 @@
+2001-02-20  Andreas Jaeger  <aj@suse.de>
+
+	* low-level-sys-info.tex: Fix long double passing conventions.
+	General cleanup.
+	* macros.tex: Increment version.
+
 2001-02-14  Andreas Jaeger  <aj@suse.de>
 
+	* low-level-sys-info.tex: Some cleanups:
+	The __int128, __float128, __m64 and __m128 types are optional.
+	The CPU will be in x87 mode.
+	Values of type __m64 will be passed in XMM registers.
+	Values of type __m64 will be returned in XMM registers.
+	Values of type long double will be passed on the stack
+	A value of type long double will be returned in %st.
+	
 	* dl.tex: Fix LaTeX bug in last patch.
 
 Wed Feb 14 12:16:04 CET 2001  Jan Hubicka  <jh@suse.cz>
