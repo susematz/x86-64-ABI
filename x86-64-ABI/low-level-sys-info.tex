@@ -513,7 +513,7 @@ size and address range.  We define only a small number of code models
 that are of general interest:
 
 \begin{description}
-\item[\textindex{small code model}] 
+\item[\textindex{Small code model}] 
   The virtual address of code executed is known at link time.
   Additionally all symbols are known to be located in the virtual
   addresses in the range from $0$ to $2^{31}-2^{10} - 1$.
@@ -528,7 +528,7 @@ that are of general interest:
   This is the fastest code model and we expect it to be suitable for
   the vast majority of programs.
 
-\item[\textindex{kernel code model}]
+\item[\textindex{Kernel code model}]
   
   The kernel of an operating system is usually rather small but runs
   in the negative half of the address space.  So we define all symbols
@@ -539,7 +539,7 @@ that are of general interest:
   offsets from $2^{31}$ to $2^{31}+2^{10}$. The range offsets for
   sign extended reference changes to $0$--$2^{31}+2^{10}$.
 
-\item[\textindex{medium code model}]
+\item[\textindex{Medium code model}]
   
   The medium code model does not make any assumptions about the range
   of symbolic references to data sections. Size and address of the
@@ -550,7 +550,7 @@ that are of general interest:
   the advantages of the small code model for manipulation of addresses
   to the text section (specially needed for branches).
 
-\item[\textindex{large code model}]
+\item[\textindex{Large code model}]
   
   The large code model makes no assumptions about addresses and sizes
   of sections.
@@ -583,11 +583,23 @@ that are of general interest:
   This model is like the previous model, but makes no assumptions
   about the distance of symbols to the data section.
   
+  In the medium PIC model, the instruction pointer relative addressing
+  can not be used directly for accessing static data, since the offset
+  can exceed the limitations on the size of the displacement field in
+  the instruction.  Instead an unwind sequence consisting of
+  \code{movabs}, \code{lea} and \code{add} needs to be used.
+
 \item[\textindex{Large position independent code model}
   (\textindex{PIC})]
   
   This model is like the previous model, but makes no assumptions
   about the distance of symbols.
+  
+  The large PIC model implies the same limitation as the the medium
+  PIC model regarding addressing of static data.  Additionally,
+  references to the global offset table and to the procedure linkage
+  table and branch destiniations need to be calculated in a similar
+  way.
 
 \end{description}
 
