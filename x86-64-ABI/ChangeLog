@@ -1,5 +1,8 @@
 2000-07-12  Andreas Jaeger  <aj@suse.de>
 
+	* low-level-sys-info.tex (subsubsection{Fundamental Types}):
+	Described long double format.
+
 	* macros.tex: Add Emacs macros and some comments.
 	Add macros to print version and date on every page.
 
@@ -8,4 +11,3 @@
 2000-07-07  Andreas Jaeger  <aj@suse.de>
 
 	* Initial checkin of files.
-
