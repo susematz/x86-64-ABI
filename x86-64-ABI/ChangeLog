@@ -1,3 +1,8 @@
+2001-02-27  Bo Thorsen  <bo@suse.de>
+
+	* low-level-sys-info.tex: Don't use '*' for both pointer types and
+	footnote reference.
+
 2001-02-21  Andreas Jaeger  <aj@suse.de>
 
 	* low-level-sys-info.tex: Fix layout problems.
