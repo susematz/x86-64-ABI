@@ -1,3 +1,11 @@
+2000-08-18  Andreas Jaeger  <aj@suse.de>
+
+	* conventions.tex: Cleanup and add some index entries.
+
+	* macros.tex: Add new macros for easier indexing.
+
+	* low-level-sys-info.tex: Some cleanups.
+
 2000-08-17  Andreas Jaeger  <aj@suse.de>
 
 	* conventions.tex (Execution of 32bit programs): Libraries go to

@@ -73,9 +73,10 @@ scalar types and the processor's.
 }
 \end{figure}
 
-The \code{__float128} type uses a 15-bit exponent, a 113-bit mantissa
-(the high order significant bit is implicit) and an exponent bias of
-16383.\footnote{Initial implementations of the \xARCH architecture are
+The \codeindex{__float128} type uses a 15-bit
+exponent, a 113-bit mantissa (the high order significant bit is
+implicit) and an exponent bias of 16383.%
+\footnote{Initial implementations of the \xARCH architecture are
   expected to support operations on the \texttt{__float128} type only
   via software emulation.}
 
@@ -91,7 +92,7 @@ require all data access to be properly aligned.  Accessing misaligned
 data will be slower than accessing properly aligned data, but
 otherwise there is no difference.
 
-\subsubsection{Aggregates And Unions}
+\subsubsection{Aggregates and Unions}
 
 An array uses the same alignment as its elements, except that an array
 that requires at least 16 bytes always has alignment of at least 16
@@ -305,7 +306,7 @@ Doubleword \emph{X} of an aggregate gets assigned class \emph{Y} if and only
 if all the fields crossing doubleword \emph{X} belongs to same class \emph{Y}.  If
 no field crosses the given doubleword, its type is \emph{None}. When no class fits
 the rules above, class \emph{Int} is used.  Exception is also 
-\editornote{Jan, something is missing here --- please fill in the rest
+\editornote{\textbf{Jan}, something is missing here --- please fill in the rest
   of the sentence.}
 
 Similarly doubleword \emph{X} of a union gets assigned class \emph{Y}

@@ -13,9 +13,8 @@ No changes required.
 
 \subsubsection{Global Offset Table}
 
-The only difference is in the size of the global offset table, it
+The only difference is in the size of the \textindex{global offset table}, it
 contains 64 bit addresses.
-\index{global offset table}
 
 \begin{figure}[H]
 \Hrule
@@ -33,10 +32,11 @@ No changes required.
 \subsubsection{Procedure Linkage Table}
 
 
-\editornote{This is ia32 enhanced to 64 bits without an explicit GOT
-  register.}
+%This is ia32 enhanced to 64 bits without an explicit GOT
+%  register.
 
 % This has been copied from the i386 ABI.
+\index{procedure linkage table|(}
 Much as the global offset table redirects position-independent address
 calculations to absolute locations, the procedure linkage table
 redirects position-independent function calls to absolute locations.
@@ -50,7 +50,7 @@ destinations' absolute addresses and modifies the global offset
 table's memory image accordingly.  The dynamic linker thus can
 redirect the entries without compromising the position-independence
 and shareability of the program's text.  Executable files and shared
-object files have separate procedure linkage tables.  
+object files have separate procedure linkage tables.
 
 
 \begin{figure}[H]
@@ -145,14 +145,15 @@ The \code{LD_BIND_NOW} environment variable can change the dynamic
 linking behavior.  If its value is non-null, the dynamic linker
 evaluates procedure linkage table entries before transferring control
 to the program.  That is, the dynamic linker processes relocation
-entries of type \code{R_X8664_JMP_SLOT} \index{R_X8664_JMP_SLOT}
+entries of type \codeindex{R_X8664_JMP_SLOT}
 during process initialization.  Otherwise, the dynamic linker
 evaluates procedure linkage table entries lazily, delaying symbol
 resolution and relocation until the first execution of a table entry.
+\index{procedure linkage table|)}
 
 \subsection{Program Interpreter}
 
-There is one valid program interpreter \index{program interpreter} for
+There is one valid \textindex{program interpreter} for
 programs conforming to the \xARCH ABI:
 
 \bigskip
@@ -162,13 +163,13 @@ programs conforming to the \xARCH ABI:
 
 % copied from ia64
 The implementation is responsible for executing the initialization
-functions specified by \code{DT_INIT}, \code{DT_INIT_ARRAY} , and
-\code{DT_PREINIT_ARRAY} entries in the executable file and shared
-object files for a process, and the termination (or finalization)
-functions specified by \code{DT_FINI} and \code{DT_FINI_ARRAY}, as
-specified by the \textit{System V ABI}.  The user program plays no
-further part in executing the initialization and termination functions
-specified by these dynamic tags.
+functions specified by \codeindex{DT_INIT}, \codeindex{DT_INIT_ARRAY},
+and \codeindex{DT_PREINIT_ARRAY} entries in the executable file and
+shared object files for a process, and the termination (or
+finalization) functions specified by \codeindex{DT_FINI} and
+\codeindex{DT_FINI_ARRAY}, as specified by the \textit{System V ABI}.
+The user program plays no further part in executing the initialization
+and termination functions specified by these dynamic tags.
 
 
 %%% Local Variables:

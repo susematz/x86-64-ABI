@@ -1,4 +1,3 @@
-
 \chapter{Conventions}
 
 \editornote{This chapter is used to document some features special to
@@ -15,7 +14,7 @@ specific ABIs, uses a dedicated register (\reg{EBX}) to address the
 base of the GOT table.  The function prologue of every function needs
 to set up this register to the correct value.  The \xARCH processor
 family introduces a new IP-relative addressing mode which is used in
-this ABI instead of a using a dedicated register.
+this ABI instead of using a dedicated register.
 
 On \xARCH the GOT table contains 64 bit entries.
 
@@ -35,12 +34,12 @@ directory.
 
 \section{C++\label{section-cpp}}
 
-For the C++ ABI we will use the ia64 C++ ABI and instantiate it
+For the \textindex{C++} ABI we will use the ia64 C++ ABI and instantiate it
 appropriately.  The current draft of that ABI is available at:\\
 \url{http://reality.sgi.com/dehnert_engr/cxx/abi.html}
 
 
-%%% Local Variables: 
+%%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "abi"
-%%% End: 
+%%% End:
