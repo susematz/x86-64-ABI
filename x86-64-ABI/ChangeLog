@@ -1,5 +1,8 @@
 2000-07-25  Andreas Jaeger  <aj@suse.de>
 
+	* dl.tex: Spell check.
+	* conventions.tex: Likewise.
+
 	* development.tex: Add default sentence.
 
 	* dl.tex: Further explain proposals.

@@ -8,7 +8,7 @@ No changes required.
 
 \section{Dynamic Linking}
 
-We need three parameters for the dynamic linker to fixup the
+We need three parameters for the dynamic linker to fix up the
 PLT:
 \begin{enumerate}
 \item The address of the entry point of the dynamic linker.
@@ -67,7 +67,7 @@ procedure linkage tables reside in private data.  The dynamic linker
 determines the destinations' absolute addresses and modifies the the
 procedure linkage table's memory image accordingly.  The dynamic
 linker thus can redirect the entries without compromising the
-position-independence and sharability of the program's text.
+position-independence and shareability of the program's text.
 Executable files and shared object files have separate procedure
 linkage tables.
 
@@ -154,7 +154,7 @@ in the private global offset table.  The dynamic linker determines the
 destinations' absolute addresses and modifies the global offset
 table's memory image accordingly.  The dynamic linker thus can
 redirect the entries without compromising the position-independence
-and sharability of the program's text.  Executable files and shared
+and shareability of the program's text.  Executable files and shared
 object files have separate procedure linkage tables.  
 
 
@@ -223,7 +223,7 @@ ptr = name;               movl ptr@GOTPC(%rip), %rax
   and one memory indirect jmp, giving an overhead of one jump and one
   memory reference.}
 
-\paragraph{Proposol 3: Indirect Calls}
+\paragraph{Proposal 3: Indirect Calls}
 
 %\editornote{This was suggested to me by Wayne Meretsky}
 
@@ -244,7 +244,7 @@ in the private global offset table.  The dynamic linker determines the
 destinations' absolute addresses and modifies the global offset
 table's memory image accordingly.  The dynamic linker thus can
 redirect the entries without compromising the position-independence
-and sharability of the program's text.  Executable files and shared
+and shareability of the program's text.  Executable files and shared
 object files have separate procedure linkage tables.  
 
 \begin{figure}[H]
@@ -315,7 +315,7 @@ Other ABIs & Sparc & i386 & None? \\
                                 
 
 % common stuff
-\subsection{Programm Interpreter}
+\subsection{Program Interpreter}
 
 The name and location of the program interpreter \index{program
   interpreter} is%
