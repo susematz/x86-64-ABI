@@ -17,7 +17,7 @@ architechture. It currently tests these things:
 Relocation types should also be tested but this hasn't been implemented yet.
 
 Questions about the abitest can be directed to discuss@x86-64.org or to
-Bo Thorsen <bo@sonofthor.dk>.
+Bo Thorsen <bo@suse.de>.
 
 
 Documentation (or the lack of it)
