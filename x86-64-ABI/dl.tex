@@ -47,6 +47,7 @@ PLT:
 
 \subsection{Proposal 1: RW-PLT}
 
+
 \begin{figure}[H]
 \caption{Position-Independent Direct Function Call}
 \begin{verbatim}
@@ -68,6 +69,26 @@ ptr = name;               movl ptr@GOTPC(%rip), %rax
                           call *(%rax)
 \end{verbatim}
 \end{figure}
+
+\begin{figure}[H]
+\caption{Absolute Procedure Linkage Table}
+\begin{tabular}{lll}
+.PLT0: & pushl & got\_plus\_8; GOT[1]\\
+& jmp &got\_plus\_16 ; GOT[2] \\
+& nop & \\
+& nop & \\
+& nop & \\
+& nop & \\
+.PLT1: & jmp & .PLT1a \\
+.PLT1a& pushl & \$offset \\
+&jmp &.PLT0@PC \\
+.PLT2: & jmp& name2\\
+&pushl & \$offset \\
+& jmp & .PLT0@PC \\
+&\dots\\
+\end{tabular}
+\end{figure}
+
 
 \begin{figure}[H]
 \caption{Position-Independent Procedure Linkage Table}
@@ -104,6 +125,25 @@ ptr = name;               movl ptr@GOTPC(%rip), %rax
 extern void function ();  .globl function
 function ();              call function@PLT
 \end{verbatim}
+\end{figure}
+
+\begin{figure}[H]
+\caption{Absolute Procedure Linkage Table}
+\begin{tabular}{lll}
+.PLT0: & pushl & got\_plus\_8; GOT[1]\\
+& jmp &got\_plus\_16 ; GOT[2] \\
+& nop & \\
+& nop & \\
+& nop & \\
+& nop & \\
+.PLT1: & jmp & *name1\_in\_GOT\\
+.PLT1a& pushl & \$offset \\
+&jmp &.PLT0@PC \\
+.PLT2: & jmp& *name2\_in\_GOT\\
+&pushl & \$offset \\
+& jmp & .PLT0@PC \\
+&\dots\\
+\end{tabular}
 \end{figure}
 
 \begin{figure}[H]
@@ -145,10 +185,11 @@ ptr = name;               movl ptr@GOTPC(%rip), %rax
 
 \subsection{Proposol 3: Indirect Calls}
 
-\editornote{This was suggested to me by Wayne Meretsky}
+%\editornote{This was suggested to me by Wayne Meretsky}
 
 \editornote{Since we only relocate the GOT entries, we have a
-  read-only PLT.}
+  read-only PLT.  The disadvantage of this proposal is that
+  executables need to be compiled as PIC.}
 
 \begin{figure}[H]
 \caption{Position-Independent Direct Function Call}
@@ -157,6 +198,7 @@ extern void function ();  .globl function
 function ();              call *name@GOTPC(%rip)
 \end{verbatim}
 \end{figure}
+
 
 \begin{figure}[H]
 \caption{Position-Independent Indirect Function Call}
@@ -172,8 +214,9 @@ ptr = name;               movl ptr@GOTPC(%rip), %rax
 \end{verbatim}
 \end{figure}
 
+
 \begin{figure}[H]
-\caption{Position-Independent Procedure Linkage Table}
+\caption{Procedure Linkage Table}
 \begin{tabular}{lll}
 .PLT0: & pushl & GOT+8(\%rip); GOT[1]\\
 & jmp &GOT+16(\%rip) ; GOT[2] \\
@@ -189,7 +232,6 @@ ptr = name;               movl ptr@GOTPC(%rip), %rax
 \end{tabular}
 \end{figure}
 
-\editornote{This works only with PIC}
 
 \editornote{The costs for a call are (after fixing the PLT): one
   memory indirect call, giving an overhead of one memory reference.}
