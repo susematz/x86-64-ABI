@@ -526,9 +526,8 @@ extern void func (int e, int f,\\
 \phantom{extern void func (}structparm s, int g, int h,\\
 \phantom{extern void func (}long double ld, double m,\\
 \phantom{extern void func (}double n, int i, int j, int k);\\
-);\\
 \\
-func (e, f, s, g, h, ld, l, m, n, i, j, k);\\
+func (e, f, s, g, h, ld, m, n, i, j, k);\\
 \cline{1-1}
 \end{tabular}
 }
@@ -1347,6 +1346,7 @@ number mapping for the \xARCH processor family.%
 \footnote{This document does not define mappings for privileged registers.}%
 
 \begin{figure}
+\Hrule
 \caption{DWARF Register Number Mapping} \label{tbl-reg-num-map}
 \begin{center}
 \begin{tabular}{l|r|l}
@@ -1369,7 +1369,102 @@ Floating Point Registers 0--7   & 33-40 & \reg{st0}--\reg{st7} \\
 MMX Registers 0--7              & 41-48 & \reg{mm0}--\reg{mm7} \\
 \end{tabular}
 \end{center}
+\Hrule
 \end{figure}
+
+\section{Stack Unwind Algorithm}
+
+The stack frames are not self descriptive and where stack unwinding is
+desirable (such as for exception handling) additional unwind
+information needs to be generated.  The information is stored in an
+allocatable section \code{.eh_unwind} whose format is identical to
+\code{.debug_frame} defined by the DWARF debug information standard,
+see \emph{DWARF Debugging Information Format}, with the following
+extensions:
+
+\begin{description}
+\item[Position independence]
+
+  In order to avoid load time relocations for position independent
+  code, the FDE CIE offset pointer should be stored relative to the
+  start of CIE table entry.  Frames using this extension of the DWARF
+  standard must set the CIE identifier tag to 1.
+
+\item[Outgoing arguments area delta]
+  
+  To maintain the size of the temporarily allocated outgoing arguments
+  area present on the end of the stack (when using \code{push}
+  instructions), operation \code{GNU_ARGS_SIZE} (\code{0x2e}) can be
+  used.  This operation takes a single \code{uleb128} argument
+  specifying the current size.  This information is used to adjust the
+  stack frame when jumping into the exception handler of the function
+  after unwinding the stack frame.  Additionally the CIE Augmentation
+  shall contain an exact specification of the encoding used.  It is
+  recommended to use a PC relative encoding whenever possible and
+  adjust the size according to the code model used.
+
+\item[CIE Augmentations:]
+ 
+  The augmentation field is formated according to the augmentation
+  field formating string stored in the CIE header.
+  
+  The string may contain the following characters:
+
+\begin{description}
+\item[z] Indicates that a \code{uleb128} is present determining the size of
+  the augmentation section.
+\item[L] Indicates the encoding (and thus presence) of an LSDA pointer in the FDE augmentation.
+  
+  The data filed consist of single byte specifying the way pointers
+  are encoded.  It is a mask of the values specified by the table
+  \ref{tbl-pointer-encoding}.
+
+\begin{figure}
+\Hrule
+\caption{Pointer encoding specification byte} \label{tbl-pointer-encoding}
+\begin{center}
+\begin{tabular}{r|l}
+\multicolumn{1}{c}{Mask}&\multicolumn{1}{c}{Meaning}\\
+\hline
+0x1 & Values are stored as \code{uleb128} or \code{sleb128} type (according to flag 0x8)\\
+0x2 & Values are stored as 2 bytes wide integers (\code{udata2} or \code{sdata2})\\
+0x3 & Values are stored as 4 bytes wide integers (\code{udata4} or \code{sdata2})\\
+0x4 & Values are stored as 8 bytes wide integers (\code{udata8} or \code{sdata2})\\
+0x8 & Values are signed\\
+0x10 & Values are PC relative\\
+0x20 & Values are text section relative\\
+0x30 & Values are data section relative\\
+0x40 & Values are relative to the start of function\\
+\end{tabular}
+\end{center}
+\Hrule
+\end{figure}
+
+The default DWARF2 pointer encoding (direct 4-byte absolute pointers)
+is represented by value 0.
+
+\item[R]  
+  Indicates a non-default pointer encoding for FDE code pointers.  The
+  formating is represented by a single byte in the same way as in the
+  `L' command.
+
+\item[P]  
+  Indicates the presence and an encoding of a language personality
+  routine in the CIE augmentation.  The encoding is represented by a
+  single byte in the same way as in the 'L' command followed by a
+  pointer to the personality function encoded by the specified
+  encoding.
+
+\end{description}
+
+When the augmentation is present, the first command must always be
+`\code{z}' to allow easy skipping of the information.
+
+\end{description}
+
+In order to simplify manipulation of the unwind tables, the runtime
+library provide higher level API to stack unwinding mechanism, for
+details see section \ref{unwindlib}.
 
 %%% Local Variables:
 %%% mode: latex
