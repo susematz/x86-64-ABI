@@ -23,14 +23,13 @@ On \xARCH the GOT table contains 64 bit entries.
 % Let's follow Sparc64 and MIPS64
 
 The \xARCH is able to execute 64 bit \xARCH and also 32 bit ia32
-programs.  Libraries conforming to the i386 psABI will live in the
+programs.  Libraries conforming to the \intelabi will live in the
 normal places like \path{/lib}, \path{/usr/lib} and \path{/usr/bin}.
 Libraries following the \xARCH, will use \path{lib64} subdirectories
 for the libraries, e.g \path{/lib64} and \path{/usr/lib64}.  Programs
-conforming to i386 psABI and to this \xARCH psABI will share
-directories like \path{/usr/bin}, there's no need for a \path{bin64}
+conforming to \intelabi and to the \xARCH ABI will share directories
+like \path{/usr/bin}.  In particular, there will be no \path{bin64}
 directory.
-
 
 \section{C++\label{section-cpp}}
 

@@ -4,13 +4,6 @@
 
 \subsection{Processor Architecture}
 
-The \xARCH architecture (see
-\url{http://www.x86-64.org/documentation}) defines extensions to
-the x86 architecture.  The \xARCH architecture allows the execution of
-32-bit programs in 32-bit mode.  Such programs will continue to make
-use of the Intel386 psABI; this document applies only to programs
-running in ``long'' mode.
-
 \subsection{Data Representation}
 
 Within this specification, the term \emph{halfword} refers to a 16-bit
@@ -59,6 +52,11 @@ scalar types and the processor's.
     & \texttt{unsigned long} & 8 & 8 & unsigned doubleword \\
     & \texttt{unsigned long long} & 8 & 8 & unsigned doubleword \\
     \hline
+    & \texttt{__int128} & 16 & 8 & signed quadword \\
+    & \texttt{signed __int128} & 16 & 8 & signed quadword \\
+    \hline
+    & \texttt{unsigned __int128} & 16 & 8 & unsigned quadword \\
+    \hline
     Pointer & \texttt{\textit{any-type} *} & 8 & 8 & unsigned doubleword \\
     & \texttt{\textit{any-type} (*)()} & & \\
     \hline
@@ -73,17 +71,22 @@ scalar types and the processor's.
 }
 \end{figure}
 
-The \codeindex{__float128} type uses a 15-bit
-exponent, a 113-bit mantissa (the high order significant bit is
-implicit) and an exponent bias of 16383.%
-\footnote{Initial implementations of the \xARCH architecture are
-  expected to support operations on the \texttt{__float128} type only
-  via software emulation.}
+The \codeindex{__float128} type uses a 15-bit exponent, a 113-bit
+mantissa (the high order significant bit is implicit) and an exponent
+bias of 16383.\footnote{Initial implementations of the \xARCH
+  architecture are expected to support operations on the
+  \texttt{__float128} type only via software emulation.}
 
 The \code{long double} type uses a 15 bit exponent, a 64-bit mantissa
 with an explicit high order significand bit and an exponent bias of
-16383\footnote{This is the x87 double extented precision data type.}.
-The contents of the 6 padding bytes is undefined.
+16383.\footnote{This type is the x87 double extented precision data
+  type.}  Although a \code{long double} requires 16 bytes of storage,
+only the first 10 bytes are significant.  The remaining six bytes are
+tail padding, and the contents of these bytes are undefined.
+
+The \code{__int128} type is stored in little-endian order in memory,
+i.e., the 64 low-order bits are stored at a a lower address than the
+64 high-order bits.
 
 A null pointer (for all types) has value zero.
 
@@ -95,9 +98,13 @@ otherwise there is no difference.
 \subsubsection{Aggregates and Unions}
 
 An array uses the same alignment as its elements, except that an array
-that requires at least 16 bytes always has alignment of at least 16
-bytes.\footnote{This alignment requirement allows the use of SSE
-  operations.}
+that requires at least 16 bytes, or a C99 variable-length array,
+always has alignment of at least 16 bytes.\footnote{The alignment
+  requirement allows the use of SSE instructions when operating on the
+  array.  The compiler cannot in general calculate the size of a
+  variable-length array, but it is expected that most VLAs will
+  require at least 16 bytes, so it is logical to mandate that VLAs
+  have at least a 16-byte alignment.}
 
 No other changes required.
 
@@ -123,10 +130,9 @@ Amend the description of bit-field ranges as follows:
 \Hrule
 \end{figure}
 
-Properties of bitfields having the type \texttt{__m64} or
-\texttt{__m128} are not defined by the ABI.  Although compilers are
-free to support bitfields with these types, programs making use of
-these features will not conform to the \xARCH ABI.
+The ABI does not permit bitfields having the type \texttt{__m64} or
+\texttt{__m128}.  Programs using bitfields of these types are not
+portable.
 
 No other changes required.
 
@@ -142,529 +148,172 @@ compilation units may use different conventions.  Nevertheless, it is
 recommended that all functions use the standard calling sequence when
 possible.
 
-\subsection{Registers}
+\subsection{Registers and the Stack Frame}
 \label{subsec-registers}
 
 The \xARCH architecture provides 16 general purpose 64-bit registers.
 In addition the architecture provides 16 SSE registers, each 128 bits
 wide and 8 x87 floating point registers, each 80 bits wide.  Each of
 the x87 floating point registers may be referred to in \MMX/\threednow
-mode as a 64-bit register.  There are several additional
-special-purpose registers.
+mode as a 64-bit register.  All of these registesr are global to all
+procedures in a running program.
 
-This subsection discusses usage of each register.  The registers called
-\emph{global registers} ``belong'' to the calling function and the called function
-is required to preserve their values, while the \emph{temporary registers} may
-be freely clobbered by the called function.
-\editornote{The split to global/temporaries is still subject of change
-  and depends on the different proposals for passing.}
+This subsection discusses usage of each register.  Registers \RBP,
+registers \reg{r8} through \reg{r15} and registers \reg{xmm8} through
+\reg{xmm15} ``belong'' to the calling function and the called function
+is required to preserve their values.  In other words, a called
+function must preserve these registers' values for its caller.
+Remaining registers ``belong'' to the called function.\footnote{Note
+  that in contrast to the \intelabi, \RBX, \RDI, and \RSI belong to
+  the called function, not the caller.}  If a calling function wants
+to preserve such a register value across a function call, it must save
+the value in its local stack frame.
 
-\subsubsection {General Purpose Registers}
-
-\begin{description}
-  \item [\RAX]
-    Temporary register used to pass first integer argument and to return
-    the first doubleword of the return value.
-  \item [\RDX]
-    Temporary register used to pass second integer argument
-    and to return the second doubleword of the return value.
-  \item [\RCX] Temporary register used to pass third integer argument.
-  \item [\RBX] Temporary register used to pass fourth integer argument.
-  \item [\RBP] Global register optionally used as frame pointer.
-  \item [\RSP] The stack pointer.
-  \item [\RSI]
-    Temporary register used to pass fifth doubleword of argument area.
-  \item [\RDI] 
-    Temporary register used to pass sixth doubleword of argument area.
-  \item [\reg{R8}, \reg{R9}] Temporary registers.
-  \item [\reg{R10} -- \reg{R15}] Global registers.
-\end{description}
-
-\subsubsection {SSE registers}
-
-\begin{description}
-\item [\reg{XMM0}, \reg{XMM1}] Temporary registers used to pass first
-  two SSE arguments. \reg{XMM0} is also used as a return register for
-  two doublewords.
-  \item [\reg{XMM2} -- \reg{XMM6}] Temporary registers used to pass 2nd--6th SSE arguments
-  \item [\reg{XMM6} -- \reg{XMM13}] Global registers
-  \item [\reg{XMM13} -- \reg{XMM15}] Temporary registers
-\end{description}
-
-\subsubsection {\MMX/\threednow and x87 registers}
-
-Since the usage of SSE instruction set if prefered over the x87, the CPU is in
-``\MMX'' mode across function calls. Every function that uses x87 register
-stack is required to convert the registers properly using \op{emms} or \op{femms}
-instructions and thus x87 registers cannot be used to hold values across a
-function call.  To make usage of x87 easier, all \MMX{} registers are temporaries,
-so the FEMMS instruction may be used.
-\begin{description}
-\item [\reg{MM0}, \reg{MM1}] Temporary registers used to return first
-  two doublewords of the return value.
-  \item [\reg{MM2} -- \reg{MM8}] Temporary registers.
-  \item [\reg{st(0)} -- \reg{st(8)}] Temporary registers not available across function calls
-\end{description}
-
-
-\subsubsection {Special purpose registers}
-All special purpose registers should be handled as global registers
-with the exception of the direction flag in EFLAGS register.  The
-value of the direction flag must be clear at the entry of a function.
-\editornote{Do we want to define values of fpu and SSE control words?}
+The CPU shall be in MMX mode upon entry to a function.  Therefore,
+every function that uses the x87 register stack is required to issue
+an \op{emms} or \op{femms} instruction before accessing the x87
+register stack.\footnote{All \MMX{} registers are caller-saved, so
+  callees that make use of the x87 register stack may use the fsater
+  \op{femms} instruction.}
 
 \subsection{The Stack Frame}
-In addition to registers, each function has a frame on the run-time stack.  This
-stack grows downwards from high addresses, figure \ref{fig-stack-frame} shows the
-stack organization.
-
+In addition to registers, each function has a frame on the run-time
+stack.  This stack grows downwards from high addresses.  Figure
+\ref{fig-stack-frame} shows the stack organization.
 
 \begin{figure}
 \Hrule
   \caption{Stack Frame}
   \label{fig-stack-frame}
   \begin{center}
-    \begin{tabular}{r|cl|l}
+    \begin{tabular}{r|c|l}
       \noalign{\smallskip}
-      \multicolumn{1}{l}{\bf Frame} &
+      \multicolumn{1}{l}{\bf Position} &
       \multicolumn{1}{c}{\bf Contents} &
-      \multicolumn{1}{l}{\bf Size} &
-      \multicolumn{1}{l}{\bf Address} \\
+      \multicolumn{1}{l}{\bf Frame} \\
       \noalign{\smallskip}  \cline{2-3}
-      & incoming arguments: doubleword $n$ & 8 bytes & $\RBP+16+8n$ \\
-      & \dots & & \\
-      Previous& incoming arguments: doubleword $0$ & 8 bytes & $\RBP+16$ \\ \cline{1-4} 
-      Current & return address & 8 bytes & $\RBP+8$\\ \cline{2-3}
-      & previous \RBP{} value & 8 bytes & $\RBP$ \\ \cline{2-3}
-      & local save area & unspecified & $\RBP-8$\\ 
-      & \dots & & \\ \cline {2-3}
-      & outgoing arguments: doubleword $0$ & 8 bytes &\\
-      & \dots & & \\
-      & outgoing arguments: doubleword $n$ & 8 bytes & $\RSP$ \\ \cline{2-3}
+      \code{8n+16(\RBP)} & argument doubleword $n$ \\
+      & \dots & Previous \\
+      \code{16(\RBP)} & argument doubleword $0$ \\
+      \cline{1-3} 
+      \code{8(\RBP)} & return address \\ \cline{2-2}
+      \code{0(\RBP)} & previous \RBP value \\ 
+      \cline{2-2}
+      \code{-8(\RBP)} & unspecified & Current \\ 
+      & \dots & \\ 
+      \code{0(\RSP)} & variable size
     \end{tabular}
   \end{center}
 \Hrule
 \end{figure}
 
+The end of the input argument area shall be aligned on a 16 byte
+boundary.  In other words, the value $(\RSP - 8)$ is always a multiple
+of $16$ when control is transferred to the function entry point.  The
+stack pointer, \RSP, always point to the end of the latest allocated
+stack frame.  \footnote{The conventional use of \RBP{} as a frame
+  pointer for the stack frame may be avoided by using \RSP (the stack
+  pointer) to index into the stack frame.  This technique saves two
+  instructions in the prologue and epilogue and makes one additional
+  general-purpose register (\RSP) available.}
 
-Functions may expect the end of the input argument area to be aligned
-to a 16 byte boundary --- this means that value $(\RSP - 8)$ is always a
-multiple of $16$ at the entry point. This alignment must be preserved by
-all called functions that use the standard calling convention. The
-frames of functions with local calling conventions may or may not obey
-this rule so algorithms for stack unwinding cannot rely on it.
+\subsection{Parameter Passing}
 
-At any point of program execution, the stack pointer, \RSP, shall
-point to the end of the latest allocated stack frame.
+After the argument values have been computed, they are placed in
+registers, or pushed on the stack.  The arguments are processed in
+right-to-left order.  Since the stack grows downwards, the rightmost
+argument will have the highest address.\footnote{Right-to-left order
+  makes the handling of functions that take a variable number of
+  arguments simpler.  The location of the first argument can always be
+  computed statically, based on the type of that argument.  It would
+  be difficult to compute the address of the first argument if the
+  arguments were pushed in left-to-right order.}
 
-The organization of the \emph{local save area} is implementation
-specific. Usual practice is to save clobbered global registers in the
-prologue at the beginning or end of the save area and use the rest for saving
-local object and spilled variables.  Saving registers at the beginning
-is harder to implement, since the offset from \RBP{} is not known
-until after the register allocation, but overall results in shorter
-and faster prologues and epilogues allowing to allocate and deallocate
-the outgoing arguments area by the same instruction used to
-(de)allocate the \emph{local save area}.
+For each argument, the following method is used to determine the
+location in which the argument is passed.  In all cases where a value
+is pushed on the stack, the stack shall be left doubleword-aligned.
+In all cases, the value pushed shall be located on a boundary whose
+alignment is the maximum of 8 (doubleword alignment) and the alignment
+of the type being pushed.  If the value does not consume the entire
+doubleword, the contents of the unused storage located at higher
+numbered addresses within the doubleword is undefined.
 
-The conventional use of \RBP{} as a frame pointer (base pointer) for a stack
-frame may be avoided by using \RSP{} (the stack pointer) to index the
-stack frame in cases where the frame is fixed length.%
-\footnote{This corresponds to the \code{-fomit-frame-pointer} option of GCC}
-This saves two instructions in the prologue and epilogue and
-gives another global general purpose register.  See details about
-stack traceback algorithm for conditions when this optimization is
-allowed.  \editornote{The stack traceback algorithm has not been
-  specified yet and we are not sure if we need one at all.}
+If the argument is a scalar type, other than \code{__m64} or
+\code{__int128}, then it is placed in the next available register
+suitable for its type.  In particular, arguments of integral or
+pointer type are placed in the next available general purpose
+register, taken in the order \RAX, \RDX, \RCX, \RBX, \RSI, \RDI,
+\reg{r8}, and \reg{r9}.  Arguments of floating point type and of type
+\code{__m128}, are placed in the next available SSE register, taken
+in order from \reg{xmm0} to \reg{xmm7}.  If no registers are
+available, the values are placed on the stack.
 
-\subsection{Classes}
+Scalar values of type \code{__int128} are handled as they consisted
+of two separate 64-bit arguments of type \code{long}.  The 64
+low-order bits are considered to be the first argument, and therefore
+processed second.\footnote{Thus, if all 128 bits are placed on the
+  stack, the low-order bits will be at a lower address, which allows
+  the caller to access the value normally.}
 
-The \xARCH CPU has three register classes available for parameter and
-return value passing --- the integer (general purpose) registers, SSE
-registers and \MMX{} registers.  All integral types and pointer belong
-to the class \emph{Int}, all floating point values (including the
-128bit type) and type \verb|__m128| belongs to the class \emph{SSE}
-and finally the type \verb|__mm64| to class \emph{MMX}.
+Scalar values of type \code{__m64} are always placed on the stack.
 
-Aggregate and union types are split to doublewords and each doubleword has
-assigned its own class. To assign the class of doubleword \emph{X} the
-first matching rule of the following is used.
-\begin{enumerate}
-  \item (Aggregates only) In case the doubleword \emph{X} contains upper half field of
-    \verb|__m128| type, the class is \emph{SSE}.
-    
-  \item In case all fields of an aggregate (or all subtypes of a
-    union) crossing the word \emph{X} have the same class \emph{Y},
-    the class is \emph{Y}.
-    
-  \item In case all fields of an aggregate (or all subtypes of a
-    union) crossing the word \emph{X} have the same class \emph{SSE}
-    or \emph{SSE2}, the class is \emph{SSE}.
+Structure or union objects with more than 16 bytes, those that contain
+scalar components of type \code{__m64}, or, in C++, non-POD structure
+or union types,\footnote{A non-POD object cannot be returned in
+  registers because such objects must have well defined addresses; the
+  address at which an object is constructed (by the caller) and the
+  address at which the object is destroyed (by the callee) must be the
+  same.  Similar issues apply when returning a non-POD object from a
+  function.} are always passed on the stack.  The stack is aligned as
+required by the alignment of the structure or union type being passed.
+Then, the structure value is copied onto the stack.
 
-  \item If nothing matches, use class is \emph{Int}.
-\end{enumerate}
+Structure or union objects that contain fewer than 16 bytes, do not
+contain any scalar components of type \code{__m64}, and, in C++, are
+PODs, are passed in registers, if registers are available.  If the
+entire structure cannot be placed in registers as described below,
+then the structure is passed on the stack, as above.  If the structure
+contains a single scalar component, then it is passed as if it were a
+single argument of that scalar type.  Otherwise, the first (or only,
+if the structure has fewer than 8 bytes), doubleword of the sturcture
+is passed first.  If the first doubleword consists of a single scalar
+component of floating point type, the first doubleword is passed as if
+it were an argument of that floating point type.  Otherwise, the
+doubleword is passed as if it were a single integer argument, using
+the smallest type sufficient to contain the argument.  Any bytes not
+used by the value passed have undefined contents.  If the structure
+has more than 8 bytes, then the process is repeated for the second
+doubleword.
 
-Doubleword \emph{X} of an aggregate gets assigned class \emph{Y} if and only
-if all the fields crossing doubleword \emph{X} belongs to same class \emph{Y}.  If
-no field crosses the given doubleword, its type is \emph{None}. When no class fits
-the rules above, class \emph{Int} is used.  Exception is also 
-\editornote{\textbf{Jan}, something is missing here --- please fill in the rest
-  of the sentence.}
+\subsection{Functions Returning Scalars or No Value}
 
-Similarly doubleword \emph{X} of a union gets assigned class \emph{Y}
-if and only if each type in the union either does not cross \emph{X}
-or its class for doubleword \emph{X} is \emph{Y}.
+If a function returns a scalar of type \code{__m64}, the value is
+returned in \reg{mm0}.  If the function returns a scalar of some other
+type, the value is returned in a register or registers.  The register
+or registers chosen are the same as those that would be selected were
+a value of the same type to be passed to a function taking only one
+argument of that same structure type.
 
-\subsection{Parameter Passing Conventions}
+\subsection{Functions Returning Structures or Unions}
 
-It is generally more efficient to pass arguments to called functions
-in registers than to push them onto the stack. Even with good support
-for memory operands and \op{push} instruction, passing arguments in
-registers reduces memory bandwidth as well as simplifies the cleanup
-after function call.  The number of registers implemented in the
-processor architecture naturally limits the number of arguments passed
-in this manner.
+If a function returns a structure or union whose size is greater than
+16 bytes, or, for C++, if the structure or union is a non-POD, then
+the caller provides space for the return value and passes the address
+of this address in \RAX as if it were the first argument to the
+function.  In effect, this address becomes a ``hidden'' first
+argument.
 
-For \xARCH up to six general purpose registers and six SSE registers
-are used for parameter passing.  If fewer (or no) arguments are
-passed, the unneeded registers will contain undefined value at the
-entry of function.  
-\editornote{The number of registers used for passing is subject to
-  change.}
-
-\MMX{} registers are not used to pass \verb|__mm64| type, since \MMX{}
-usage is depreached and doing so simplifies functions with variable
-number of arguments.  Instead all arguments of type \verb|__mm64| as
-well as arguments that do not fit into the available registers are
-passed on the runtime stack.
-
-The aggregates and unions shorter than 16~bytes are passed directly
-using registers, while others by reference.  The caller is expected to
-make a copy of the object so the callee is allowed to freely modify
-the contents.  The caller may not copy the object in case it is known
-to be unused after a function call, it does have proper alignment and
-no aliases. The aggregate or union, when passed in registers is
-represented equally as if it were passed at the stack slot.
-
-The following algorithm is used to determine where data is passed for
-C language.  For this purpose consider arguments as ordered from left
-(first argument) to right (last arguments), although the order of
-evaluation is unspecified. In this algorithm \verb|sr| contains the
-first available SSE register and \verb|gr| contains the next available
-general purpose register and \verb|ap| is used as a pointer to the
-``output argument area'' on the stack.  As written, the algorithm is
-not directly applicable, since it fills the stack in the opposite
-direction.  In reality a two pass algorithm is required.  The first
-pass computes positions for output arguments and the second pass
-actually pushes the arguments onto the stack and/or loads them into
-registers.
-
-
-\subsubsection {Proposal 1: ``Smart'' mapping of structures}
-
-\begin{description}
-  \item[Initialize:]
-    Set $\verb|sr|=1$, $\verb|gr|=1$, $\verb|ap|=0$
-
-
-  \item[Scan:]
-    If there are no more arguments, go to ``terminate''. Otherwise select one of the
-    following rules depending on the type of the next argument:
-      \begin{description}
-        \item[Simple integer argument:]
-          A simple integer argument is one of the following:
-          \begin{itemize}
-            \item One of the simple integer types, maximal 64~bits long.
-            \item A pointer.
-            \item Aggregates and unions greater than 16 bytes should
-              be treated as pointer to object, or pointer to a copy of
-              the objects if necessary to enforce call-by-value
-              semantics.
-            \item Aggregates and unions maximal 8 bytes long with
-              class \emph{Int}.
-          \end{itemize}
-        If $\verb|gr| >= 6$ go to other, otherwise pick the \verb|gr|-th register from
-        the sequence: \RAX, \RDX, \RCX, \RBX, \RSI, \RDI{} and assign it to the current
-        argument. Set \verb|gr| to $\verb|gr|+1$.
-
-
-    \item[Simple SSE argument:]
-      A simple SSE argument is one of the following:
-      \begin{itemize}
-        \item One of the simple floating point types.
-        \item An argument of type \verb|__m128|.
-        \item Aggregates and unions maximal 8 bytes long with class \emph{SSE}.
-        \item Aggregates and unions greater than 8 bytes and smaller
-          than 17 bytes with class  \emph{SSE} of the first doubleword
-          and class \emph{SSE} of the second doubleword.
-      \end{itemize}
-      If $\verb|sr| >= 6$ go to other, otherwise pick the \verb|sr|-th
-      register from the sequence: \reg{XMM0}, \reg{XMM1}, \reg{XMM2},
-      \reg{XMM3}, \reg{XMM4}, \reg{XMM5}, \reg{XMM6} and assign it to
-      the current argument.  Set \verb|sr| to $\verb|sr|+1$.
-
-    \item[Double integer argument]
-      A double integer argument is one of the following:
-      \begin{itemize}
-        \item An argument of type \verb|__int128|.
-        \item Aggregates and unions greater than 8 bytes and smaller
-          than 17 bytes with class \emph{Int} for both doublewords.
-      \end{itemize}
-      If $\verb|gr| >= 5$ go to other, otherwise pick the \verb|gr|-th register from
-      the sequence: \RAX, \RDX, \RCX, \RBX, \RSI, \RDI{} and assign it together with the
-      next register to the current argument.
-      Set \verb|gr| to $\verb|gr|+2$.
-
-    \item[Double SSE argument]
-      A double SSE argument is one of the following:
-      \begin{itemize}
-        \item Aggregates and unions greater than 8 bytes and smaller
-          than 17 bytes with class \emph{SSE} for both doublewords.
-      \end{itemize}
-      If $\verb|sr| >= 5$ go to other, otherwise pick the \verb|sr|-th
-      register from the sequence: \reg{XMM0}, \reg{XMM1}, \reg{XMM2},
-      \reg{XMM3}, \reg{XMM4}, \reg{XMM5}, \reg{XMM6} and assign it
-      together with the next register to the current argument.  Set
-      \verb|sr| to $\verb|sr|+2$.
-
-    \item[Integer-SSE type argument]
-      An Integer-SSE type argument is one of the following:
-      \begin{itemize}
-        \item Aggregates and unions greater than 8 bytes and smaller
-          than 17 bytes with class \emph{Int} for the first doubleword
-          and \emph{SSE} for the second doubleword.
-      \end{itemize}
-      If $\verb|sr| >= 6$ or $\verb|gr| >= 6$ go to other, otherwise
-      pick the \verb|gr|-th register from the sequence: \RAX, \RDX,
-      \RCX, \RBX, \RSI, \RDI{} and assign it the first doubleword of
-      the current argument and pick the \verb|sr|-th register from the
-      sequence: \reg{XMM0}, \reg{XMM1}, \reg{XMM2}, \reg{XMM3},
-      \reg{XMM4}, \reg{XMM5}, \reg{XMM6} and assign it the second
-      doubleword of the current argument.  Set \verb|gr| to
-      $\verb|gr|+1$ and set \verb|sr| to $\verb|sr|+1$.
-
-    \item[SSE-Integer type argument]
-      An SSE-Integer type argument is one of the following:
-      \begin{itemize}
-      \item Aggregates and unions greater than 8 bytes and smaller
-        than 17 bytes with class \emph{SSe} for the first doubleword
-        and \emph{Int} for the second doubleword.
-      \end{itemize}
-      If $\verb|sr| >= 6$ or $\verb|gr| >= 6$ go to other, otherwise
-      pick the \verb|sr|-th register from the sequence: \reg{XMM0},
-      \reg{XMM1}, \reg{XMM2}, \reg{XMM3}, \reg{XMM4}, \reg{XMM5},
-      \reg{XMM6} and assign it the first doubleword of the current
-      argument and pick the \verb|gr|-th register from the sequence:
-      \RAX, \RDX, \RCX, \RBX, \RSI, \RDI{} and assign it the second
-      doubleword of the current argument.  Set \verb|gr| to
-      $\verb|gr|+1$ and set \verb|sr| to $\verb|sr|+1$.
-
-   \end{description}
-   Go to ``Scan''.
-
-  \item[Other:]
-
-    Arguments not handled otherwise are passed at stack frame. \RSP{} is the
-    pointer to the end of the outgoing argument area and we do expect \RSP{} to be
-    aligned to a 16 byte boundary and the outgoing area large enough to fit all
-    the arguments (this means the value \verb|ap| bytes for the final value of
-    \verb|ap| once algorithm terminates).  To compute the address of a given argument,
-    round \verb|ap| to the nearest multiple of the operand's alignment in bytes
-    (minimally to 8 bytes) and
-    assign location $\verb|ap|+\RSP$ to the argument and increase \verb|ap| by
-    the size of the argument in bytes.
-    Go to ``Scan''.
-
-  \item[Terminate:]
-    Round \verb|ap| up to a multiple of 16. Terminate the algorithm.
-\end{description}
-
-As an example assume the function call as shown below:
-
-\begin{verbatim}
-int a,b,c,d,e;
-float A,B;
-double C,D;
-long double E;
-__mm64 mm;
-struct small {long a; double b;} small;
-struct large {int a,b,c,d,e,f;} small;
-func (small, large, mm, a, b, c, d, e, A, B, C, D, E);
-\end{verbatim}
-
-The results of register allocation for parameter passing is shown in table \ref{tab-passing}.
-
-\begin{table}
-  \caption{Register Allocation For Parameter Passing}\label{tab-passing}
-  \begin{tabular}{rlrlrl}
-    \hline\noalign{\smallskip}
-    integer register & contents & SSE register & contents & stack slot & contents\\
-    \noalign{\smallskip}\hline\noalign{\smallskip}
-    \RAX & \verb|small.a| & \reg{XMM0} & \verb|small.b| & $\RSP$ & \verb|mm|\\
-    \RDX & \verb|&large| & \reg{XMM1} & \verb|A| & $\RSP+8$ & \verb|e|\\
-    \RCX & \verb|a| & \reg{XMM2} & \verb|B| &  & \\
-    \RBX & \verb|b| & \reg{XMM3} & \verb|C| &  & \\
-    \RSI & \verb|c| & \reg{XMM4} & \verb|D| &  & \\
-    \RDI & \verb|d| & \reg{XMM5} & \verb|E| &  & \\
-    \hline
-  \end{tabular}
-\end{table}
-
-\subsubsection {Proposal 2: Structures always mapped to integers}
-
-\begin{description}
-  \item[Initialize:]
-    Set $\verb|sr|=1$, $\verb|gr|=1$, $\verb|ap|=0$
-
-
-  \item[Scan:]
-    If there are no more arguments, go to ``terminate''. Otherwise select one of the
-    following rules depending on the type of the next argument:
-      \begin{description}
-        \item[Simple integer argument:]
-          A simple integer argument is one of the following:
-          \begin{itemize}
-            \item One of the simple integer types, maximal 64 bits long.
-            \item A pointer.
-            \item Aggregates and unions greater than 16 bytes should be treated as
-              pointer to object, or pointer to a copy of the objects if necessary to enforce
-              call-by-value semantics.
-            \item Aggregates and unions maximal 8 bytes long with class \emph{Int}.
-          \end{itemize}
-        If $\verb|gr| >= 6$ go to other, otherwise pick the \verb|gr|-th register from
-        the sequence: \RAX, \RDX, \RCX, \RBX, \RSI, \RDI{} and assign it to the current
-        argument. Set \verb|gr| to $\verb|gr|+1$.
-
-
-    \item[Simple SSE argument:]
-      A simple SSE argument is one of the following:
-      \begin{itemize}
-        \item One of the simple floating point types.
-        \item An argument of type \verb|__m128|.
-        \item Aggregates and unions maximal 8 bytes long with class \emph{SSE}.
-        \item Aggregates and unions greater than 8 bytes and smaller
-          than 17 bytes with class \emph{SSE} for the first doubleword
-          and class \emph{SSE2} for the second doubleword.
-      \end{itemize}
-      If $\verb|sr| >= 6$ go to other, otherwise pick the \verb|sr|-th
-      register from the sequence: \reg{XMM0}, \reg{XMM1}, \reg{XMM2},
-      \reg{XMM3}, \reg{XMM4}, \reg{XMM5}, \reg{XMM6} and assign it to
-      the current argument.
-      Set \verb|sr| to $\verb|sr|+1$.
-
-    \item[Double integer argument]
-      A double integer argument is one of the following:
-      \begin{itemize}
-        \item An argument of type \verb|__int128|.
-        \item Aggregates and unions greater than 8 bytes and smaller
-          than 17 bytes.
-      \end{itemize}
-      If $\verb|gr| >= 5$ go to other, otherwise pick the \verb|gr|-th register from
-      the sequence: \RAX, \RDX, \RCX, \RBX, \RSI, \RDI{} and assign it together with the
-      next register to the current argument.
-      Set \verb|gr| to $\verb|gr|+2$.
-   \end{description}
-   Go to ``Scan''.
-
-  \item[Other:]
-
-    Arguments not handled otherwise are passed at stack frame. \RSP{} is the
-    pointer to the end of outgoing argument area and we do expect \RSP{} to be
-    aligned to a 16 byte boundary and the outgoing area space large enough to fit all
-    the arguments (this means the value \verb|ap| bytes for the final value of
-    \verb|ap| once algorithm terminates).  To compute the address of a given argument,
-    round \verb|ap| to the nearest multiple of the operand's alignment in bytes
-    (minimal to 8 bytes) and
-    assign location $\verb|ap|+\RSP$ to the argument and increase \verb|ap| by
-    the size of the argument in bytes.
-    Go to ``Scan''.
-
-  \item[Terminate:]
-    Round \verb|ap| up to a multiple of 16. Terminate the algorithm.
-\end{description}
-
-As an example assume the function call as shown below:
-
-\begin{verbatim}
-int a,b,c,d,e;
-float A,B;
-double C,D;
-long double E;
-__mm64 mm;
-struct small {long a; double b;} small;
-struct large {int a,b,c,d,e,f;} small;
-func (small, large, mm, a, b, c, d, e, A, B, C, D, E);
-\end{verbatim}
-
-The results of register allocation for parameter passing is shown in table \ref{tab-passing2}.
-
-\begin{table}
-  \caption{Register Allocation For Parameter Passing}\label{tab-passing2}
-  \begin{tabular}{rlrlrl}
-    \hline\noalign{\smallskip}
-    integer register & contents & SSE register & contents & stack slot & contents\\
-    \noalign{\smallskip}\hline\noalign{\smallskip}
-    \RAX & \verb|small.a| & \reg{XMM0} & \verb|A| & $\RSP$ & \verb|mm|\\
-    \RDX & \verb|small.b| & \reg{XMM1} & \verb|B| & $\RSP+8$ & \verb|e|\\
-    \RCX & \verb|&large| & \reg{XMM2} & \verb|C| &$\RSP+16$& \verb|d| \\
-    \RBX & \verb|a| & \reg{XMM3} & \verb|D| &  & \\
-    \RSI & \verb|b| & \reg{XMM4} & \verb|E| &  & \\
-    \RDI & \verb|c| & \reg{XMM5} & undefined &  & \\
-    \hline
-  \end{tabular}
-\end{table}
-
-
-\subsection{Variable Argument Lists}
-
-Some otherwise portable C programs depend on the argument passing scheme,
-implicitly assuming that 1) all arguments are passed on the stack, and 2)
-arguments appear in increasing order on the stack. Programs that make these
-assumptions never have been portable, but they have worked on many
-implementations. However, they do not work on the \xARCH architecture because
-some arguments are passed in registers. Portable C programs use the header
-files \verb|stdarg.h| or \verb|varargs.h| to deal with variable argument lists
-on x86-64 and other machines as well.
-
-\editornote {Use flag to signalize SSE registers?}
-
-\subsection{Return Values}
-
-\subsubsection {Proposal 1: ``Smart'' mapping of structures}
-
-Scalars, complex numbers, aggregates and unions not exceeding 16 bytes
-or no value are returned directly.  First one or two classes are
-assigned to a given value and then the relevant registers are used as
-discussed in subsection \ref{subsec-registers} leaving the rest of
-registers undefined.
-
-Scalar values are returned in a single register. One of the registers
-\RAX, \reg{XMM0} and \reg{MM0} is chosen according to its class.
-\verb|__int128| is returned in \RDX:\RAX.
-
-The first doubleword of unions, aggregates and real part of complex
-values not exceeding 8 bytes is returned the same way as simple scalar
-registers.  The second doubleword (if available) is returned in one of
-the following registers: \RAX, \reg{XMM0} and \reg{MM1} depending on
-their class.  Class \emph{SSE} is returned in the upper half of
-register \reg{XMM0}.
-
-Complex numbers, aggregates and unions exceeding 16 bytes are stored
-in an area prepared by the caller and passed to the function as
-``hidden'' first parameter.  The contents of all return registers is
-left undefined.
-\editornote{i386 abi returns the pointer to the area to simplify
-  caller.  Is that a good idea?}
-
-\subsubsection {Proposal 2: Integer-only mapping of structures}
-
-The \verb|__mm64| type is returned using \reg{MM0}.  Complex numbers,
-aggregates and unions exceeding 16 bytes are stored in an area
-prepared by the caller and passed to the function as ``hidden'' first
-parameter.  The contents of all return registers is left undefined.
-
-Other values are returned as if they were passed as first argument to
-the function.
+In this case, the function also sets \RAX to the value of the original
+address in the calle's area before it returns.  Thus when the caller
+receives control again, the address of the returned object resides in
+register \RAX and can be used to access the object.
+  
+If a function returns a structure or union whose size is less than or
+equal to 16 bytes, and, for C++, the structure or union is a POD, then
+the structure is returned in registers.  The registers chosen for a
+given structure or union type are the same as those that would be
+selected were a value of the same type to be passed to a function
+taking only one argument of that same structure type.
 
 \section{Operating System Interface}
 
@@ -794,6 +443,17 @@ ptr = name;               &&movl ptr@GOTPCREL(\%rip), \%rax  \\
 \Hrule
 \end{figure}
 
+\subsection{Variable Argument Lists}
+
+Some otherwise portable C programs depend on the argument passing
+scheme, implicitly assuming that 1) all arguments are passed on the
+stack, and 2) arguments appear in increasing order on the stack.
+Programs that make these assumptions never have been portable, but
+they have worked on many implementations. However, they do not work on
+the \xARCH architecture because some arguments are passed in
+registers.  Portable C programs must use the header files
+\code{<stdarg.h>} or \code{<varargs.h>} in order to handle variable
+argument lists.
 
 %%% Local Variables: 
 %%% mode: latex

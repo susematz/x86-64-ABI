@@ -55,18 +55,18 @@
 \renewcommand{\PrelimWords}{x86-64 ABI Draft \version}
 
 % Some commands:
-\newcommand{\editornote}[1]{(\emph{Editor:}\/ #1)}
+\newcommand{\editornote}[1]{\footnote{#1}}
 
 %Typesetting of registers
-\newcommand{\reg}[1]{{\texttt{#1}}\xspace}
-\newcommand{\RAX}{\reg{RAX}}
-\newcommand{\RBX}{\reg{RBX}}
-\newcommand{\RCX}{\reg{RCX}}
-\newcommand{\RDX}{\reg{RDX}}
-\newcommand{\RSI}{\reg{RSI}}
-\newcommand{\RDI}{\reg{RDI}}
-\newcommand{\RBP}{\reg{RBP}}
-\newcommand{\RSP}{\reg{RSP}}
+\newcommand{\reg}[1]{{\texttt{\%#1}}\xspace}
+\newcommand{\RAX}{\reg{rax}}
+\newcommand{\RBX}{\reg{rbx}}
+\newcommand{\RCX}{\reg{rcx}}
+\newcommand{\RDX}{\reg{rdx}}
+\newcommand{\RSI}{\reg{rsi}}
+\newcommand{\RDI}{\reg{rdi}}
+\newcommand{\RBP}{\reg{rbp}}
+\newcommand{\RSP}{\reg{rsp}}
 
 %Typesetting of opcodes
 \newcommand{\op}[1]{\texttt{#1}}
@@ -95,6 +95,9 @@
 
 % Make `_' an ordinary character.
 \catcode`_=12
+
+% The Intel386 psABI document.
+\newcommand{\intelabi}{Intel386 ABI\xspace}
 
 %%% Local Variables:
 %%% mode: latex

@@ -1,3 +1,14 @@
+2000-09-21  Mark Mitchell  <mark@codesourcery.com>
+
+	Cleanups throughout.
+	* conventions.tex: Clarify.
+	* dl.tex: Likewise.
+	* introducion.tex: Clarify scope of ABI.
+	* low-level-sys-info.tex: Reword calling convention description
+	* macros.tex: Change layout of registers.
+	(\intelabi): New command.
+	* sw-installation.tex: Tidy.
+	
 2000-09-01  Mark Mitchell  <mark@codesourcery.com>
 
 	* object-files.tex: Add R_X8664_32S relocation.
