@@ -102,7 +102,7 @@ linkage table and the global offset table.
   the stack. The relocation index is a 32-bit, non-negative index into
   the relocation table addressed by the \codeindex{DT_JMPREL} dynamic
   section entry.  The designated relocation entry will have type
-  \codeindex{R_X86_64_JMP_SLOT}, and its offset will specify the
+  \codeindex{R_X86_64_JUMP_SLOT}, and its offset will specify the
   global offset table entry used in the previous \code{jmp}
   instruction.  The relocation entry contains a symbol table index
   that will reference the appropriate symbol, \code{name1} in the
@@ -131,7 +131,7 @@ The \code{LD_BIND_NOW} environment variable can change the dynamic
 linking behavior.  If its value is non-null, the dynamic linker
 evaluates procedure linkage table entries before transferring control
 to the program.  That is, the dynamic linker processes relocation
-entries of type \codeindex{R_X86_64_JMP_SLOT}
+entries of type \codeindex{R_X86_64_JUMP_SLOT}
 during process initialization.  Otherwise, the dynamic linker
 evaluates procedure linkage table entries lazily, delaying symbol
 resolution and relocation until the first execution of a table entry.
