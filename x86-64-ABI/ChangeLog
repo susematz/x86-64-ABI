@@ -1,3 +1,23 @@
+2004-11-03  Michael Matz  <matz@suse.de>
+
+	* abi.tex (changelog): Describe 0.94.
+	* macros.tex (version): Increase to 0.94.
+	(usepackage): Include changebar package.
+	(cbnew): New command.
+	* development.tex (Development Environment): Describe predefined
+	pre-processor symbols.
+	* dl.tex (Program Loading): Describe self-contained.
+	(Dynamic Section, Global Offset Table, Function Addresses): Ditto.
+	* libraries.tex (_Unwind_GetCFA): Define and describe function.
+	(Personality Routine): New subsection.
+	* low-level-sys-info.tex (Aggregates and Unions): Refine.
+	(Bit-Fields): Ditto.
+	(Special Registers): Move to ...
+	(Initial Stack and Register State): ... this new section.
+	(Stack State): New section.
+	(Auxiliary Vector): Describe self-contained.
+	* object-files.tex (EH_FRAME sections): New section.
+
 2004-10-01  Michael Matz  <matz@suse.de>
 
 	* Makefile (abi.dvi): Run latex three times.

@@ -40,7 +40,7 @@
 \usepackage{here}
 
 % Version number of document - increment occasionally ;-)
-\newcommand{\version}{0.92}
+\newcommand{\version}{0.94}
 
 % Print a footer everywhere with current date
 % prelim2e needs \thistime
@@ -93,7 +93,7 @@
 \ifpdf
 \usepackage[pdftex]{hyperref}
 \else
-\usepackage[dvips]{hyperref}
+\usepackage[dvips]{hyperref,changebar}
 \fi
 
 % Make `_' an ordinary character.
@@ -109,6 +109,7 @@
 \newcommand{\eightbytes}{eightbytes\xspace}
 \newcommand{\sixteenbyte}{sixteenbyte\xspace}
 
+\newcommand*{\cbnew}{\marginpar{\textsf{New}}}
 
 %%% Local Variables:
 %%% mode: latex

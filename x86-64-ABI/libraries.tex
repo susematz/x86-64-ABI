@@ -45,7 +45,8 @@ The unwind library interface consists of at least the following routines:\\
 \codeindex{\_Unwind\_SetIP},\\
 \codeindex{\_Unwind\_GetRegionStart},\\
 \codeindex{\_Unwind\_GetLanguageSpecificData},\\
-\codeindex{\_Unwind\_ForcedUnwind}
+\codeindex{\_Unwind\_ForcedUnwind},\\
+\codeindex{\_Unwind\_GetCFA}
 
 In addition, two datatypes are defined (\codeindex{\_Unwind\_Context}
 and \codeindex{\_Unwind\_Exception}) to interface a calling runtime
@@ -565,6 +566,21 @@ that contains the calls. During unwinding, the function returns the
 start of the procedure fragment containing the call site in the current
 stack frame.
 
+\subsubsection{\code{\_Unwind\_GetCFA}}
+
+\code{
+\begin{tabular}{l}
+    uint64 \_Unwind\_GetCFA\\
+    \ \ (struct \_Unwind\_Context *context);\\
+\end{tabular}
+}
+
+This function returns the 64-bit Canonical Frame Address which
+is defined as the value of \RSP at the call site in the
+previous frame.  This value is guaranteed to be correct any
+time the context has been passed to a personality routine or a
+stop function.
+
 % XXX: Disable for now
 %\paragraph{Example: backtrace\\}
 %
@@ -612,18 +628,18 @@ stack frame.
 %\Hrule
 %\end{figure}
 %
-%\subsection{Personality Routine}
-%
-%\code{
-%\begin{tabular}{l}
-%    \_Unwind\_Reason\_Code (*\_\_personality\_routine)\\
-%    \ \ (int version,\\
-%    \ \ \ \_Unwind\_Action actions,\\
-%    \ \ \ uint64 exceptionClass,\\
-%    \ \ \ struct \_Unwind\_Exception *exceptionObject,\\
-%    \ \ \ struct \_Unwind\_Context *context);\\
-%\end{tabular}
-%}
+\subsection{Personality Routine}
+
+\code{
+\begin{tabular}{l}
+    \_Unwind\_Reason\_Code (*\_\_personality\_routine)\\
+    \ \ (int version,\\
+    \ \ \ \_Unwind\_Action actions,\\
+    \ \ \ uint64 exceptionClass,\\
+    \ \ \ struct \_Unwind\_Exception *exceptionObject,\\
+    \ \ \ struct \_Unwind\_Context *context);\\
+\end{tabular}
+}
 
 The personality routine is the function in the C++ (or other language)
 runtime library which serves as an interface between the system

@@ -124,6 +124,11 @@ but otherwise there is no difference.  The only exception here is that
 
 \subsubsection{Aggregates and Unions}
 
+Structures and unions assume the alignment of their most strictly
+aligned component.  Each member is assigned to the lowest available
+offset with the appropriate alignment.  The size of any object is always
+a multiple of the object`s alignment.
+
 An array uses the same alignment as its elements, except that a local
 or global array variable that requires at least 16 bytes, or a C99
 local or global variable-length array variable, always has alignment
@@ -133,12 +138,17 @@ of at least 16 bytes.\footnote{The alignment requirement allows the
   it is expected that most VLAs will require at least 16 bytes, so it
   is logical to mandate that VLAs have at least a 16-byte alignment.}
 
-No other changes required.
+Structure and union objects can require padding to meet size and
+alignment constraints.  The contents of any padding is undefined.
+
+%%% SUN <examples - add diagrams>
 
 \subsubsection{Bit-Fields}
 
-Amend the description of bit-field ranges as follows:
+C struct and union definitions may include bit-fields that define
+integral values of a specified size.
 
+%%% SUN <table><include complete i386 + below table>
 \begin{figure}[h]
 \Hrule
   \caption{Bit-Field Ranges}
@@ -161,7 +171,25 @@ The ABI does not permit bitfields having the type \texttt{__m64} or
 \texttt{__m128}.  Programs using bitfields of these types are not
 portable.
 
-No other changes required.
+Bit-fields that are neither signed nor unsigned
+always have non-negative values. Although they may have type char,
+short, int, or long (which can have negative values), these bit-fields
+have the same range as a bit-field of the same size with the
+corresponding unsigned type. Bit-fields obey the same size and
+alignment rules as other structure and union members.
+
+Also  
+\begin{itemize}
+ \item bit-fields are allocated from right to left
+ \item bit-fields must be contained in a storage unit appropriate 
+       for its declared type
+ \item bit-fields may share a storage unit with other struct / union members
+\end{itemize}
+
+Unnamed bit-fields' types do not affect the alignment of a structure
+or union.
+
+%%% SUN <examples - add diagrams>
 
 \section{Function Calling Sequence}
 
@@ -627,58 +655,6 @@ generate a bounds check fault in long mode.
 \Hrule
 \end{table}
 
-\subsection{Special Registers}
-
-The \xARCH architecture defines floating point instructions.  At
-process startup the two floating point units, SSE2 and x87, both have
-all floating-point exception status flags cleared.  The status of the
-control words is as defined in tables \ref{x87-fpucw} and
-\ref{mxcsr-status}.
-
-
-\begin{table}
-\Hrule
-  \caption{x87 Floating-Point Control Word}
-  \label{x87-fpucw}
-  \begin{center}
-    \begin{tabular}[t]{l|l|l}
-      \multicolumn{1}{c}{Field} & \multicolumn{1}{c}{Value}& \multicolumn{1}{c}{Note} \\
-      \hline
-      \texttt{RC} & 0 & Round to nearest\\
-      \texttt{PC} & 11& Double extended precision\\
-      \texttt{PM} & 1& Precision masked\\
-      \texttt{UM} & 1& Underflow masked\\
-      \texttt{OM} & 1& Overflow masked\\
-      \texttt{ZM} & 1& Zero divide masked\\
-      \texttt{DM} & 1& Denormal operand masked\\
-      \texttt{IM} & 1& Invalid operation masked\\
-    \end{tabular}
-  \end{center}
-\Hrule
-\end{table}
-
-\begin{table}
-\Hrule
-  \caption{MXCSR Status Bits}
-  \label{mxcsr-status}
-  \begin{center}
-    \begin{tabular}[t]{l|l|l}
-      \multicolumn{1}{c}{Field} & \multicolumn{1}{c}{Value}& \multicolumn{1}{c}{Note} \\
-      \hline
-      \texttt{FZ} & 0 & Do not flush to zero\\
-      \texttt{RC} & 0 & Round to nearest\\
-      \texttt{PM} & 1& Precision masked\\
-      \texttt{UM} & 1& Underflow masked\\
-      \texttt{OM} & 1& Overflow masked\\
-      \texttt{ZM} & 1& Zero divide masked\\
-      \texttt{DM} & 1& Denormal operand masked\\
-      \texttt{IM} & 1& Invalid operation masked\\
-      \texttt{DAZ} & 0 & Denormals are not zero\\
-    \end{tabular}
-  \end{center}
-\Hrule
-\end{table}
-
 \subsection{Virtual Address Space}
 
 Although the \xARCH architecture uses 64-bit pointers, implementations
@@ -687,14 +663,14 @@ processes may only use addresses from \texttt{0x00000000\,00000000} to
 \texttt{0x00007fff\,ffffffff}\footnote{0x0000ffff\,ffffffff is not a
   canonical address and cannot be used.}.
 
-No other changes required.
+Processes begin with three logical segments, commonly called text,
+data, and stack. Use of shared libraries add other segments and
+a process may dynamically create segments.
 
 \subsection{Page Size}
 
 Systems are permitted to use any power-of-two page size between 4KB
 and 64KB, inclusive.
-
-No other changes required.
 
 \subsection{Virtual Address Assignments}
 
@@ -713,6 +689,9 @@ In practice, however, several factors limit the size of a process.
     shared resources. System load, which can vary from one program execution
     to the next, affects the available amount.
 \end{itemize}
+
+Programs that dereference null pointers are erroneous and a process
+should not expect 0x0 to be a valid address.
 
 \begin{figure}[H]
 \Hrule
@@ -758,9 +737,199 @@ arrangement appears in figure \ref{fig-cfg}.
 
 \section{Process Initialization}
 
+\subsection{Initial Stack and Register State}
+
+\subsubsection{Special Registers}
+
+The \xARCH architecture defines floating point instructions.  At
+process startup the two floating point units, SSE2 and x87, both have
+all floating-point exception status flags cleared.  The status of the
+control words is as defined in tables \ref{x87-fpucw} and
+\ref{mxcsr-status}.
+
+\begin{table}[H]
+\Hrule
+  \caption{x87 Floating-Point Control Word}
+  \label{x87-fpucw}
+  \begin{center}
+    \begin{tabular}[t]{l|l|l}
+      \multicolumn{1}{c}{Field} & \multicolumn{1}{c}{Value}& \multicolumn{1}{c}{Note} \\
+      \hline
+      \texttt{RC} & 0 & Round to nearest\\
+      \texttt{PC} & 11& Double extended precision\\
+      \texttt{PM} & 1 & Precision masked\\
+      \texttt{UM} & 1 & Underflow masked\\
+      \texttt{OM} & 1 & Overflow masked\\
+      \texttt{ZM} & 1 & Zero divide masked\\
+      \texttt{DM} & 1 & Denormal operand masked\\
+      \texttt{IM} & 1 & Invalid operation masked\\
+    \end{tabular}
+  \end{center}
+\Hrule
+\end{table}
+
+\begin{table}[H]
+\Hrule
+  \caption{MXCSR Status Bits}
+  \label{mxcsr-status}
+  \begin{center}
+    \begin{tabular}[t]{l|l|l}
+      \multicolumn{1}{c}{Field} & \multicolumn{1}{c}{Value}& \multicolumn{1}{c}{Note} \\
+      \hline
+      \texttt{FZ}  & 0 & Do not flush to zero\\
+      \texttt{RC}  & 0 & Round to nearest\\
+      \texttt{PM}  & 1 & Precision masked\\
+      \texttt{UM}  & 1 & Underflow masked\\
+      \texttt{OM}  & 1 & Overflow masked\\
+      \texttt{ZM}  & 1 & Zero divide masked\\
+      \texttt{DM}  & 1 & Denormal operand masked\\
+      \texttt{IM}  & 1 & Invalid operation masked\\
+      \texttt{DAZ} & 0 & Denormals are not zero\\
+    \end{tabular}
+  \end{center}
+\Hrule
+\end{table}
+
+The \code{rFLAGS} register contains the system flags, such as the
+direction flag and the carry flag.  The low 16 bits (FLAGS portion)
+of \code{rFLAGS} are accessible by
+application software.  The state of them at process initialization
+is shown in table \ref{rflags-status}.
+
+\begin{table}[H]
+\Hrule
+  \caption{\code{rFLAGS} Bits}
+  \label{rflags-status}
+  \begin{center}
+    \begin{tabular}[t]{l|l|l}
+      \multicolumn{1}{c}{Field} & \multicolumn{1}{c}{Value}& \multicolumn{1}{c}{Note} \\
+      \hline
+      \texttt{DF} & 0 & Direction forward\\
+      \texttt{CF} & 0 & No carry\\
+      \texttt{PF} & 0 & Even parity\\
+      \texttt{AF} & 0 & No auxiliary carry\\
+      \texttt{ZF} & 0 & No zero result\\
+      \texttt{SF} & 0 & Unsigned result\\
+      \texttt{OF} & 0 & No overflow occured\\
+    \end{tabular}
+  \end{center}
+\Hrule
+\end{table}
+
+The direction flag \code{DF} must be set to
+the ``forward'' direction (that is to zero) before entry and upon exit
+from a function. Other user flags have no specified role in the
+standard calling sequence and are {\em not} preserved.
+
+\subsubsection{Stack State}
+
+This section describes the machine state that \codeindex{exec}(BA\_OS) creates
+for new processes. Various language implementations transform this
+initial program state to the state required by the language standard.
+
+For example, a C program begins executing at a
+function named \code{main} declared as:
+
+\begin{footnotesize}
+\begin{verbatim}
+    extern int main ( int argc , char *argv[ ] , char* envp[ ] );
+\end{verbatim}
+\end{footnotesize}
+
+where
+\begin{description}
+ \item[argc] is a non-negative argument count
+ \item[argv] is an array of argument strings, with \code{argv[argc] == 0}
+ \item[envp] is an array of environment strings,
+             terminated by a null pointer.
+\end{description}
+
+When \code{main()} returns its value is passed to \code{exit()} and if
+that has been
+over-ridden and returns, \code{\_exit()} (which must be immune to user
+interposition).
+
+The initial state of the process stack, i.e. when \code{\_start} is called
+is shown in figure \ref{initial-stack}. 
+
+\begin{figure}[H]
+\Hrule
+\caption{Initial Process Stack}
+\label{initial-stack}
+\begin{center}
+\begin{tabular}{p{14em}|l|p{7em}}
+  \multicolumn{1}{c}{Purpose}
+         & \multicolumn{1}{c}{Start Address}
+         & \multicolumn{1}{c}{Length} \\
+\hline
+  Unspecified & High Addresses & \\ \hline
+  Information block, including argument strings, environment strings,
+    auxiliary information ... & & varies \\ \hline
+  Unspecified & & \\ \hline
+  Null auxiliary vector entry & & 1 eightbyte \\ \hline
+  Auxiliary vector entries ... & & 2 eightbytes each \\ \hline
+  0 & & eightbyte \\ \hline
+  Environment pointers ... & & 1 eightbyte each \\ \hline
+  0 & \code{8+8*argc+\RSP} & eightbyte \\ \hline
+  Argument pointers & \code{8+\RSP} & argc eightbytes \\ \hline
+  Argument count & \RSP & eightbyte \\ \hline
+  Undefined & Low Addresses & \\ \hline
+    \end{tabular}
+  \end{center}
+\Hrule
+\end{figure}
+
+Argument strings, environment strings, and the auxiliary information
+appear in no specific order within the information block and they
+need not be compactly allocated.
+
+Only the registers listed below have specified values at process
+entry:
+\begin{description}
+ \item[\RBP] The content of this register is unspecified at process
+                initialization time, but the user code should mark the
+                deepest stack frame by setting the frame pointer to zero.
+ \item[\RSP] The stack pointer holds the address of the byte with
+                lowest address which is part of the stack. It is
+                guaranteed to be 16-byte aligned at process entry.
+ \item[\RDX] a function pointer that the application should register
+                with \code{atexit}(BA\_OS).
+\end{description}
+
+It is unspecified wether 
+the data and stack segments are initially mapped with
+execute permissions or not.
+Applications which need to execute code on the stack or data
+segments should take proper precautions, e.g., by calling
+\code{mprotect()}.
+
 \subsection{Auxiliary Vector}
 
-The \xARCH ABI uses the following auxiliary vector types.
+The \textindex{auxiliary vector} is an array of the following structures
+(ref. figure \ref{fig_auxv_t}),
+interpreted according to the \code{a\_type} member.
+
+\begin{figure}[H]
+\Hrule
+\caption{\code{auxv\_t} Type Definition}
+\label{fig_auxv_t}
+\begin{center}
+\begin{verbatim}
+ typedef struct
+ {
+     int a_type;
+     union {
+         long a_val;
+         void *a_ptr;
+         void (*a_fnc)();
+     } a_un;
+ } auxv_t;
+\end{verbatim}
+\end{center}
+\Hrule
+\end{figure}
+
+The \xARCH ABI uses the auxiliary vector types defined in figure \ref{aux-vec}.
 
 \begin{figure}[H]
 \Hrule
@@ -770,7 +939,7 @@ The \xARCH ABI uses the following auxiliary vector types.
 \begin{tabular}{l|r|l}
   \multicolumn{1}{c}{Name}
          & \multicolumn{1}{c}{Value}
-         & \multicolumn{1}{c}{a_un} \\
+         & \multicolumn{1}{c}{\code{a\_un}} \\
       \hline
 \texttt{AT_NULL}& 0 & ignored\\
 \texttt{AT_IGNORE}& 1& ignored\\
@@ -793,10 +962,39 @@ The \xARCH ABI uses the following auxiliary vector types.
 \Hrule
 \end{figure}
 
-The entries that are different than in the \intelabi are
-specified as follows:
-
 \begin{description}
+\item[AT_NULL] The auxiliary vector has no fixed length; instead its
+  last entry's \code{a\_type} member has this value.
+\item[AT_IGNORE] This type indicates the entry has no meaning. The
+  corresponding value of \code{a\_un} is undefined.
+\item[AT_EXECFD] At process creation the system may pass control to an
+  interpreter program. When this happens, the system places either an
+  entry of type \code{AT\_EXECFD} or one of type \code{AT\_PHDR} in the
+  auxiliary vector. The entry for type \code{AT\_EXECFD} uses the
+  \code{a\_val} member to contain a file descriptor open to read the
+  application program's object file.
+\item[AT_PHDR] The system may create the memory image of the
+  application program before passing control to the interpreter program.
+  When this happens, the \code{a\_ptr} member of the \code{AT\_PHDR}
+  entry tells the interpreter where to find the program header table in
+  the memory image.
+\item[AT_PHENT] The \code{a\_val} member of this entry holds the size,
+  in bytes, of one entry in the program header table to which the
+  \code{AT\_PHDR} entry points.
+\item[AT_PHNUM] The \code{a\_val} member of this entry holds the number of
+  entries in the program header table to which the \code{AT\_PHDR} entry
+  points.
+\item[AT_PAGESZ] If present, this entry's \code{a\_val} member gives the
+  system page size, in bytes.
+\item[AT_BASE] The \code{a\_ptr} member of this entry holds the base address
+  at which the interpreter program was loaded into memory. See ``Program
+  Header'' in the System V ABI for more information about the base
+  address.
+\item[AT_FLAGS] If present, the \code{a\_val} member of this entry holds
+  one-bit flags.  Bits with undefined semantics are set to zero.
+\item[AT_ENTRY] The \code{a\_ptr} member of this entry holds the entry point
+  of the application program to which the interpreter program should
+  transfer control.
 \item[AT_NOTELF] The \code{a_val} member of this entry is non-zero if
   the program is in another format than ELF.
 \item[AT_UID] The \code{a_val} member of this entry holds the real
@@ -811,8 +1009,13 @@ specified as follows:
 
 
 \section{Coding Examples}
+\label{sec_coding_examples}
 
-The following sections show only the difference to the \intelabi.
+This section discusses example code sequences for fundamental
+operations such as calling functions, accessing static objects, and
+transferring control from one part of a program to another.  Unlike
+previous material, this material is not normative.  It shows only the
+difference to the \intelabi.
 
 \subsection{Architectural Constraints}
 
@@ -1377,7 +1580,7 @@ MMX Registers 0--7              & 41-48 & \reg{mm0}--\reg{mm7} \\
 The stack frames are not self descriptive and where stack unwinding is
 desirable (such as for exception handling) additional unwind
 information needs to be generated.  The information is stored in an
-allocatable section \code{.eh_unwind} whose format is identical to
+allocatable section \code{.eh_frame} whose format is identical to
 \code{.debug_frame} defined by the DWARF debug information standard,
 see \emph{DWARF Debugging Information Format}, with the following
 extensions:
