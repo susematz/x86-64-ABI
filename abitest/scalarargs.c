@@ -45,7 +45,5 @@ scalarargs (void)
 
   test_mixed_types_on_stack ();
   test_too_many_mixed_types ();
-
-  test_returning ();
 #endif
 }

@@ -1,3 +1,12 @@
+2001-04-11  Bo Thorsen  <bo@suse.co.uk>
+
+	* defines.h: Add setting for checks of float and double passing.
+	Add setting for checks of returning complex types.
+	Disabled these two tests.
+	* returning.c (test_complex_returning): Added test for returning
+	complex numbers. Complex numbers with float, double and long double
+	types are tested. Test originally written by Andreas Jaeger.
+
 2001-02-28  Bo Thorsen  <bo@suse.de>
 
 	* struniargs.c (test_struct_passing): Hardware registers should be

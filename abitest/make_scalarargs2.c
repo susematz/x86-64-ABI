@@ -252,11 +252,16 @@ make_int_tests ()
 void
 make_float_tests ()
 {
+#ifdef CHECK_FLOAT_DOUBLE_PASSING
   make_test2 ("test_floats_on_stack", FLOAT_TEST, "float", 8, 16);
   make_test ("test_too_many_floats", FLOAT_TEST, "float", 20);
 
   make_test2 ("test_doubles_on_stack", FLOAT_TEST, "double", 8, 16);
   make_test ("test_too_many_doubles", FLOAT_TEST, "double", 20);
+#else
+  make_empty_tests ("float");
+  make_empty_tests ("double");
+#endif
 
 #if defined CHECK_LARGE_SCALAR_PASSING && CHECK_LONG_DOUBLE
   make_test ("test_long_doubles_on_stack", FLOAT_TEST, "long double", 8);

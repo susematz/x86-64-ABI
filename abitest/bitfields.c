@@ -149,7 +149,7 @@ test_bitfields ()
   str2.d = 9;
   passing1 (str1, 4, 5, 6);
   passing2 (str2, 4, 5, 6, 7, 8, 9);
-  passing3 (str3, 4, 5);
+/*    passing3 (str3, 4, 5); */
   passing4 (str4, 4, 5, 6);
   passing5 (str5, 4, 5);
 

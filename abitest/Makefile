@@ -30,7 +30,7 @@ $(TARGET): $(OBJECTS)
 	x86_64-unknown-linux-ld -T /opt/x86-64/lib/ldscr.lds a.out -o image.simics
 
 simnow:
-	@echo "Not supported yet."
+	@echo "SimNOW! testing is not currently supported."
 	@exit 1
 
 simics: all

@@ -18,8 +18,14 @@
 /* Scalar types __m64 and __m128.  */
 /* #define CHECK_M64_M128 */
 
+/* Returning of complex type.  */
+/* #define CHECK_COMPLEX */
+
 /* Structs with size >= 16.  */
 #define CHECK_LARGER_STRUCTS
+
+/* Checks for passing floats and doubles.  */
+/*  #define CHECK_FLOAT_DOUBLE_PASSING */
 
 /* Union passing with not-extremely-simple unions.  */
 #define CHECK_LARGER_UNION_PASSING
