@@ -158,16 +158,15 @@ the x87 floating point registers may be referred to in \MMX/\threednow
 mode as a 64-bit register.  All of these registesr are global to all
 procedures in a running program.
 
-This subsection discusses usage of each register.  Registers \RBP,
-registers \reg{r8} through \reg{r15} and registers \reg{xmm8} through
-\reg{xmm15} ``belong'' to the calling function and the called function
-is required to preserve their values.  In other words, a called
-function must preserve these registers' values for its caller.
-Remaining registers ``belong'' to the called function.\footnote{Note
-  that in contrast to the \intelabi, \RBX, \RDI, and \RSI belong to
-  the called function, not the caller.}  If a calling function wants
-to preserve such a register value across a function call, it must save
-the value in its local stack frame.
+This subsection discusses usage of each register.  Registers \RBP and
+\reg{r8} through \reg{r15} ``belong'' to the calling function and the
+called function is required to preserve their values.  In other words,
+a called function must preserve these registers' values for its
+caller.  Remaining registers ``belong'' to the called
+function.\footnote{Note that in contrast to the \intelabi, \RBX, \RDI,
+  and \RSI belong to the called function, not the caller.}  If a
+calling function wants to preserve such a register value across a
+function call, it must save the value in its local stack frame.
 
 The CPU shall be in MMX mode upon entry to a function.  Therefore,
 every function that uses the x87 register stack is required to issue
@@ -215,7 +214,7 @@ stack frame.  \footnote{The conventional use of \RBP{} as a frame
   pointer for the stack frame may be avoided by using \RSP (the stack
   pointer) to index into the stack frame.  This technique saves two
   instructions in the prologue and epilogue and makes one additional
-  general-purpose register (\RSP) available.}
+  general-purpose register (\RBP) available.}
 
 \subsection{Parameter Passing}
 
@@ -245,7 +244,7 @@ pointer type are placed in the next available general purpose
 register, taken in the order \RAX, \RDX, \RCX, \RBX, \RSI, and \RDI.
 Arguments of floating point type and of type \code{__m128}, are placed
 in the next available SSE register, taken in order from \reg{xmm0} to
-\reg{xmm7}.  If no registers are available, the values are placed on
+\reg{xmm15}.  If no registers are available, the values are placed on
 the stack.
 
 Scalar values of type \code{__int128} are handled as they consisted
@@ -258,12 +257,17 @@ processed second.\footnote{Thus, if all 128 bits are placed on the
 Scalar values of type \code{__m64} are always placed on the stack.
 
 Structure or union objects with more than 16 bytes, those that contain
-scalar components of type \code{__m64}, or, in C++, non-POD structure
-or union types,\footnote{A non-POD object cannot be returned in
-  registers because such objects must have well defined addresses; the
-  address at which an object is constructed (by the caller) and the
-  address at which the object is destroyed (by the callee) must be the
-  same.  Similar issues apply when returning a non-POD object from a
+scalar components of type \code{__m64}, or, in C++,
+non-POD\footnote{The term POD is from the ANSI/ISO C++ Standard, and
+  stands for Plain Ol' Data.  Although the exact definition is
+  technical, a POD is essentially a structure or union that could
+  could have been written in C; there cannot be any member functions,
+  or base classes, or similar C++ extensions.}  structure or union
+types,\footnote{A non-POD object cannot be returned in registers
+  because such objects must have well defined addresses; the address
+  at which an object is constructed (by the caller) and the address at
+  which the object is destroyed (by the callee) must be the same.
+  Similar issues apply when returning a non-POD object from a
   function.} are always passed on the stack.  The stack is aligned as
 required by the alignment of the structure or union type being passed.
 Then, the structure value is copied onto the stack.

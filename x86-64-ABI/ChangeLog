@@ -1,3 +1,8 @@
+2000-09-22  Mark Mitchell  <mark@codesourcery.com>
+
+	* low-level-sys-info.tex: Make all XMM registers caller-saved.
+	Fix typo.  Add footnote about PODs.
+
 2000-09-21  Mark Mitchell  <mark@codesourcery.com>
 
 	* low-level-sys-info.tex: Fix typo.
