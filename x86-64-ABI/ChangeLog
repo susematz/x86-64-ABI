@@ -1,3 +1,8 @@
+2001-01-12  Andreas Jaeger  <aj@suse.de>
+
+	* low-level-sys-info.tex: Fix typo, reported by Philipp Thomas
+	<pthomas@suse.de>.
+
 2001-01-11  Jan Hubicka <jh@suse.cz>,  Philipp Thomas <pthomas@suse.de>
 
 	* low-level-sys-info.tex: Document Code models.
