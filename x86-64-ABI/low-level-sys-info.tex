@@ -407,10 +407,9 @@ on the stack in reversed (right-to-left\footnote{Right-to-left order
 For calls that may call functions that use varargs or stdargs
 (prototype-less calls or calls to functions containing ellipsis
 (\dots) in the declaration) \RAX is used as hidden argument to specify
-the number of SSE registers used.  The content of \RAX does not need
-to match exactly the number of registers, but must be an upper bound
-on the number of SSE registers used. It is in the range 0--15,
-inclusive.
+the number of SSE registers used. The contents of \RAX do not need to
+match exactly the number of registers, but must be an upper bound on
+the number of SSE registers used and is in the range 0--15 inclusive.
 
 \paragraph{Returning of Values}
 The returning of values is done according to the following algorithm:
