@@ -1,15 +1,10 @@
 \chapter{Program Loading and Dynamic Linking}
 
-\editornote{Where should the dynamic linker and the libries live?  The
-  ia64 ABI defines new paths, e.g. /usr/lib/ia64l32/ and leaves
-  /usr/lib to ia32.  I'll follow this example and use /usr/lib/x86-64/
-  as path.}
-
 \section{Program Header}
 
 \section{Program Loading}
 
-\begin{figure}
+\begin{figure}[H]
 \caption{Example Executable File}
 \begin{center}
 \begin{tabular}{r|c|l}
@@ -34,7 +29,176 @@
 
 \section{Dynamic Linking}
 
+We need three parameters for the dynamic linker to fixup the
+PLT:
+\begin{enumerate}
+\item The address of the entry point of the dynamic linker.
+\item The relocation entry that needs to be relocated (either GOT or
+  PLT, depending on the proposal)
+\item A special parameter to identify the shared object.
+\end{enumerate}
 
+\editornote{A location for these parameters has to be determined.}
+
+\editornote{So far only the conventions for shared objects have been
+  specified.  The conventions for the executable need to be written
+  down.}
+% executable: PIC or not PIC?
+
+\subsection{Proposal 1: RW-PLT}
+
+\begin{figure}[H]
+\caption{Position-Independent Direct Function Call}
+\begin{verbatim}
+extern void function ();  .globl function
+function ();              call function@PLT
+\end{verbatim}
+\end{figure}
+
+\begin{figure}[H]
+\caption{Position-Independent Indirect Function Call}
+\begin{verbatim}
+extern void (*ptr) ();    .globl ptr, name
+extern void name ();
+ptr = name;               movl ptr@GOTPC(%rip), %rax
+                          movl name@GOTPC(%rip), %rdx
+                          movl %rdx, (%rax)
+
+(*ptr)();                 movl ptr@GOTPC(%rip), %rax
+                          call *(%rax)
+\end{verbatim}
+\end{figure}
+
+\begin{figure}[H]
+\caption{Position-Independent Procedure Linkage Table}
+\begin{tabular}{lll}
+.PLT0: & pushl & GOT+8(\%rip); GOT[1]\\
+& jmp &GOT+16(\%rip) ; GOT[2] \\
+& nop & \\
+& nop & \\
+& nop & \\
+& nop & \\
+.PLT1: & jmp & PLT1a\\
+.PLT1a& pushl & \$offset \\
+&jmp &.PLT0@PC \\
+.PLT2: & jmp& name2\\
+&pushl & \$offset \\
+& jmp & .PLT0@PC \\
+&\dots\\
+\end{tabular}
+\end{figure}
+
+\editornote{The costs for a call are (after fixing the PLT): one call
+  and one direct jmp, giving an overhead of one jump.  The problem is
+  that we have self modifying code.}
+
+\subsection{Proposal 2: RO-PLT}
+
+\editornote{This is ia32 enhanced to 64 bits without an explicit GOT
+  register.}
+
+
+\begin{figure}[H]
+\caption{Position-Independent Direct Function Call}
+\begin{verbatim}
+extern void function ();  .globl function
+function ();              call function@PLT
+\end{verbatim}
+\end{figure}
+
+\begin{figure}[H]
+\caption{Position-Independent Indirect Function Call}
+\begin{verbatim}
+extern void (*ptr) ();    .globl ptr, name
+extern void name ();
+ptr = name;               movl ptr@GOTPC(%rip), %rax
+                          movl name@GOTPC(%rip), %rdx
+                          movl %rdx, (%rax)
+
+(*ptr)();                 movl ptr@GOTPC(%rip), %rax
+                          call *(%rax)
+\end{verbatim}
+\end{figure}
+
+\begin{figure}[H]
+\caption{Position-Independent Procedure Linkage Table}
+\begin{tabular}{lll}
+.PLT0: & pushl & GOT+8(\%rip); GOT[1]\\
+& jmp &GOT+16(\%rip) ; GOT[2] \\
+& nop & \\
+& nop & \\
+& nop & \\
+& nop & \\
+.PLT1: & jmp &*name1@GOTPC(\%rip)\\
+& pushl & \$offset \\
+&jmp &.PLT0@PC \\
+.PLT2: & jmp&*name2@GOTPC(\%rip)\\
+&pushl & \$offset \\
+& jmp & .PLT0@PC \\
+&\dots\\
+\end{tabular}
+\end{figure}
+
+\editornote{The costs for a call are (after fixing the PLT): one call
+  and one memory indirect jmp, giving an overhead of one jump and one
+  memory reference.}
+
+\subsection{Proposol 3: Indirect Calls}
+
+\editornote{This was suggested to me by Wayne Meretsky}
+
+\editornote{Since we only relocate the GOT entries, we have a
+  read-only PLT.}
+
+\begin{figure}[H]
+\caption{Position-Independent Direct Function Call}
+\begin{verbatim}
+extern void function ();  .globl function
+function ();              call *name@GOTPC(%rip)
+\end{verbatim}
+\end{figure}
+
+\begin{figure}[H]
+\caption{Position-Independent Indirect Function Call}
+\begin{verbatim}
+extern void (*ptr) ();    .globl ptr, name
+extern void name ();
+ptr = name;               movl ptr@GOTPC(%rip), %rax
+                          movl name@GOTPC(%rip), %rdx
+                          movl %rdx, (%rax)
+
+(*ptr)();                 movl ptr@GOTPC(%rip), %rax
+                          call *(%rax)
+\end{verbatim}
+\end{figure}
+
+\begin{figure}[H]
+\caption{Position-Independent Procedure Linkage Table}
+\begin{tabular}{lll}
+.PLT0: & pushl & GOT+8(\%rip); GOT[1]\\
+& jmp &GOT+16(\%rip) ; GOT[2] \\
+& nop & \\
+& nop & \\
+& nop & \\
+& nop & \\
+.PLT1: & pushl & \$offset \\
+&jmp &.PLT0@PC \\
+.PLT2: &pushl & \$offset \\
+& jmp & .PLT0@PC \\
+&\dots\\
+\end{tabular}
+\end{figure}
+
+\editornote{This works only with PIC}
+
+\editornote{The costs for a call are (after fixing the PLT): one
+  memory indirect call, giving an overhead of one memory reference.}
+
+% common stuff
+\subsection{Programm Interpreter}
+
+The name and location of the program interpreter is:
+/usr/lib/ld.so.1
 
 %%% Local Variables:
 %%% mode: latex
