@@ -1,3 +1,7 @@
+2000-07-19  Andreas Jaeger  <aj@suse.de>
+
+	* macros.tex: Use here style.
+
 Tue Jul 18 20:33:36 CEST 2000  Jan Hubicka  <jh@suse.cz>
 
 	* macros.tex (\reg, \RAX, \RBX, \RCX, \RDX, \RSI, \RDI, \RBP, \RSP,
