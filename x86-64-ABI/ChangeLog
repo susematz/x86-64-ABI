@@ -1,3 +1,8 @@
+2000-12-20  Andreas Jaeger  <aj@suse.de>
+
+	* low-level-sys-info.tex: Fix return register documentation.
+	Enhance register table.
+
 2000-12-19  Andreas Jaeger  <aj@suse.de>
 
 	* low-level-sys-info.tex: Add table describing usage of generic

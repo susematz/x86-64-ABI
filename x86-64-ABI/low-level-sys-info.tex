@@ -336,11 +336,12 @@ for the second doubleword.
       \multicolumn{1}{l}{\bf function calls} \\
       \hline
       \noalign{\smallskip}
-\RAX & temporary register; used also for variable arguments to pass
-information about the number of SSE registers used  & No \\
-\RBX & callee-saved register & Yes \\
+\RAX & temporary register; with variable arguments passes
+information about the number of SSE registers used; 1$^{\rm st}$
+return register & No \\
+\RBX & callee-saved register; optionally used as base pointer & Yes \\
 \RCX & used to pass 4$^{\rm th}$ integer argument to functions & No \\
-\RDX & used to pass 3$^{\rm rd}$ argument to functions & No \\
+\RDX & used to pass 3$^{\rm rd}$ argument to functions ; 2$^{\rm nd}$ return register & No \\
 \RSP & stack pointer & Yes. \\
 \RBP & callee-saved register & Yes \\
 \RSI & used to pass 2$^{\rm nd}$  argument to functions & No \\
@@ -354,6 +355,13 @@ chain pointer & No \\
 \reg{r13} & callee-saved register & Yes \\
 \reg{r14} & callee-saved register & Yes \\
 \reg{r15} & callee-saved register & Yes \\
+\reg{xmm0}--\reg{xmm1} & used to pass and return floating point
+arguments & No\\
+\reg{xmm2}--\reg{xmm15} & used to pass floating point arguments & No\\
+\reg{mmx0}--\reg{mmx1},&&\\
+\reg{st0}--\reg{st1} & temporary registers; used to return MMX arguments & No \\
+\reg{mmx2}--\reg{mmx8},&&\\
+\reg{st2}--\reg{st8} & temporary registers & No \\
 \noalign{\medskip}
 \cline{1-1}\multicolumn{3}{l}{\small Note: Register assignment is right to left.}\\
     \end{tabular}
@@ -368,34 +376,34 @@ chain pointer & No \\
 If a function returns a scalar of type \code{__m64}, the value is
 returned in \reg{mm0}.  If the function returns a scalar of some other
 type, the value is returned in a register or registers.  The register
-or registers chosen are the same as those that would be selected for
-a value of the same type to be passed to a function taking only one
-argument of that same type, except that \RAX is added at the beginning
-of the list of available registers.\footnote{This implies that only
-  \RAX, \RBX, \reg{mm0} and \reg{xmm0} will be used as return
-  registers.}
+or registers chosen are the same as those that would be selected for a
+value of the same type to be passed to a function taking only one
+argument of that same type, except that the list for integral or
+pointer type scalars consists of \RAX and \RDX.
 
 \subsection{Functions Returning Structures or Unions}
 
 If a function returns a structure or union whose size is greater than
 16 bytes, or, for C++, if the structure or union is a non-POD, then
 the caller provides space for the return value and passes the address
-of this storage in \RAX as if it were the first argument to the
+of this storage in \RDI as if it were the first argument to the
 function.  In effect, this address becomes a ``hidden'' first
 argument.
 
-In this case, the function also sets \RAX to the value of the original
+In this case, the function also sets \RDI to the value of the original
 address in the callee's area before it returns.  Thus when the caller
 receives control again, the address of the returned object resides in
-register \RAX and can be used to access the object.
+register \RDI and can be used to access the object.
   
 If a function returns a structure or union whose size is less than or
 equal to 16 bytes, and, for C++, the structure or union is a POD, then
 the structure is returned in registers.  The registers chosen for a
 given structure or union type are the same as those that would be
 selected for a value of the same type to be passed to a function
-taking only one argument of that same structure type, except that \RAX
-is added at the beginning of the list of available registers.
+taking only one argument of that same structure type, except that the
+list for integral or pointer type scalars consists of \RAX and \RDX.
+For returning, structures and unions are treated the same way as for
+passing them.
 
 \section{Operating System Interface}
 
