@@ -1,5 +1,9 @@
 2000-09-25  Mark Mitchell  <mark@codesourcery.com>
 
+	* low-level-sys-info.tex: Make RAX the return register again.
+	
+2000-09-25  Mark Mitchell  <mark@codesourcery.com>
+
 	* low-level-sys-info.tex: Tweak register allocation for
 	parameter-passing.
 

@@ -326,7 +326,8 @@ returned in \reg{mm0}.  If the function returns a scalar of some other
 type, the value is returned in a register or registers.  The register
 or registers chosen are the same as those that would be selected were
 a value of the same type to be passed to a function taking only one
-argument of that same structure type.
+argument of that same type, except that \RAX is added at the beginning
+of the list of available registers.
 
 \subsection{Functions Returning Structures or Unions}
 
@@ -347,7 +348,8 @@ equal to 16 bytes, and, for C++, the structure or union is a POD, then
 the structure is returned in registers.  The registers chosen for a
 given structure or union type are the same as those that would be
 selected were a value of the same type to be passed to a function
-taking only one argument of that same structure type.
+taking only one argument of that same structure type, except that \RAX
+is added at the beginning of the list of available registers.
 
 \section{Operating System Interface}
 
