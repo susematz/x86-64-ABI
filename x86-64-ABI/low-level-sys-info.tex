@@ -6,11 +6,20 @@
 
 \subsection{Data Representation}
 
-Within this specification, the term \emph{\textindex{halfword}} refers
-to a 16-bit object, the term \emph{\textindex{word}} refers to a
-32-bit object, the term \emph{\textindex{doubleword}} refers to a
-64-bit object, and the term \emph{\textindex{quadword}} refers to a
-128-bit object.
+Within this specification, the term \emph{\textindex{\byte{}}} refers to
+a 8-bit object, the term \emph{\textindex{\twobyte{}}} refers to a 16-bit
+object, the term \emph{\textindex{\fourbyte{}}} refers to a 32-bit
+object, the term \emph{\textindex{\eightbyte{}}} refers to a 64-bit
+object, and the term \emph{\textindex{\sixteenbyte{}}} refers to a
+128-bit object.%
+\footnote{The \intelabi uses the term \emph{\textindex{halfword}} for
+  a 16-bit object, the term \emph{\textindex{word}} for a 32-bit
+  object, the term \emph{\textindex{doubleword}} for a 64-bit object.  But
+  most ia32 processor specific documentation define a
+  \emph{\textindex{word}} as a 16-bit object, a
+  \emph{\textindex{doubleword}} as a 32-bit object, a
+  \emph{\textindex{quardword}} as a 64-bit object and a
+  \emph{\textindex{double quadword}} as a 128-bit object.}
 
 \subsubsection{Fundamental Types}
 
@@ -35,31 +44,31 @@ scalar types and the processor's. The \code{__int128},
     \cline{2-5}
     & \texttt{unsigned char} & 1 & 1 & unsigned byte \\
     \cline{2-5}
-    & \texttt{short} & 2 & 2 & signed halfword \\
+    & \texttt{short} & 2 & 2 & signed \twobyte \\
     & \texttt{signed short} & & \\
     \cline{2-5}
-    & \texttt{unsigned short} & 2 & 2 & unsigned halfword \\
+    & \texttt{unsigned short} & 2 & 2 & unsigned \twobyte \\
     \cline{2-5}
-    & \texttt{int} & 4 & 4 & signed word \\
+    & \texttt{int} & 4 & 4 & signed \fourbyte \\
     Integral & \texttt{signed int} & & \\
     & \texttt{enum} & & \\
     \cline{2-5}
-    & \texttt{unsigned int} & 4 & 4 & unsigned word \\
+    & \texttt{unsigned int} & 4 & 4 & unsigned \fourbyte \\
     \cline{2-5}
-    & \texttt{long} & 8 & 8 & signed doubleword \\
+    & \texttt{long} & 8 & 8 & signed \eightbyte \\
     & \texttt{signed long} & & \\
     & \texttt{long long} & & \\
     & \texttt{signed long long} & & \\
     \cline{2-5}
-    & \texttt{unsigned long} & 8 & 8 & unsigned doubleword \\
-    & \texttt{unsigned long long} & 8 & 8 & unsigned doubleword \\
+    & \texttt{unsigned long} & 8 & 8 & unsigned \eightbyte \\
+    & \texttt{unsigned long long} & 8 & 8 & unsigned \eightbyte \\
     \hline
-    & \texttt{__int128}$^\dagger$ & 16 & 16 & signed quadword \\
-    & \texttt{signed __int128}$^\dagger$ & 16 & 16 & signed quadword \\
+    & \texttt{__int128}$^\dagger$ & 16 & 16 & signed \sixteenbyte \\
+    & \texttt{signed __int128}$^\dagger$ & 16 & 16 & signed \sixteenbyte \\
     \hline
-    & \texttt{unsigned __int128}$^\dagger$ & 16 & 16 & unsigned quadword \\
+    & \texttt{unsigned __int128}$^\dagger$ & 16 & 16 & unsigned \sixteenbyte \\
     \hline
-    Pointer & \texttt{\textit{any-type} *} & 8 & 8 & unsigned doubleword \\
+    Pointer & \texttt{\textit{any-type} *} & 8 & 8 & unsigned \eightbyte \\
     & \texttt{\textit{any-type} (*)()} & & \\
     \hline
     Floating-& \texttt{float} & 4 & 4 & single (IEEE) \\
@@ -198,9 +207,9 @@ stack.  This stack grows downwards from high addresses.  Figure
       \multicolumn{1}{c}{Contents} &
       \multicolumn{1}{l}{Frame} \\
       \noalign{\smallskip}  \cline{1-3}
-      \code{8n+16(\RBP)} & argument doubleword $n$ \\
+      \code{8n+16(\RBP)} & argument \eightbyte $n$ \\
       & \dots & Previous \\
-      \code{16(\RBP)} & argument doubleword $0$ \\
+      \code{16(\RBP)} & argument \eightbyte $0$ \\
       \cline{1-3}
       \code{8(\RBP)} & return address \\ \cline{2-2}
       \code{0(\RBP)} & previous \RBP value \\
@@ -235,6 +244,7 @@ frame, rather than adjusting the stack pointer in the prologue and
 epilogue.
 
 \subsection{Parameter Passing}
+\label{sec-calling-conventions}
 
 After the argument values have been computed, they are placed in
 registers, or pushed on the stack.  The way how values are passed is
@@ -261,7 +271,7 @@ classes correspondend to x86-64 register classes and are:
 
 \paragraph{Classification}
 The size of each argument gets rounded up to
-doublewords.\footnote{Therefore the stack will always be doubleword aligned.}
+\eightbytes.\footnote{Therefore the stack will always be \eightbyte aligned.}
 
 The basic types are assigned their natural classes:
 \begin{itemize}
@@ -284,7 +294,7 @@ The classification of aggregate (structures and arrays) and union
 types works as follows:
 
 \begin{enumerate}
-\item If the size of an object is larger than two doublewords, or
+\item If the size of an object is larger than two \eightbytes, or
     in C++, is a non-\textindex{POD}%
 \footnote{The term POD is from the ANSI/ISO C++ Standard, and
     stands for Plain Ol' Data.  Although the exact definition is
@@ -300,11 +310,11 @@ types works as follows:
     Similar issues apply when returning a non-POD object from a
     function.}
 
-\item Both doublewords get initialized to class NO_CLASS.
+\item Both \eightbytes get initialized to class NO_CLASS.
 
 \item Each field of an object is classified recursively so that always
    two fields are considered.  The resulting class is calculated
-   according to the classes of the fields in the doubleword:
+   according to the classes of the fields in the \eightbyte:
    \begin{enumerate}
    \item
       If both classes are equal, this is the resulting class.
@@ -343,7 +353,7 @@ left-to-right order) for passing as follows:
 \item If the class is SSE, the next available SSE register is used, the
    registers are taken in the order from \reg{xmm0} to \reg{xmm15}.
    
-item If the class is SSEUP, the doubleword is passed in the upper
+item If the class is SSEUP, the \eightbyte is passed in the upper
    half of the least used SSE register.
 
 \item If the class is X87 or X87UP, it is passed in memory.
@@ -391,9 +401,9 @@ arguments & No\\
 \Hrule
 \end{figure}
 
-If there is no register available anymore for any doubleword of an
+If there is no register available anymore for any \eightbyte of an
 argument, the whole argument is passed on the stack. If registers have
-already been assigned for some doublewords of this argument, those
+already been assigned for some \eightbytes of this argument, those
 assignments get reverted.
 
 Once registers are assigned, the arguments passed in memory are pushed
@@ -427,7 +437,7 @@ The returning of values is done according to the following algorithm:
 \item If the class is SSE, the next available SSE register of the
    sequence \reg{xmm0}, \reg{xmm1} is used.
 
-\item If the class is SSEUP, the doubleword is passed in the upper half of the
+\item If the class is SSEUP, the \eightbyte is passed in the upper half of the
    least used SSE register.
 
 \item If the class is X87, the value is returned on the X87 stack in
@@ -551,7 +561,7 @@ generate a bounds check fault in long mode.
 
 \begin{table}
 \Hrule
-  \caption{Floating-point Exceptions}
+  \caption{Floating-Point Exceptions}
   \begin{center}
     \begin{tabular}[t]{l|l}
       \multicolumn{1}{c}{Code} & \multicolumn{1}{c}{Reason} \\
@@ -561,6 +571,58 @@ generate a bounds check fault in long mode.
       \texttt{FPE\_FLTUND} & \texttt{floating-point underflow} \\
       \texttt{FPE\_FLTRES} & \texttt{floating-point inexact result} \\
       \texttt{FPE\_FLTINV} & \texttt{invalid floating-point operation}
+    \end{tabular}
+  \end{center}
+\Hrule
+\end{table}
+
+\subsection{Special Registers}
+
+The \xARCH architecture defines floating point instructions.  At
+process startup the two floating point units, SSE2 and x87, both have
+all floating-point excection status flags cleared.  The status of the
+control words is as defined in tables \ref{x87-fpucw} and
+\ref{mxcsr-status}.
+
+
+\begin{table}
+\Hrule
+  \caption{x87 Floating-Point Control Word}
+  \label{x87-fpucw}
+  \begin{center}
+    \begin{tabular}[t]{l|l|l}
+      \multicolumn{1}{c}{Field} & \multicolumn{1}{c}{Value}& \multicolumn{1}{c}{Note} \\
+      \hline
+      \texttt{RC} & 0 & Round to nearest\\
+      \texttt{PC} & 11& Double extended precision\\
+      \texttt{PM} & 1& Precision masked\\
+      \texttt{UM} & 1& Undeflow masked\\
+      \texttt{OM} & 1& Overflow masked\\
+      \texttt{ZM} & 1& Zero divide masked\\
+      \texttt{DM} & 1& Denormal operand masked\\
+      \texttt{IM} & 1& Invalid operation masked\\
+    \end{tabular}
+  \end{center}
+\Hrule
+\end{table}
+
+\begin{table}
+\Hrule
+  \caption{MXCSR Status Bits}
+  \label{mxcsr-status}
+  \begin{center}
+    \begin{tabular}[t]{l|l|l}
+      \multicolumn{1}{c}{Field} & \multicolumn{1}{c}{Value}& \multicolumn{1}{c}{Note} \\
+      \hline
+      \texttt{FZ} & 0 & Flush to zero\\
+      \texttt{RC} & 0 & Round to nearest\\
+      \texttt{PM} & 1& Precision masked\\
+      \texttt{UM} & 1& Undeflow masked\\
+      \texttt{OM} & 1& Overflow masked\\
+      \texttt{ZM} & 1& Zero divide masked\\
+      \texttt{DM} & 1& Denormal operand masked\\
+      \texttt{IM} & 1& Invalid operation masked\\
+      \texttt{DAZ} & 0 & Denormals are zero\\
     \end{tabular}
   \end{center}
 \Hrule

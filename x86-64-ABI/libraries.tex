@@ -98,7 +98,7 @@ pthreads cancellation.
 
 \subsubsection{The Unwind Process}
 
-The standard ABI exception handling / unwind process begins with the raising
+The standard ABI exception handling/unwind process begins with the raising
 of an exception, in one of the forms mentioned above. This call specifies an
 exception object and an exception class.
 
@@ -675,7 +675,7 @@ be the exceptionObject pointer, which must be preserved to be passed to
 
 The landing pad may receive other arguments, for instance a switch value 
 indicating the type of the exception. Four scratch registers are reserved 
-for this use (\RDI, \RSI, \RDX, \RCX.) 
+for this use (\RDI, \RSI, \RDX, \RCX). 
 
 \subsubsection{Rules for Correct Inter-Language Operation}
 
@@ -696,26 +696,27 @@ This is true even if it understands the exception object format
 A runtime is not allowed to catch an exception if the 
 \_UA\_FORCE\_UNWIND flag was passed to the personality routine. 
 
-Example: Foreign Exceptions in C++. In C++, foreign exceptions can be 
-caught by a catch(...) statement. They can also be caught
-as if they were of a \_\_foreign\_exception class, 
-defined in <exception>. The \_\_foreign\_exception may have subclasses,
-such as \_\_java\_exception and \_\_ada\_exception, if the runtime is 
-capable of identifying some of the foreign languages. 
+\paragraph{Example: Foreign Exceptions in C++.} In C++, foreign exceptions can be 
+caught by a \code{catch(\dots)} statement. They can also be caught as if they
+were of a \code{\_\_foreign\_exception} class, defined in \code{<exception>}. The
+\code{\_\_foreign\_exception} may have subclasses, such as
+\code{\_\_java\_exception} and \code{\_\_ada\_exception}, if the runtime is capable
+of identifying some of the foreign languages.
 
 The behavior is undefined in the following cases: 
 \begin{itemize}
-\item A \_\_foreign\_exception catch argument is accessed in any way 
+\item A \code{\_\_foreign\_exception} catch argument is accessed in any way 
      (including taking its address). 
 
-\item A \_\_foreign\_exception is active at the same time as another 
+\item A \code{\_\_foreign\_exception} is active at the same time as another 
      exception (either there is a nested exception while catching the
      foreign exception, or the foreign exception was itself nested). 
-
-\item uncaught\_exception(), set\_terminate(), set\_unexpected(), terminate(), 
-     or unexpected() is called at a time a foreign exception exists 
-     (for example, calling set\_terminate() during unwinding of a 
-     foreign exception). 
+     
+\item \code{uncaught\_exception()}, \code{set\_terminate()},
+     \code{set\_unexpected()}, \code{terminate()}, or
+     \code{unexpected()} is called at a time a foreign exception
+     exists (for example, calling \code{set\_terminate()} during
+     unwinding of a foreign exception).
 \end{itemize}
 
 All these cases might involve accessing C++ specific content of the 
@@ -729,10 +730,11 @@ Otherwise, a catch block catching a foreign exception is allowed:
       exception object must be unaltered by the C++ runtime. 
 \end{itemize}
 
-A catch-all block may be executed during forced unwinding. 
-For instance, a longjmp may execute code in a catch(...) during stack
-unwinding. However, if this happens, unwinding will proceed at the end 
-of the catch-all block, whether or not there is an explicit rethrow. 
+A catch-all block may be executed during forced unwinding.  For
+instance, a longjmp may execute code in a \code{catch(\dots)} during
+stack unwinding. However, if this happens, unwinding will proceed at
+the end of the catch-all block, whether or not there is an explicit
+rethrow.
 
 Setting the low 4 bytes of exception class to C++$\backslash$0 is reserved 
 for use by C++ runtimes compatible with the common C++ ABI. 

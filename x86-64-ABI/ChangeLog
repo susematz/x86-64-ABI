@@ -1,3 +1,28 @@
+2001-05-10  Andreas Jaeger  <aj@suse.de>
+
+	* macros.tex: Update version numbers.
+
+	* low-level-sys-info.tex: Add information about floating point
+	control words.
+
+2001-05-03  Andreas Jaeger  <aj@suse.de>
+
+	* libraries.tex: Fix some typos.
+
+2001-04-30  Andreas Jaeger  <aj@suse.de>
+
+	* object-files.tex (subsection{Relocation Types}): Describe
+	relocations.
+
+2001-04-24  Andreas Jaeger  <aj@suse.de>
+
+	* low-level-sys-info.tex: Don't confuse the user with doubleword
+	etc.
+
+	* abi.tex: Include kernel.
+
+	* Makefile (INCLUDES): Add kernel.tex
+
 2001-03-19  Geert Bosch  <bosch@gnat.com>
 
 	* libraries.tex: (Unwind Library Interface): New section.

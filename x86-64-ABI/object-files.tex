@@ -71,13 +71,34 @@ The \xARCH ABI adds one additional field:
                   \xARCH architecture. \\
 \end{tabular*}
 
+The following notations are used for specifying relocations in table
+\ref{tab-relocations}:
+\begin{description}
+\item[A] Represents the addend used to compute the value of the
+  relocatable field.
+\item[B] Represents the base address at which a shared object has been
+  loaded into memory during execution.  Generally, a shared object is
+  built with a 0 base virtual address, but the execution address will
+  be different.
+\item[G] Represents the offset into the global offset table at which 
+  the relocation entry's symbol will reside during execution.
+\item[GOT] Represents the address of the global offset table.
+\item[L] Represents the place (section offset or address) of the
+  \textindex{Procedure Linkage Table} entry for a symbol.
+\item[P] Represents the place (section offset or address) of the
+  storage unit being relocated (computed using \code{r_offset}).
+\item[S] Represents the value of the symbol whose index resides in the
+  relocation entry.
+\end{description}
+
 The \xARCH ABI architectures uses only \texttt{Elf64_Rela} relocation
 entries with explicit addends.  The \code{r_addend} member serves as
 the relocation addend.
 
-\begin{figure}[H]
+\begin{table}[H]
 \Hrule
   \caption{Relocation Types}
+  \label{tab-relocations}
   \begin{center}
     \begin{tabular}[t]{l|r|l|l}
       \multicolumn{1}{c}{Name} & 
@@ -106,7 +127,7 @@ the relocation addend.
     \end{tabular}
   \end{center}
 \Hrule
-\end{figure}
+\end{table}
 
 The special semantics for most of these relocation types are identical
 to those used for the Intel386 architecture.  \footnote{Even though
