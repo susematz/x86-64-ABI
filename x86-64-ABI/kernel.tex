@@ -1,6 +1,5 @@
 \chapter{Linux Conventions}
 
-
 This chapter describes some details that are only relevant to 
 GNU/Linux systems and the Linux kernel.
 
@@ -44,6 +43,13 @@ the following differences:
 \item Only values of class INTEGER or class MEMORY are passed to the
   kernel.
 \end{enumerate}
+
+\subsection{Stack Layout}
+
+The Linux kernel does not honor the \textindex{red zone} (see
+\ref{sec-stack-frame} and therefore this area is not allowed to be
+used by kernel code.  Kernel code should be compiled by GCC with the
+option \code{-mno-red-zone}.
 
 
 \subsection{Required Processor Features}
