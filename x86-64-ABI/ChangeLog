@@ -1,5 +1,7 @@
 2001-01-08  Andreas Jaeger  <aj@suse.de>
 
+	* object-files.tex: Document 16 and 8 bit relocations.
+
 	* dl.tex: Fix relocation name; use pushq for pushing GOT[1] since
 	we need a 64 bit value.
 

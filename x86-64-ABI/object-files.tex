@@ -44,9 +44,11 @@ The \xARCH ABI adds one additional field:
 \Hrule
   \caption{Relocatable Fields}
 \begin{center}
-  \begin{picture}(300,100)
-    \put(0,66){\framebox(150, 33){31\hfill\textit{word32}\hfill 0}}
-    \put(0,0){\framebox(300, 33){63\hfill\textit{word64}\hfill 0}}
+  \begin{picture}(360,190)
+    \put(0,150){\framebox(50, 33){8\hfill\textit{word8}\hfill 0}}
+    \put(0,100){\framebox(90, 33){16\hfill\textit{word16}\hfill 0}}
+    \put(0,50){\framebox(180, 33){31\hfill\textit{word32}\hfill 0}}
+    \put(0,0){\framebox(360, 33){63\hfill\textit{word64}\hfill 0}}
   \end{picture}
 \end{center}
 \Hrule
@@ -54,6 +56,11 @@ The \xARCH ABI adds one additional field:
 
 \noindent
 \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}p{4in}}
+\textit{word8} & This specifies a 8-bit field occupying 1 byte.\\
+\textit{word16} & This specifies a 16-bit field occupying 2 bytes
+                  with arbitrary byte alignment.  These values use
+                  the same byte order as other word values in the
+                  \xARCH architecture. \\
 \textit{word32} & This specifies a 32-bit field occupying 4 bytes
                   with arbitrary byte alignment.  These values use
                   the same byte order as other word values in the
@@ -90,6 +97,11 @@ the relocation addend.
       \texttt{R_X86_64_GOTPCREL} & 9 & \textit{word32} & \texttt{G + GOT + A - P} \\
       \texttt{R_X86_64_32}    & 10 & \textit{word32} & \texttt{S + A} \\
       \texttt{R_X86_64_32S}   & 11 & \textit{word32} & \texttt{S + A} \\
+      \texttt{R_X86_64_16}    & 12 & \textit{word16} & \texttt{S + A} \\
+      \texttt{R_X86_64_PC16}  & 13 & \textit{word16} & \texttt{S + A - P} \\
+      \texttt{R_X86_64_8}     & 14 & \textit{word8} & \texttt{S + A} \\
+      \texttt{R_X86_64_PC8}   & 15 & \textit{word8} & \texttt{S + A - P} \\
+
     \end{tabular}
   \end{center}
 \Hrule
@@ -123,6 +135,15 @@ The \texttt{R_X86_64_32} and \texttt{R_X86_64_32S} relocations truncate
 the computed value to 32-bits.  The linker must verify that the
 generated value for the \texttt{R_X86_64_32} (\texttt{R_X86_64_32S})
 relocation zero-extends (sign-extends) to the original 64-bit value.
+\end{sloppypar}
+
+\begin{sloppypar}
+A program or object file using \texttt{R_X86_64_8},
+\texttt{R_X86_64_16}, \texttt{R_X86_64_PC16} or \texttt{R_X86_64_PC8}
+relocations is not conformant to this ABI, these relocations are only
+added for documentation purposes.  The \texttt{R_X86_64_16}, and
+\texttt{R_X86_64_8} relocations truncate the computed value to 16-bits
+resp. 8-bits.
 \end{sloppypar}
 
 %%% Local Variables: 
