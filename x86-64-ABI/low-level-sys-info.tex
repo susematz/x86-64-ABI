@@ -179,14 +179,16 @@ registers.\footnote{All x87 registers are caller-saved, so
   \op{femms} instruction.}  The direction flag in the \reg{eflags}
 register must be clear on function entry, and on function return.
 
+
 \subsection{The Stack Frame}
+
 In addition to registers, each function has a frame on the run-time
 stack.  This stack grows downwards from high addresses.  Figure
 \ref{fig-stack-frame} shows the stack organization.
 
 \begin{figure}
 \Hrule
-  \caption{Stack Frame}
+  \caption{Stack Frame with Base Pointer}
   \label{fig-stack-frame}
   \begin{center}
     \begin{tabular}{r|c|l}
@@ -984,7 +986,7 @@ Table \ref{tbl-reg-num-map} outlines the register number mapping
 for the \xARCH processor family.%
 \footnote{This document does not define mappings for privileged registers.}%
 \footnote{The table defines Return Address to have a register number, even
-though the address is stored in $0($\RSP$)$ and not in a physical register.}
+though the address is stored in 0(\RSP) and not in a physical register.}
 
 \begin{figure}
 \caption{DWARF Register Number Mapping} \label{tbl-reg-num-map}
