@@ -18,6 +18,7 @@ abi.dvi: $(ALL_FILES)
 	latex abi
 	makeindex abi
 	latex abi
+	latex abi
 
 pdf abi.pdf: $(ALL_FILES)
 	pdflatex abi

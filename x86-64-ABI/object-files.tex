@@ -28,7 +28,53 @@ Processor identification resides in the ELF header's
 
 \section{Sections}
 
-No changes required.
+\subsection{Section types}
+
+\begin{table}[H]
+\Hrule
+  \caption{Section header types}
+  \begin{center}
+    \begin{tabular}[t]{l|l}
+      \multicolumn{1}{c}{sh_type name} & \multicolumn{1}{c}{Value} \\
+      \hline
+      \texttt{SHT_X86_64_UNWIND} & \texttt{0x70000001}
+    \end{tabular}
+  \end{center}
+\Hrule
+\end{table}
+
+\begin{description}
+ \item[SHT_X86_64_UNWIND]
+        This section contains unwind function table entries for
+        stack unwinding.  The contents are described in
+        Section \ref{UNKNOWN} of this document.
+\end{description}
+
+\subsection{Special sections}
+
+\begin{table}[H]
+\Hrule
+  \caption{Special sections}
+  \begin{center}
+    \begin{tabular}[t]{l|l|l}
+      \multicolumn{1}{c}{Name} & \multicolumn{1}{c}{Type}
+       & \multicolumn{1}{c}{Attributes} \\
+      \hline
+      \texttt{.got} & \texttt{SHT_PROGBITS} & \texttt{SHF_ALLOC+SHF_WRITE} \\
+      \texttt{.plt}&\texttt{SHT_PROGBITS} & \texttt{SHF_ALLOC+SHF_EXECINSTR} \\
+      \texttt{.eh_frame} & \texttt{SHT_X86_64_UNWIND} & \texttt{SHF_ALLOC}
+    \end{tabular}
+  \end{center}
+\Hrule
+\end{table}
+
+\begin{description}
+ \item[.got] This section holds the global offset table.
+ \item[.plt] This section holds the procedure linkage table.
+ \item[.eh_frame] This section holds the unwind function table.
+                      The contents are described in Section \ref{UNKNOWN}
+                      of this document.
+\end{description}
 
 \section{Symbol Table}
 
