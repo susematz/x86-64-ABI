@@ -1,7 +1,0 @@
-*~
-*.o
-*.s
-core
-a.out
-test_3_element_struct_and_unions.c
-make_3esau
