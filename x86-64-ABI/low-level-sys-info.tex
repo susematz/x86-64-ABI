@@ -5,15 +5,15 @@
 
 \subsection{Processor Architecture}
 
-The x86-64 architecture defines a new mode, referred to as 32/64-bit
-mode. See x86-64 Specification details. All information in this
+The \xARCH architecture defines a new mode, referred to as 32/64-bit
+mode. See the \xARCH Specification details. All information in this
 document is relevant only to 32/64-bit mode, unless stated otherwise.
 
 \editornote{Is this correct?}
 
 \subsection{Data Representation}
 
-In accordance with x86 tradition and x86-64 register names the terms
+In accordance with x86 tradition and \xARCH register names the terms
 byte, word, dword, qword and tword refer to the corresponding data
 objects of 8, 16, 32, 64 and 128 bits in size.
 
@@ -65,7 +65,7 @@ The basic types are specified in Table \ref{tab-basic-types}.  The
 \end{table}
 
 The IEEE extended-precision type uses a 15 bits exponent, 113 bits for
-the mantissa (the high order significand bit is implicit) and an
+the mantissa (the high order significant bit is implicit) and an
 exponent bias of 16383.  This type is optional and needs software
 emulation.
 \editornote{Is it really optional? - probably not (HH)}
@@ -76,14 +76,14 @@ A null pointer (for all types) has value zero.
 \subsubsection{Aggregates And Unions}
 
 Structure members are ``naturally'' aligned.  Structures and unions assume the
-alignment of the most strictly aligned component (compare with Table
+alignment of the most strictly aligned component (compare with table
 \ref{tab-basic-types}).  The size of aggregates is a multiple of the alignment.
 
 \subsubsection{Arrays}
 
 Arrays assume the alignment of the most strictly aligned component.
-Aditionally arrays greater than 16~bytes are required to be aligned minimally
-to the 16~byte boundary to make usage of SSE packed operations more efecient.
+Additionally arrays greater than 16~bytes are required to be aligned minimally
+to the 16~byte boundary to make usage of SSE packed operations more efficient.
 
 \subsubsection{Bit-Fields}
 
@@ -108,10 +108,10 @@ stack traceback algorithm.
 \subsection{Registers}
 \label{subsec-registers}
 
-The x86-64 architecture provides 16 general purpose registers, each 64
+The \xARCH architecture provides 16 general purpose registers, each 64
 bits wide. In addition the architecture provides 16 SSE registers,
 each 128 bits wide and 8 x87 floating point registers, each 80 bits
-wide useable as 64 bits wide \MMX/3dNOW! registers and several special
+wide usable as 64 bits wide \MMX/3dNOW! registers and several special
 purpose registers.
 
 This subsection discusses usage of each register.  The registers called
@@ -168,14 +168,14 @@ so the FEMMS instruction may be used.
 
 
 \subsubsection {Special purpose registers}
-All special purpose registers should be handled as global registers with
-the exception of the direction flag in EFLAGS register.  The value of direction
-flag must be clear at the entry of function.
+All special purpose registers should be handled as global registers
+with the exception of the direction flag in EFLAGS register.  The
+value of the direction flag must be clear at the entry of a function.
 \editornote{Do we want to define values of fpu and SSE control words?}
 
 \subsection{The Stack Frame}
 In addition to registers, each function has a frame on the run-time stack.  This
-stack grows downward from high addresses, figure \ref{fig-stack-frame} shows the
+stack grows downwards from high addresses, figure \ref{fig-stack-frame} shows the
 stack organization.
 
 
@@ -207,22 +207,23 @@ stack organization.
 
 Functions may expect the end of the input argument area to be aligned
 to a 16 byte boundary --- this means that value $(\RSP - 8)$ is always a
-multiple of $16$ at the entry point. This alignment must be preserved to
+multiple of $16$ at the entry point. This alignment must be preserved by
 all called functions that use the standard calling convention. The
 frames of functions with local calling conventions may or may not obey
 this rule so algorithms for stack unwinding cannot rely on it.
 
 At any point of program execution, the stack pointer, \RSP, shall point to
-the end of latest allocated stack frame.
+the end of  latest allocated stack frame.
 
-The organization of \emph{local save area} is implementation specific. Usual
-practice is to save clobered global registers in the prologue at the beginning
-or end of save area and use rest for saving local object and spilled variables.
-Saving registers at the begining is harder to implement, since the offset
-from \RBP{} is not known until after the register allocation, but overall results
-in shorter and faster prologues and epilogues allowing to allocate and deallocate
-the outgoing arguments are by same instruction used to (de)allocate the \emph{local
-save area}.
+The organization of the \emph{local save area} is implementation
+specific. Usual practice is to save clobbered global registers in the
+prologue at the beginning or end of save area and use rest for saving
+local object and spilled variables.  Saving registers at the beginning
+is harder to implement, since the offset from \RBP{} is not known
+until after the register allocation, but overall results in shorter
+and faster prologues and epilogues allowing to allocate and deallocate
+the outgoing arguments area by the same instruction used to
+(de)allocate the \emph{local save area}.
 
 The usage of \RBP{} as base pointer may be avoided by using \RSP{} instead
 to save two instructions in the prologue and epilogue and get global general
@@ -231,7 +232,7 @@ when this optimization is allowed.
 
 \subsection{Classes}
 
-The x86-64 CPU has three register classes available for parameter and
+The \xARCH CPU has three register classes available for parameter and
 return value passing convention --- the integer (general purpose)
 registers, SSE registers and \MMX{} registers.  All integral types and
 pointer belong to the class \emph{Int}, all floating point values
@@ -259,9 +260,9 @@ Qword \emph{X} of an aggregate gets assigned class \emph{Y} if and only
 if all the fields crossing qword \emph{X} belongs to same class \emph{Y}.  If
 no field crosses the given Qword, its type is \emph{None}. When no class fits
 the rules above, class \emph{Int} is used.  Exception is also 
-% Honza, something is missing here.
+\editornote{Honza, something is missing here.}
 
-Similary qword \emph{X} of union gets assigned class \emph{Y} if and only if
+Similarly qword \emph{X} of union gets assigned class \emph{Y} if and only if
 each type in the union either does not cross \emph{X} or its class for qword
 \emph{X} is \emph{Y}.
 
@@ -274,7 +275,7 @@ memory bandwidth as well as simplifies the cleanup after function call.  The
 number of registers implemented in the processor architecture naturally limits
 the number of arguments passed in this manner.
 
-For x86-64 up to six general purpose registers and six SSE registers are used
+For \xARCH up to six general purpose registers and six SSE registers are used
 for parameter passing.  If fewer (or no) arguments are passed, the unneeded registers
 will contain undefined value at the entry of function.
 \editornote{The number of registers is subject to change.}
@@ -397,9 +398,9 @@ arguments onto the stack and/or loads them into registers.
 
     Arguments not handled otherwise are passed at stack frame. \RSP{} is the
     pointer to end of outgoing argument area and we do expect \RSP{} to be
-    aligned to a 16~byte boundary and the outgoing area space large enough to fit all
+    aligned to a 16~byte boundary and the outgoing area large enough to fit all
     the arguments (this means the value \verb|ap| bytes for the final value of
-    \verb|ap| once algorithm terminates).  To compute address of given argument,
+    \verb|ap| once algorithm terminates).  To compute the address of a given argument,
     round \verb|ap| to the nearest multiple of the operand's alignment in bytes
     (minimally to 8~bytes) and
     store assign location $\verb|ap|+\RSP$ to the argument and increase \verb|ap| by
@@ -547,7 +548,7 @@ Some otherwise portable C programs depend on the argument passing scheme,
 implicitly assuming that 1) all arguments are passed on the stack, and 2)
 arguments appear in increasing order on the stack. Programs that make these
 assumptions never have been portable, but they have worked on many
-implementations. However, they do not work on the x86-64 Architecture because
+implementations. However, they do not work on the \xARCH architecture because
 some arguments are passed in registers. Portable C programs use the header
 files \verb|stdarg.h| or \verb|varargs.h| to deal with variable argument lists
 on x86-64 and other machines as well.
@@ -563,7 +564,7 @@ value and then relevant registers are used as discussed in subsection
 \ref{subsec-registers} leaving rest of registers undefined.
 
 The scalar values are returned in single register. One of the
-\RAX, \reg{XMM0} and \reg{MM0} are choosen according to their class.
+\RAX, \reg{XMM0} and \reg{MM0} are chosen according to their class.
 \verb|__int128| is returned in \RDX:\RAX.
 
 First oword of unions, aggregates and real part of complex values not exceeding
@@ -593,35 +594,37 @@ the function.
 
 \subsection{Virtual Address Space}
 
-The x86-64 architecture provides 64~bits of virtual space, but implementation
-is allowed to support less. The processes are allowed to require only 48~bits
-of address space, as supported by the initial implementation.  It is expected
-the address space to monotonically grow in the future.
+The \xARCH architecture provides 64~bits of virtual space, but
+implementation is allowed to support less. The processes are allowed
+to require only 48~bits of address space, as supported by the initial
+implementation.  It is expected that the address space grows
+monotonically in the future.
 
-According the \emph{canonical address form} as defined by the x86-64
+According the \emph{canonical address form} as defined by the \xARCH
 architecture, every byte of virtual space is having two addresses unless the
-implementation support full 64~bit address space.  The applications may not
-depend on this behaviour and address the data only using single address.
+implementation supports the full 64~bit address space.  The applications may not
+depend on this behavior and address the data only using single address.
 
-Memory management translates virtual address to physical address, hyding
-physical addressing and letting a process run anywhere in the system's real
-memory. Process typically begin with three logical segments called ``text'',
-``data'' and ``stack''. An object file may contain more segments (for example.
-for debugger use), and a process also creates additional segments for itself
-with system services.
+Memory management translates virtual address to physical address,
+hiding physical addressing and letting a process run anywhere in the
+system's real memory. Processes typically begin with three logical
+segments called ``text'', ``data'' and ``stack''. An object file may
+contain more segments (for example for debugger use), and a process
+also creates additional segments for itself with system services.
 
 \subsection{Page Size}
+
 Memory is organized by pages, which are the system's smallest units of
-memory allocation. Page size can vary from one system to another.
-Process may call \verb|sysconf|(\verb|BA_OS|) to determine current page size.
-This ABI allows system to cluster memory to logical power-of-two page
-sizes up to 65536 bytes.
+memory allocation. The page size can vary from one system to another.
+Processes may call \verb|sysconf|(\verb|BA_OS|) to determine the
+current page size.  This ABI allows system to cluster memory to
+logical power-of-two page sizes up to 65536 bytes.
 
 \subsection{Virtual Address Assignments}
-Conceptually process have full (minimally) 48-bit address space available.
+Conceptually processes have full (minimally) 48-bit address space available.
 In practice, however, several factors limit the size of a process.
 \begin{itemize}
-  \item The system reserves configuration dependent amount of virutal space.
+  \item The system reserves configuration dependent amount of virtual space.
   \item The system reserves configuration dependent amount of space per
     process.
   \item
@@ -645,34 +648,34 @@ In practice, however, several factors limit the size of a process.
       & \dots & \\
       \verb|0x80000000000| & Dynamic segments & \\ \cline{2-2}
       & \dots & \\
-      \verb|0| & Process segments & Beggining of memory\\ \cline{2-2}
+      \verb|0| & Process segments & Beginning of memory\\ \cline{2-2}
     \end{tabular}
   \end{center}
 \end{figure}
 
-Figure \ref{fig-address} shows the virtual address configuration on the x86-64
+Figure \ref{fig-address} shows the virtual address configuration on the \xARCH
 Architecture.  The segments with different properties are typically grouped in
 different areas of the address space:
 
 \begin{description}
   \item [Process segments]
-    Processese loadable segments and stack may begin at 0. The exact addresses
+    Processes loadable segments and stack may begin at 0. The exact addresses
     depend on the executable file format. Processes can control the amount
-    of virtual memory allotted for stack space, as described below.
+    of virtual memory allocated for stack space, as described below.
   \item [Dynamic segments]
-    A processes dynamic segments reside below the reserved area.
+    A process's dynamic segment resides below the reserved area.
   \item [Reserved] A reserved area resides at the top of virtual space.
 \end{description}
 
 As the figure shows, the system reserves the high end of virtual address space,
-with a processss dynamic segments below that. Although the exact boundary
-between the reserved area and a process depends on the systemas configuration,
+with a process's dynamic segments below that. Although the exact boundary
+between the reserved area and a process depends on the system's configuration,
 the reserved area shall not consume more than 1 GB of the address space.
 Individual systems may reserve less space, increasing processes  virtual memory
 range.
 
 Although applications may control their memory assignments, the typical
-arrangement appears in figure \ref{fig-cfg}
+arrangement appears in figure \ref{fig-cfg}.
 
 \begin{figure}[H]
   \caption{Conventional Segment Arrangements}
@@ -692,6 +695,8 @@ arrangement appears in figure \ref{fig-cfg}
     \end{tabular}
   \end{center}
 \end{figure}
+
+
 %%% Local Variables: 
 %%% mode: latex
 %%% TeX-master: "abi"

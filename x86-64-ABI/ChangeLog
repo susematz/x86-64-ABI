@@ -1,5 +1,9 @@
 2000-07-25  Andreas Jaeger  <aj@suse.de>
 
+	* introduction.tex: Spell check.
+	* low-level-sys-info.tex: Likewise.
+	* object-files.tex: Likewise.
+
 	* dl.tex: Spell check.
 	* conventions.tex: Likewise.
 
