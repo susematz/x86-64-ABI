@@ -1,22 +1,20 @@
 What's this?
 ------------
 
-This is an early abitestsuite for gcc and binutils for the x86-64
+This is an abitestsuite for gcc and binutils for the x86-64
 architechture. It currently tests these things:
 
-   1: Size and alignment -- sizal() and sizal2()
-      Tests for correct sizeof of all basic types, structs and arrays. Also
-      tests for correct alignment of these.
+   1: Size and alignment -- sizal()
+      Tests for correct size and alignment of all basic types, structs
+      and arrays. Also tests bitfields.
    2: Passing scalar arguments -- scalarargs()
-      Tests that arguments of basic types are passed correctly.
+      Tests that arguments of basic types are passed and returned correctly.
    3: Passing struct and union arguments -- structargs()
-      Tests that arguments of struct and union types are passed correctly.
-      Also tests for mixed struct/union/scalar types
+      Tests that arguments of struct and union types are passed and
+      returned correctly. Also tests for mixed struct/union/scalar types
    4: Passing a variable number of args -- variargs()
-   5: Tests bitfields' passing, size and alignments -- bitfields()
-
-These tests will be implemented shortly:
-- relocation types
+   5: Generation of relocation types -- reloc()
+      Not implemented yet.
 
 Questions about the abitest can be directed to discuss@x86-64.org or to
 Bo Thorsen <bo@suse.de>.
@@ -60,8 +58,8 @@ the generated assembler sources and the Makefile dependency file.
 Known problems in GCC and binutils for now
 ------------------------------------------
 
-This is a list of bugs in either GCC or the abi test:
+These are the bug in GCC the test uncovers:
 
-- long double is 12 bytes and not 16 as the abi says
+- long double is wrong
 
 - the types __int128, __float128, __m64 and __m128 are not implemented

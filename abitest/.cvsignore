@@ -6,3 +6,5 @@ make_sizal2
 core
 a.out
 .Makefile.deps
+scalarargs2.c
+make_scalarargs2

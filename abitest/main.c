@@ -8,7 +8,7 @@
       standalone and as members of structs, structure member alignments
       and bitfields.
    2: Passing and returning scalar arguments -- scalarargs()
-      Tests that arguments of basic types are passed correctly.
+      Tests that arguments of basic types are passed and returned correctly.
    3: Passing and returning struct and union arguments -- struniargs()
       Tests that arguments of struct and union types are passed correctly.
       Also tests for mixed struct/union/scalar types
@@ -29,31 +29,29 @@ int current_test;
 void
 my_abort (void)
 {
-    __asm__ __volatile__ ("movl %0, %%ecx\n\t"
-			  "jmp abort\n"
-			  : /* No output */
-			  : "g" (current_test)
-			  : "rcx");
+  __asm__ __volatile__ ("movl %0, %%ecx\n\t"
+			"jmp abort\n"
+			:: "g" (current_test) : "rcx");
 }
 
 /* Quick assert function which sets currest test number in %rax and exits.   */
 void
 assert (int expr)
 {
-    if (!expr)
-	my_abort();
+  if (!expr)
+    my_abort();
 }
 
 int
 main (int argc, char **argv)
 {
-    current_test = 1; sizal();
-    current_test = 2; scalarargs();
-    current_test = 3; struniargs();
-    current_test = 4; variargs();
-    current_test = 5; reloc();
+  current_test = 1; sizal();
+  current_test = 2; scalarargs();
+  current_test = 3; struniargs();
+  current_test = 4; variargs();
+  current_test = 5; reloc();
 
-    clear_hardware_registers;
+  clear_int_hardware_registers;
 
-    return 0;
+  return 0;
 }

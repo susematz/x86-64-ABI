@@ -1,38 +1,7 @@
 #include "defines.h"
+#include "typelist.h"
 #include <stdio.h>
 
-/* These defines control the building of the list of types to check. There
-   is a string identifying the type (with a comma after), a size of the type
-   (also with a comma and an integer for adding to the total amount of types.  
-*/
-#ifdef CHECK_INT128
-#define CI128_S "__int128",
-#define CI128_I 16, 
-#else
-#define CI128_S
-#define CI128_I
-#endif
-#ifdef CHECK_LONG_DOUBLE
-#define CLD_S "long double",
-#define CLD_I 16, 
-#else
-#define CLD_S
-#define CLD_I
-#endif
-#ifdef CHECK_FLOAT128
-#define CF128_S "__float128",
-#define CF128_I 16, 
-#else
-#define CF128_S
-#define CF128_I
-#endif
-#ifdef CHECK_M64_M128
-#define CMM_S "__m64", "__m128",
-#define CMM_I 8, 16, 
-#else
-#define CMM_S
-#define CMM_I
-#endif
 
 /* Find the maximum of three integers.  */
 int
@@ -108,22 +77,21 @@ void
 make_size_test ()
 {
   int i, j, k;
-  char *types[] = { "char", "short", "int", "long", "long long",
-		    "float", "double", CI128_S CLD_S CF128_S CMM_S };
-  int sizes[] = { 1, 2, 4, 8, 8, 4, 8, CI128_I CLD_I CF128_I CMM_I };
-  int maxcheck = sizeof(types) / sizeof(types[0]);
 
   printf ("/* Check structs and unions of all permutations of 3 basic ");
   printf ("types.  */\n");
   printf ("void\ntest_struct_and_unions ()\n{\n");
-  for (i=0; i<maxcheck; i++)
-    for (j=0; j<maxcheck; j++)
-      for (k=0; k<maxcheck; k++) {
-	int element_sizes[3], struct_size, union_size;
+  for (i=0; i<typecount; i++)
+    for (j=0; j<typecount; j++)
+      for (k=0; k<typecount; k++) {
+	int element_sizes[3], element_aligns[3], struct_size, union_size;
 
 	element_sizes[0] = sizes[i];
 	element_sizes[1] = sizes[j];
 	element_sizes[2] = sizes[k];
+	element_aligns[0] = aligns[i];
+	element_aligns[1] = aligns[j];
+	element_aligns[2] = aligns[k];
 
 	/* There is no difference between size and alignment in the abi.  */
 	struct_size = calculate_struct_size (3, element_sizes, element_sizes);
@@ -134,19 +102,15 @@ make_size_test ()
       }
 }
 
-void
-make_array_alignment_test ()
-{
-}
-
 /* This constructs the test for size of structs and unions with three scalar
    types.  */
 int
 main (int argc, char **argv)
 {
+  init_typelist ();
+
   make_file_start ();
   make_size_test ();
-  make_array_alignment_test ();
 
   /* Finish the function.  */
   printf ("}\n");
