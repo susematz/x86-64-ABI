@@ -65,7 +65,7 @@ scalar types and the processor's. The \code{__int128},
     & \texttt{unsigned long} & 8 & 8 & unsigned \eightbyte \\
     & \texttt{unsigned long long} & 8 & 8 & unsigned \eightbyte \\
     \hline
-    & \texttt{__int128}${^\dagger\dagger}$ & 16 & 16 & signed \sixteenbyte \\
+    & \texttt{__int128}$^{\dagger\dagger}$ & 16 & 16 & signed \sixteenbyte \\
     & \texttt{signed __int128}$^{\dagger\dagger}$ & 16 & 16 & signed \sixteenbyte \\
     \hline
     & \texttt{unsigned __int128}$^{\dagger\dagger}$ & 16 & 16 & unsigned \sixteenbyte \\
@@ -79,7 +79,7 @@ scalar types and the processor's. The \code{__int128},
     & \texttt{__float128}$^{\dagger\dagger}$ & 16 & 16 & 128-bit extended (IEEE) \\
     \hline
     Packed & \texttt{__m64}$^{\dagger\dagger}$ & 8 & 8 & \MMX{} and \threednow \\
-    & \texttt{__m128}$^\dagger$ & 16 & 16 & SSE and SSE-2 \\
+    & \texttt{__m128}$^{\dagger\dagger}$ & 16 & 16 & SSE and SSE-2 \\
 \noalign{\smallskip}
 \cline{1-2}
 \multicolumn{3}{l}{\small $^\dagger$ This type is called \texttt{bool}
@@ -107,6 +107,8 @@ i.e., the 64 low-order bits are stored at a a lower address than the
 64 high-order bits.
 
 A null pointer (for all types) has the value zero.
+
+The type \codeindex{size\_t} is defined as \code{unsigned long}.
 
 Booleans\index{boolean}, when stored in a memory object, are stored as
 single byte objects the value of which is always 0 (\code{false}) or 1
@@ -1276,9 +1278,9 @@ General Purpose Register RAX & 0 &\RAX\\
 General Purpose Register RBX & 1 &\RBX\\
 General Purpose Register RCX & 2 &\RCX\\
 General Purpose Register RDX & 3 &\RDX\\
-Frame Pointer Register   RBP & 4 &\RBP\\
-General Purpose Register RSI & 5 &\RSI\\
-General Purpose Register RDI & 6 &\RDI\\
+General Purpose Register RSI & 4 &\RSI\\
+General Purpose Register RDI & 5 &\RDI\\
+Frame Pointer Register   RBP & 6 &\RBP\\
 Stack Pointer Register   RSP & 7 &\RSP\\
 Extended Integer Registers 8-15 & 8-15 &\reg{r8}--\reg{r15}\\
 Return Address RA

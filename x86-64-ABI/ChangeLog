@@ -1,3 +1,17 @@
+2002-07-11  Andreas Jaeger  <aj@suse.de>
+
+	* libraries.tex (subsection{Floating Point Environment
+	Functions}): New.
+
+	* low-level-sys-info.tex (subsubsection{Fundamental Types}): Add
+	size_t.
+
+2002-05-13  Andreas Jaeger  <aj@suse.de>
+
+	* low-level-sys-info.tex (subsection{DWARF Register Number
+	Mapping}): Renumbered to reflect reality.
+	(subsubsection{Fundamental Types}): Fix dagger usage.
+
 2002-03-26  Andreas Jaeger  <aj@suse.de>
 
 	* low-level-sys-info.tex (paragraph{Passing}): Mention RBX as
