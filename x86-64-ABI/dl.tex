@@ -1,6 +1,5 @@
 \chapter{Program Loading and Dynamic Linking}
 
-
 \section{Program Loading}
 
 No changes required.
@@ -22,7 +21,7 @@ PLT:
 \editornote{So far only the conventions for shared objects have been
   specified.  The conventions for the executable need to be written
   down.}
-% executable: PIC or not PIC?
+
 
 \subsubsection{Dynamic Section}
 
@@ -31,9 +30,6 @@ No changes required.
 \subsubsection{Global Offset Table}
 
 \index{global offset table}
-
-\editornote{Some minor changes might be required, depending on the
-  proposal.  This will be clarified later.}
 
 \begin{figure}[H]
 \caption{Global Offset Table}
@@ -48,99 +44,6 @@ No changes required.
 
 \subsubsection{Procedure Linkage Table}
 
-\editornote{Either of the three proposals will be implemented.  Some
-  details need to filled in, like the number of reserved entries and
-  the exact algorithm used.}
-
-
-\bigskip\hrule
-
-\paragraph{Proposal 1: RW-PLT}
-
-% This has been copied from the i386 ABI and the SPARC ABI.
-
-Much as the global offset table redirects position-independent address
-calculations to absolute locations, the procedure linkage table
-redirects position-independent function calls to absolute locations.
-The link editor cannot resolve execution transfers (such as function
-calls) from one executable or shared object to another.  Consequently,
-the link editor arranges to have the program transfer control to
-entries in the procedure linkage table.  On the \xARCH architecture,
-procedure linkage tables reside in private data.  The dynamic linker
-determines the destinations' absolute addresses and modifies the the
-procedure linkage table's memory image accordingly.  The dynamic
-linker thus can redirect the entries without compromising the
-position-independence and shareability of the program's text.
-Executable files and shared object files have separate procedure
-linkage tables.
-
-%\begin{figure}[H]
-%\caption{Position-Independent Direct Function Call}
-%\begin{verbatim}
-%extern void function ();  .globl function
-%function ();              call function@PLT
-%\end{verbatim}
-%\end{figure}
-%
-%\begin{figure}[H]
-%\caption{Position-Independent Indirect Function Call}
-%\begin{verbatim}
-%extern void (*ptr) ();    .globl ptr, name
-%extern void name ();
-%ptr = name;               movl ptr@GOTPC(%rip), %rax
-%                          movl name@GOTPC(%rip), %rdx
-%                          movl %rdx, (%rax)
-%
-%(*ptr)();                 movl ptr@GOTPC(%rip), %rax
-%                          call *(%rax)
-%\end{verbatim}
-%\end{figure}
-
-
-\editornote{The proposal needs serious discussing and feasibility
-  checking.   The PLT entries should also be aligned.  The proposal
-  should work with 8 byte atomic moves.}
-
-\begin{figure}[H]
-\caption{Position-Independent Procedure Linkage Table}
-\begin{center}
-\begin{tabular}{lll|lll}
-\multicolumn{3}{c}{Object File} & \multicolumn{3}{c}{Memory Segment} \\
-\hline
-.PLT0: &  && .PLT0: &\\
-& \dots &  \\
-.PLT1: & nop &&.PLT1:& .dword& identification \\
-& \dots & \\
-&\dots && \dots \\
-.PLT10: & mv & R9, index  & .PLT10: & nop;nop;\\
- &  &   &  & nop;nop\\
- &  &   &  & nop;nop\\
-& jmp & .PLT0 && mv & R9, address \\
-& nop;nop &&& jmp & *(R9)  \\
-& nop;nop && & \\
-& nop;nop && & \\
-& nop;nop && & \\
-&\dots && \dots \\
-\end{tabular}
-\end{center}
-
-% NOP is 1 byte
-%
-\end{figure}
-
-\editornote{R9 is a temporary register and can therefore be
-  overwritten --- any other temporary register can be used instead and
-  we should consider using one of the ``normal'' registers so that we
-  do not need a prefix.}
-
-
-\editornote{The costs for a call are (after fixing the PLT): one call;
-  one load and one direct jmp, giving an overhead of one load and one
-  jump.  The problem is that we have self modifying code.}
-
-\bigskip\hrule
-
-\paragraph{Proposal 2: RO-PLT}
 
 \editornote{This is ia32 enhanced to 64 bits without an explicit GOT
   register.}
@@ -162,15 +65,6 @@ and shareability of the program's text.  Executable files and shared
 object files have separate procedure linkage tables.  
 
 
-
-\begin{figure}[H]
-\caption{Position-Independent Direct Function Call}
-\begin{verbatim}
-extern void function ();  .globl function
-function ();              call function@PLT
-\end{verbatim}
-\end{figure}
-
 \begin{figure}[H]
 \caption{Absolute Procedure Linkage Table}
 \begin{tabular}{lll}
@@ -191,20 +85,6 @@ function ();              call function@PLT
 \end{figure}
 
 \begin{figure}[H]
-\caption{Position-Independent Indirect Function Call}
-\begin{verbatim}
-extern void (*ptr) ();    .globl ptr, name
-extern void name ();
-ptr = name;               movl ptr@GOTPC(%rip), %rax
-                          movl name@GOTPC(%rip), %rdx
-                          movl %rdx, (%rax)
-
-(*ptr)();                 movl ptr@GOTPC(%rip), %rax
-                          call *(%rax)
-\end{verbatim}
-\end{figure}
-
-\begin{figure}[H]
 \caption{Position-Independent Procedure Linkage Table}
 \begin{tabular}{lll}
 .PLT0: & pushl & GOT+8(\%rip); GOT[1]\\
@@ -222,10 +102,6 @@ ptr = name;               movl ptr@GOTPC(%rip), %rax
 &\dots\\
 \end{tabular}
 \end{figure}
-
-\editornote{The costs for a call are (after fixing the PLT): one call
-  and one memory indirect jmp, giving an overhead of one jump and one
-  memory reference.}
 
 Following the steps below, the dynamic linker and the program
 ``cooperate'' to resolve symbolic references through the procedure
@@ -273,106 +149,6 @@ during process initialization.  Otherwise, the dynamic linker
 evaluates procedure linkage table entries lazily, delaying symbol
 resolution and relocation until the first execution of a table entry.
 
-\bigskip\hrule
-
-\paragraph{Proposal 3: Indirect Calls}
-
-%\editornote{This was suggested to me by Wayne Meretsky}
-
-\editornote{Since we only relocate the GOT entries, we have a
-  read-only PLT.  The disadvantage of this proposal is that
-  executables need to be compiled as PIC.}
-
-% This has been copied from the i386 ABI.
-Much as the global offset table redirects position-independent address
-calculations to absolute locations, the procedure linkage table
-redirects position-independent function calls to absolute locations.
-The link editor cannot resolve execution transfers (such as function
-calls) from one executable or shared object to another.  Consequently,
-the link editor arranges to have the program transfer control to
-entries in the procedure linkage table.  On the \xARCH architecture,
-procedure linkage tables reside in shared text, but they use address
-in the private global offset table.  The dynamic linker determines the
-destinations' absolute addresses and modifies the global offset
-table's memory image accordingly.  The dynamic linker thus can
-redirect the entries without compromising the position-independence
-and shareability of the program's text.  Executable files and shared
-object files have separate procedure linkage tables.  
-
-\begin{figure}[H]
-\caption{Position-Independent Direct Function Call}
-\begin{verbatim}
-extern void function ();  .globl function
-function ();              call *name@GOTPC(%rip)
-\end{verbatim}
-\end{figure}
-
-
-\begin{figure}[H]
-\caption{Position-Independent Indirect Function Call}
-\begin{verbatim}
-extern void (*ptr) ();    .globl ptr, name
-extern void name ();
-ptr = name;               movl ptr@GOTPC(%rip), %rax
-                          movl name@GOTPC(%rip), %rdx
-                          movl %rdx, (%rax)
-
-(*ptr)();                 movl ptr@GOTPC(%rip), %rax
-                          call *(%rax)
-\end{verbatim}
-\end{figure}
-
-
-\begin{figure}[H]
-\caption{Procedure Linkage Table}
-\begin{tabular}{lll}
-.PLT0: & pushl & GOT+8(\%rip); GOT[1]\\
-& jmp &GOT+16(\%rip) ; GOT[2] \\
-& nop & \\
-& nop & \\
-& nop & \\
-& nop & \\
-.PLT1: & pushl & \$offset \\
-&jmp &.PLT0@PC \\
-.PLT2: &pushl & \$offset \\
-& jmp & .PLT0@PC \\
-&\dots\\
-\end{tabular}
-\end{figure}
-
-
-\editornote{The costs for a call are (after fixing the PLT): one
-  memory indirect call, giving an overhead of one memory reference.}
-
-\bigskip\hrule
-
-\paragraph{Comparison of Proposals}
-
-The following table compares the proposals for PLT/GOT usage:
-
-\begin{figure}[H]
-\caption{Comparison of Different PLT Proposals}
-
-\begin{center}
-\begin{tabular}{llll}
-    \hline\noalign{\smallskip}
-&RW-PLT & RO-PLT & Indirect Calls \\
-    \noalign{\smallskip}\hline\noalign{\smallskip}
-PLT location & private data & shared text & shared text \\
-Address location & PLT & GOT & GOT \\
-Overhead after relocation & 1 memory ref. & 1 memory ref. & 1 memory ref.\\
-&and 1 jump &and 1 jump &  \\
-Self modifying code? & Yes &  No & No\\
-Executable is PIC? & No & No & Yes \\
-Other ABIs & Sparc & i386 & None? \\
-\end{tabular}
-\end{center}
-\end{figure}
-                                
-
-\bigskip\hrule
-
-% common stuff
 \subsection{Program Interpreter}
 
 The name and location of the program interpreter \index{program

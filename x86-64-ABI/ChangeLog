@@ -1,3 +1,13 @@
+2000-08-10  Andreas Jaeger  <aj@suse.de>
+
+	* dl.tex: Remove proposals.
+
+	* low-level-sys-info.tex (Coding Examples): Added.
+
+2000-08-09  Andreas Jaeger  <aj@suse.de>
+
+	* macros.tex: Increment version to 0.10.
+
 2000-08-02  Andreas Jaeger  <aj@suse.de>
 
 	* dl.tex (subsection{Initialization and Termination Functions}):

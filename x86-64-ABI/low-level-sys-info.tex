@@ -726,6 +726,63 @@ arrangement appears in figure \ref{fig-cfg}.
   \end{center}
 \end{figure}
 
+\section{Coding Examples}
+
+The following sections show only the difference to the i386 ABI.
+
+\subsection{Position-Independend Function Prologue}
+
+\xARCH does not need any function prologue for calculating the global
+offset table address since it does not have an explicit GOT pointer.
+
+\subsection{Data Objects}
+
+Not finished yet.
+
+\begin{figure}[H]
+\caption{Position-Independent Direct Function Call}
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\cline{1-1}\cline{3-3}
+extern void function ();  &&.globl function\\
+function ();              &&call function@PLT\\
+\cline{1-1}\cline{3-3}
+\end{tabular}
+\end{center}
+\end{figure}
+
+\subsection{Function Calls}
+
+\begin{figure}[H]
+\caption{Position-Independent Direct Function Call}
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\cline{1-1}\cline{3-3}
+extern void function ();  &&.globl function\\
+function ();              &&call function@PLT\\
+\cline{1-1}\cline{3-3}
+\end{tabular}
+\end{center}
+\end{figure}
+
+\begin{figure}[H]
+\caption{Position-Independent Indirect Function Call}
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\cline{1-1}\cline{3-3}
+extern void (*ptr) ();    &&.globl ptr, name\\
+extern void name ();      && \\
+ptr = name;               &&movl ptr@GOTPC(\%rip), \%rax  \\
+                          &&movl name@GOTPC(\%rip), \%rdx  \\
+                          &&movl \%rdx, (\%rax)  \\
+                          &&  \\
+(*ptr)();                 &&movl ptr@GOTPC(\%rip), \%rax  \\
+                          &&call *(\%rax)  \\
+\cline{1-1}\cline{3-3}
+\end{tabular}
+\end{center}
+\end{figure}
+
 
 %%% Local Variables: 
 %%% mode: latex
