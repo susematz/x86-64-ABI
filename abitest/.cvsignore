@@ -1,12 +1,7 @@
 *~
 *.o
 *.s
-sizal2.c
-make_sizal2
 core
 a.out
-.Makefile.deps
-scalarargs2.c
-make_scalarargs2
-returning2.c
-make_returning2
+test_3_element_struct_and_unions.c
+make_3esau

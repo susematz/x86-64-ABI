@@ -5,8 +5,7 @@ read-configuration abitest.conf
 
 # Set parameters
 
-load-file "/work/abitest/image.simics" 0x0
+load-file "/tmp/image.simics" 0x0
 
 source "../scripts/expect.py"
 source "../scripts/runtest.py"
-

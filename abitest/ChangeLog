@@ -1,3 +1,8 @@
+2001-05-15  Bo Thorsen  <bo@suse.co.uk>
+
+	* Nearly all files: Complete reorganization to run tests
+	individually in simics instead of as one big executable.
+
 2001-04-11  Bo Thorsen  <bo@suse.co.uk>
 
 	* defines.h: Add setting for checks of float and double passing.

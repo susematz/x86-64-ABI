@@ -64,35 +64,35 @@ extern struct FloatRegisters fregs;
 /* This is not nice, but __asm__ statements doesn't like >= 10 args.  */
 #define check_int_register_contents \
   __asm__ __volatile__("cmpq %%rax, iregs(%%rip)\n\t" \
-		       "jne my_abort\n\t" \
+		       "jne abort\n\t" \
 		       "cmpq %%rbx, iregs+8(%%rip)\n\t" \
-		       "jne my_abort\n\t" \
+		       "jne abort\n\t" \
 		       "cmpq %%rcx, iregs+16(%%rip)\n\t" \
-		       "jne my_abort\n\t" \
+		       "jne abort\n\t" \
 		       "cmpq %%rdx, iregs+24(%%rip)\n\t" \
-		       "jne my_abort\n\t" \
+		       "jne abort\n\t" \
 		       "cmpq %%rsi, iregs+32(%%rip)\n\t" \
-		       "jne my_abort\n\t" \
+		       "jne abort\n\t" \
 		       "cmpq %%rdi, iregs+40(%%rip)\n\t" \
-		       "jne my_abort\n\t" \
+		       "jne abort\n\t" \
 		       "cmpq %%r8, iregs+48(%%rip)\n\t" \
-		       "jne my_abort\n\t" \
+		       "jne abort\n\t" \
 		       "cmpq %%r9, iregs+56(%%rip)\n\t" \
-		       "jne my_abort\n\t" \
+		       "jne abort\n\t" \
 		       "cmpq %%r10, iregs+64(%%rip)\n\t" \
-		       "jne my_abort\n\t" \
+		       "jne abort\n\t" \
 		       "cmpq %%r11, iregs+72(%%rip)\n\t" \
-		       "jne my_abort\n\t" \
+		       "jne abort\n\t" \
 		       "cmpq %%r12, iregs+80(%%rip)\n\t" \
-		       "jne my_abort\n\t" \
+		       "jne abort\n\t" \
 		       "cmpq %%r13, iregs+88(%%rip)\n\t" \
-		       "jne my_abort\n\t" \
+		       "jne abort\n\t" \
 		       "cmpq %%r14, iregs+96(%%rip)\n\t" \
-		       "jne my_abort\n\t" \
+		       "jne abort\n\t" \
 		       "cmpq %%r15, iregs+104(%%rip)\n\t" \
-		       "jne my_abort\n" ::: "memory"); \
+		       "jne abort\n" ::: "memory"); \
   __asm__ __volatile__("cmpq %%rdi, %0\n\t" \
-                       "jne my_abort\n" :: "g" (iregs.rdi) : "memory");
+                       "jne abort\n" :: "g" (iregs.rdi) : "memory");
 
 /* Clear register struct.  */
 #define clear_struct_registers \

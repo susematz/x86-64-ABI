@@ -1,23 +1,8 @@
-#include "funcs.h"
-
-/* Test for returning complex numbers, located below.  */
-void test_complex_returning ();
-
-
-void
-returning ()
-{
-  test_scalar_returning ();
-  test_complex_returning ();
-}
-
-
 /* This is a small test case for returning a complex number. Written by
    Andreas Jaeger.  */
 
-/*  #define _GNU_SOURCE 1 */
-/*  #include <math.h> */
-/*  #include <unistd.h> */
+#include "defines.h"
+
 
 #define BUILD_F_COMPLEX(real, imag) \
   ({ __complex__ float __retval; \
@@ -70,8 +55,8 @@ aj_ld_times2 (__complex__ long double x)
   return res;
 }
 
-void
-test_complex_returning ()
+int
+main (int argc, char **argv)
 {
 #ifdef CHECK_COMPLEX
   _Complex float fc, fd;
@@ -93,4 +78,6 @@ test_complex_returning ()
 
   assert (__real__ ldd == 4.0L && __imag__ ldd == 6.0L);
 #endif
+
+  return 0;
 }

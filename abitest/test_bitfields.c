@@ -1,11 +1,11 @@
-#include "defines.h"
-#include "funcs.h"
-#include "macros.h"
-
 /* This is a small test to see if bitfields are working.  It is only a
    few structs and a union and a test to see if they have the correct
    size, if values can be read and written and a couple of argument
    passing tests.  No alignment testing is done.  */
+
+#include "defines.h"
+#include "macros.h"
+
 
 /* These five bitfields are taken from the System V ABI, Intel 386
    architecture supplement.  */
@@ -114,8 +114,8 @@ passingU (union Allocation u, char c)
 }
 
 
-void
-test_bitfields ()
+int
+main (int argc, char **argv)
 {
   struct RightToLeft str1;
   struct BoundaryAlignment str2;
@@ -149,7 +149,7 @@ test_bitfields ()
   str2.d = 9;
   passing1 (str1, 4, 5, 6);
   passing2 (str2, 4, 5, 6, 7, 8, 9);
-/*    passing3 (str3, 4, 5); */
+  passing3 (str3, 4, 5);
   passing4 (str4, 4, 5, 6);
   passing5 (str5, 4, 5);
 
@@ -157,4 +157,6 @@ test_bitfields ()
   passingU (u, 5);
   u.s = 6;
   passingU (u, 6);
+
+  return 0;
 }

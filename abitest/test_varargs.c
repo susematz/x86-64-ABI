@@ -1,10 +1,8 @@
-/* Test variable number of arguments passed to functions. Until the abi
-   specifies exactly how the passing is done, this is just a simple test
-   to see if something is working.  */
+/* Test variable number of arguments passed to functions. For now this is
+   just a simple test to see if it's working.  */
 
 #include <stdarg.h>
 #include "defines.h"
-#include "funcs.h"
 
 
 #define ARG_INT     1
@@ -67,15 +65,15 @@ my_noprintf (char *format, ...)
 	    assert (argp->value.pvalue == pvalue);
 	    break;
 	  default:
-	    my_abort ();
+	    abort ();
 	  }
 
 	argp++;
       }
 }
 
-void
-variargs (void)
+int
+main (int argc, char **argv)
 {
 #ifdef CHECK_VARARGS
   struct arg al[5];
@@ -94,4 +92,6 @@ variargs (void)
   arglist = al;
   my_noprintf("%d%f%p%f%d", 256, 257.0, al, 258.0, 259);
 #endif
+
+  return 0;
 }
