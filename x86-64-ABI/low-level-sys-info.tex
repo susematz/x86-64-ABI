@@ -189,7 +189,6 @@ registers.\footnote{All x87 registers are caller-saved, so
   \op{femms} instruction.}  The direction flag in the \reg{eflags}
 register must be clear on function entry, and on function return.
 
-
 \subsection{The Stack Frame}
 
 In addition to registers, each function has a frame on the run-time
@@ -351,9 +350,9 @@ left-to-right order) for passing as follows:
     pointer.}.
 
 \item If the class is SSE, the next available SSE register is used, the
-   registers are taken in the order from \reg{xmm0} to \reg{xmm15}.
+   registers are taken in the order from \reg{xmm0} to \reg{xmm7}.
 
-item If the class is SSEUP, the \eightbyte is passed in the upper
+\item If the class is SSEUP, the \eightbyte is passed in the upper
    half of the least used SSE register.
 
 \item If the class is X87 or X87UP, it is passed in memory.
@@ -391,7 +390,8 @@ chain pointer & No \\
 \reg{r12--r15} & callee-saved registers & Yes \\
 \reg{xmm0}--\reg{xmm1} & used to pass and return floating point
 arguments & No\\
-\reg{xmm2}--\reg{xmm15} & used to pass floating point arguments & No\\
+\reg{xmm2}--\reg{xmm7} & used to pass floating point arguments & No\\
+\reg{xmm8}--\reg{xmm15} & temporary registers & No\\
 \reg{mmx0}--\reg{mmx7}& temporary registers & No\\
 \reg{st0} & temporary register; used to return \code{long double} arguments & No \\
 \reg{st1}--\reg{st7} & temporary registers & No \\
@@ -419,7 +419,7 @@ For calls that may call functions that use varargs or stdargs
 (\dots) in the declaration) \RAX is used as hidden argument to specify
 the number of SSE registers used. The contents of \RAX do not need to
 match exactly the number of registers, but must be an upper bound on
-the number of SSE registers used and is in the range 0--15 inclusive.
+the number of SSE registers used and is in the range 0--7 inclusive.
 
 \paragraph{Returning of Values}
 The returning of values is done according to the following algorithm:
@@ -430,6 +430,10 @@ The returning of values is done according to the following algorithm:
    the return value and passes the address of this storage in \RDI as
    if it were the first argument to the function.  In effect, this
    address becomes a ``hidden'' first argument.
+
+   On return \RAX will contain the address that has been passed in by
+   the caller in \RDI.\editornote{We currently discuss changing this
+     to \RDI as return register to avoid one move.}
 
 \item If the class is INTEGER, the next available register of the
    sequence \RAX, \RDX is used.
@@ -887,7 +891,112 @@ offset table address since it does not have an explicit GOT pointer.
 
 \subsection{Data Objects}
 
-Not done yet.
+This section describes only objects with static storage.
+Stack-resident objects are excluded since programs always compute
+their virtual address relative to the stack or frame pointers.
+
+Because only the \code{movabs} instruction uses 64-bit addresses
+directly, depending on the code model either \RIP-relative addressing
+or building addresses in registers and accessing the memory through
+the register has to be used.
+
+For absolute addresses \RIP-relative encoding can be used in the small
+model.  In the medium model the \code{movabs} instruction has to be
+used for accessing addresses.
+
+Position-independend code cannot contain absolute address.  To access
+a global symbol the address of the symbol has to be loaded from the
+Global Offset Table.  The address of the entry in the GOT can be
+obtained with a \RIP-relative instruction in the small model.
+
+
+\begin{figure}[H]
+\Hrule
+\caption{Absolute Load and Store (Small Model)}
+\begin{center}
+\code{
+\begin{tabular}{|l|c|ll|}
+\cline{1-1}\cline{3-4}
+extern int src;&&.extern& src\\
+extern int dst;&&.extern& dst\\
+extern int *ptr;&&.extern& ptr\\
+&&.text&\\
+dst = src; && movl& src(\%rip), \%eax\\
+	   && movl& \%eax, dst(\%rip)\\
+&&&\\
+ptr = \&dst;&&lea& dst(\%rip),\%rdx\\
+           &&movq& \%rdx, ptr(\%rip)\\
+&&&\\
+\hbox{}*ptr = src;&&movq& ptr(\%rip),\%rax\\
+           &&movl& src(\%rip),\%edx\\
+           &&movl& \%edx, (\%rax)\\
+\cline{1-1}\cline{3-4}
+\end{tabular}
+}
+\end{center}
+\Hrule
+\end{figure}
+
+
+\begin{figure}[H]
+\Hrule
+\caption{Absolute Load and Store (Medium Model)}
+\begin{center}
+\code{
+\begin{tabular}{|l|c|ll|}
+\cline{1-1}\cline{3-4}
+extern int src;&&.extern& src\\
+extern int dst;&&.extern& dst\\
+extern int *ptr;&&.extern& ptr\\
+&&.text&\\
+dst = src; && movabsl& src, \%eax\\
+	   && movabsl& \%eax, dst\\
+&&&\\
+ptr = \&dst;&&movabsq& \$dst,\%rdx\\
+           &&movabsq& \%rdx, ptr\\
+&&&\\
+\hbox{}*ptr = src;&&movabsq& ptr,\%rdx\\
+           &&movabsl& src,\%eax\\
+           &&movl& \%eax, (\%rdx)\\
+\cline{1-1}\cline{3-4}
+\end{tabular}
+}
+\end{center}
+\Hrule
+\end{figure}
+
+\begin{figure}[H]
+\Hrule
+\caption{Position-Independend Load and Store (Small PIC Model)}
+\begin{center}
+\code{
+\begin{tabular}{|l|c|ll|}
+\cline{1-1}\cline{3-4}
+extern int src;&&.extern& src\\
+extern int dst;&&.extern& dst\\
+extern int *ptr;&&.extern& ptr\\
+           &&.text&\\
+dst = src; && movq& src@GOTPCREL(\%rip), \%rax\\
+	   && movl& (\%rax), \%edx\\
+           && movq& dst@GOTPCREL(\%rip), \%rax\\
+           && movl& \%edx, (\%rax)\\
+&&&\\
+ptr = \&dst;&& movq& ptr@GOTPCREL(\%rip), \%rax\\
+           && movq& dst@GOTPCREL(\%rip), \%rdx\\
+           && movq& \%rdx, (\%rax)\\
+&&&\\
+\hbox{}*ptr = src;&& movq &ptr@GOTPCREL(\%rip),\%rax\\
+           && movq &(\%rax), \%rdx\\
+           && movq &src@GOTPCREL(\%rip), \%rax\\
+           && movl &(\%rax), \%eax\\
+           && movl &\%eax, (\%rdx)\\
+\cline{1-1}\cline{3-4}
+\end{tabular}
+}
+\end{center}
+\Hrule
+\end{figure}
+
 
 \subsection{Function Calls}
 
@@ -895,12 +1004,14 @@ Not done yet.
 \Hrule
 \caption{Position-Independent Direct Function Call}
 \begin{center}
+\code{
 \begin{tabular}{|l|c|l|}
 \cline{1-1}\cline{3-3}
 extern void function ();  &&.globl function\\
 function ();              &&call function@PLT\\
 \cline{1-1}\cline{3-3}
 \end{tabular}
+}
 \end{center}
 \Hrule
 \end{figure}
@@ -909,21 +1020,27 @@ function ();              &&call function@PLT\\
 \Hrule
 \caption{Position-Independent Indirect Function Call}
 \begin{center}
+\code{
 \begin{tabular}{|l|c|l|}
 \cline{1-1}\cline{3-3}
 extern void (*ptr) ();    &&.globl ptr, name\\
 extern void name ();      && \\
-ptr = name;               &&movl ptr@GOTPCREL(\%rip), \%rax  \\
-                          &&movl name@GOTPCREL(\%rip), \%rdx  \\
-                          &&movl \%rdx, (\%rax)  \\
+ptr = name;               &&movq ptr@GOTPCREL(\%rip), \%rax  \\
+                          &&movq name@GOTPCREL(\%rip), \%rdx  \\
+                          &&movq \%rdx, (\%rax)  \\
                           &&  \\
-(*ptr)();                 &&movl ptr@GOTPCREL(\%rip), \%rax  \\
+(*ptr)();                 &&movq ptr@GOTPCREL(\%rip), \%rax  \\
                           &&call *(\%rax)  \\
 \cline{1-1}\cline{3-3}
 \end{tabular}
+}
 \end{center}
 \Hrule
 \end{figure}
+
+\subsection{Branching}
+
+Not done yet.
 
 \subsection{Variable Argument Lists}
 
