@@ -25,6 +25,9 @@ scalar types and the processor's.
 
 \begin{figure}
   \caption{Scalar Types}\label{basic-types}
+{ % Use small here - the table is still too large
+  % Has anybody an idea how to shrink the table so that it fits the page?
+  \small
   \begin{tabular}{l|l|c|c|l}
     \hline\noalign{\smallskip}
      & &  & \multicolumn{1}{c|}{Alignment} & \multicolumn{1}{c|}{x86-64} \\
@@ -67,6 +70,7 @@ scalar types and the processor's.
     Packed & \texttt{__m64} & 8 & 8 & \MMX{} and \threednow \\
     & \texttt{__m128} & 16 & 16 & SSE and SSE-2 \\
   \end{tabular}
+}
 \end{figure}
 
 The \code{__float128} type uses a 15-bit exponent, a 113-bit mantissa
@@ -265,7 +269,7 @@ instead.  This saves two instructions in the prologue and epilogue and
 gives another global general purpose register.  See details about
 stack traceback algorithm for conditions when this optimization is
 allowed.  \editornote{The stack traceback algorithm has not been
-  specified yet and we are not sure if we need one at all}
+  specified yet and we are not sure if we need one at all.}
 
 \subsection{Classes}
 
