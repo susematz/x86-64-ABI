@@ -242,11 +242,11 @@ If the argument is a scalar type, other than \code{__m64} or
 \code{__int128}, then it is placed in the next available register
 suitable for its type.  In particular, arguments of integral or
 pointer type are placed in the next available general purpose
-register, taken in the order \RAX, \RDX, \RCX, \RBX, \RSI, \RDI,
-\reg{r8}, and \reg{r9}.  Arguments of floating point type and of type
-\code{__m128}, are placed in the next available SSE register, taken
-in order from \reg{xmm0} to \reg{xmm7}.  If no registers are
-available, the values are placed on the stack.
+register, taken in the order \RAX, \RDX, \RCX, \RBX, \RSI, and \RDI.
+Arguments of floating point type and of type \code{__m128}, are placed
+in the next available SSE register, taken in order from \reg{xmm0} to
+\reg{xmm7}.  If no registers are available, the values are placed on
+the stack.
 
 Scalar values of type \code{__int128} are handled as they consisted
 of two separate 64-bit arguments of type \code{long}.  The 64

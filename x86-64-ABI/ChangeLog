@@ -1,5 +1,7 @@
 2000-09-21  Mark Mitchell  <mark@codesourcery.com>
 
+	* low-level-sys-info.tex: Fix typo.
+
 	Cleanups throughout.
 	* conventions.tex: Clarify.
 	* dl.tex: Likewise.
