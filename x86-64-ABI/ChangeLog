@@ -1,3 +1,9 @@
+2000-10-01  Mark Mitchell  <mark@codesourcery.com>
+
+	* low-level-sys-info.tex: Fix some typos in the calling
+	conventions.  Document use of R9 in varargs functions.
+	* dl.tex: Make /lib/ld64.so.1 the dynamic linker.
+	
 2000-09-25  Mark Mitchell  <mark@codesourcery.com>
 
 	* low-level-sys-info.tex: Make RAX the return register again.

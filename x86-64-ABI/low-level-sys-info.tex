@@ -253,15 +253,17 @@ If the argument is a scalar type, other than \code{__m64} or
 \code{__int128}, then it is placed in the next available register
 suitable for its type.  In particular, arguments of integral or
 pointer type are placed in the next available general purpose
-register, taken in the order \RBX, \RCX, \RDX, \RSI, \RDI, and \reg{r8}.
-\footnote{Note that \RAX and \reg{r9} are not required to be
-  preserved, nor are they used to pass arguments.  Making these
+register, taken in the order \RBX, \RDX, \RCX, \RSI, \RDI, and
+\reg{r8}.  \footnote{Note that \RAX and \reg{r9} are not required to
+  be preserved, nor are they used to pass arguments.  Making these
   registers available as scratch registers means that code in the PLT
   need not spill any registers when computing the address to which
-  control needs to be transferred.}  Arguments of floating point type
-and of type \code{__m128}, are placed in the next available SSE
-register, taken in order from \reg{xmm0} to \reg{xmm15}.  If no
-registers are available, the values are placed on the stack.
+  control needs to be transferred.  \reg{r9} is used to indicate the
+  number of SSE arguments passed to a function requiring a variable
+  number of arguments.}  Arguments of floating point type and of type
+\code{__m128}, are placed in the next available SSE register, taken in
+order from \reg{xmm0} to \reg{xmm15}.  If no registers are available,
+the values are placed on the stack.
 
 Scalar values of type \code{__int128} are handled almost as if they
 consisted of two separate 64-bit arguments of type \code{long}.  The
@@ -290,24 +292,23 @@ types,\footnote{A non-POD object cannot be returned in registers
 required by the alignment of the structure or union type being passed.
 Then, the structure value is copied onto the stack.
 
-Structure or union objects that contain no more than 16 bytes, do not
-contain any scalar components of type \code{__m64}, and, in C++, are
-PODs, are passed in registers, if registers are available.  If the
-entire structure cannot be placed in registers as described below,
-then the structure is passed on the stack, as above.  
+Structure or union objects that contain no more than 16 bytes and, in
+C++, are PODs, are passed in registers, if registers are available.
+If the entire structure cannot be placed in registers as described
+below, then the structure is passed on the stack, as above.
 
 If the structure contains a single scalar component, then it is passed
 as if it were a single argument of that scalar type.
 
 Otherwise, the first (or only, if the structure has no more than 8
-bytes), doubleword of the sturcture is passed first.  If all scalar
-components in the first are of floating point type, the first
-doubleword is passed as if it were an argument of floating point type.
-If there is only one component, the argument is passed as if it were
-an argument of that type.  If all the components begin at the same
-address, then the component is passed as if it were an argument of the
-longest floating point type used by these components.  Otherwise, the
-argument is passed as if it were an argument of type
+bytes), doubleword of the sturcture is passed first.  If there is only
+one component, the argument is passed as if it were an argument of
+that type.  Otherwise, if all scalar components in the first component
+are of floating point type, the first doubleword is passed as if it
+were an argument of floating point type.  If all the components begin
+at the same address, then the component is passed as if it were an
+argument of the longest floating point type used by these components.
+Otherwise, the argument is passed as if it were an argument of type
 \code{__float128}.\footnote{In this case, there will be no padding
   bits, because this case can only occur if there is a value of type
   \code{float} in the second word of the doubleword.}
@@ -334,14 +335,14 @@ of the list of available registers.
 If a function returns a structure or union whose size is greater than
 16 bytes, or, for C++, if the structure or union is a non-POD, then
 the caller provides space for the return value and passes the address
-of this storage in \RBX as if it were the first argument to the
+of this storage in \RAX as if it were the first argument to the
 function.  In effect, this address becomes a ``hidden'' first
 argument.
 
-In this case, the function also sets \RBX to the value of the original
+In this case, the function also sets \RAX to the value of the original
 address in the calle's area before it returns.  Thus when the caller
 receives control again, the address of the returned object resides in
-register \RBX and can be used to access the object.
+register \RAX and can be used to access the object.
   
 If a function returns a structure or union whose size is less than or
 equal to 16 bytes, and, for C++, the structure or union is a POD, then
@@ -490,6 +491,11 @@ the \xARCH architecture because some arguments are passed in
 registers.  Portable C programs must use the header files
 \code{<stdarg.h>} or \code{<varargs.h>} in order to handle variable
 argument lists.
+
+When a function taking variable-arguments is called, \reg{r9} must be
+set to the eight times the number of floating point parameters passed
+to the function in SSE registers.  The callee can use the contents of
+\reg{r9} to allocate stack space in which to save the values.
 
 %%% Local Variables: 
 %%% mode: latex
