@@ -1,3 +1,8 @@
+Sat Jul 15 12:58:29 MET DST 2000  Jan Hubicka  <jh@suse.cz>
+	* low-level-sys-info.tex (Basic data types): Document NULL to have
+	value of zero.
+	(Function Calling Sequence): Rewrite.
+
 2000-07-15  Andreas Jaeger  <aj@suse.de>
 
 	* abi-index.tex: New file.
