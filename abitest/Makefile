@@ -1,10 +1,9 @@
 CC = x86_64-unknown-linux-gcc
 CFLAGS = -O -Wall
 SOURCES = main.c sizal.c scalarargs.c struniargs.c variargs.c reloc.c \
-	bitfields.c
+	bitfields.c sizal2.c
 OBJECTS = ${SOURCES:.c=.o}
 ASMSOURCES = ${SOURCES:.c=.s}
-AUTOSOURCES = sizal2.c
 #TARGET = abitest
 TARGET = /usr/local/share/simnow/images/start64.ram
 LINK = $(X86_64DIR)/bin/simnowlink
@@ -14,7 +13,7 @@ X86_64DIR = /opt/x86-64
 
 all: $(TARGET)
 
-$(TARGET): $(AUTOSOURCES) $(OBJECTS)
+$(TARGET): $(OBJECTS)
 	$(LINK) $(OBJECTS)
 
 clean:

@@ -2,8 +2,8 @@
 #define DEFINED_DEFINES_H
 
 
-/* The defines in this file determines what part of the test should be run.
-   When GCC implements these parts, the defines should be uncommented to
+/* These defines determines what part of the test should be run.  When
+   GCC implements these parts, the defines should be uncommented to
    enable testing.  */
 
 /* Scalar type __int128.  */
@@ -27,5 +27,37 @@
 /* Variable args.  */
 #define CHECK_VARARGS
 
+
+/* Defines for sizing and alignment.  */
+
+#define TYPE_SIZE_CHAR         1
+#define TYPE_SIZE_SHORT        2
+#define TYPE_SIZE_INT          4
+#define TYPE_SIZE_LONG         8
+#define TYPE_SIZE_LONG_LONG    8
+#define TYPE_SIZE_INT128       16
+#define TYPE_SIZE_FLOAT        4
+#define TYPE_SIZE_DOUBLE       8
+#define TYPE_SIZE_LONG_DOUBLE  16
+#define TYPE_SIZE_FLOAT128     16
+#define TYPE_SIZE_M64          8
+#define TYPE_SIZE_M128         16
+#define TYPE_SIZE_ENUM         4
+#define TYPE_SIZE_POINTER      8
+
+#define TYPE_ALIGN_CHAR        1
+#define TYPE_ALIGN_SHORT       2
+#define TYPE_ALIGN_INT         4
+#define TYPE_ALIGN_LONG        8
+#define TYPE_ALIGN_LONG_LONG   8
+#define TYPE_ALIGN_INT128      16
+#define TYPE_ALIGN_FLOAT       4
+#define TYPE_ALIGN_DOUBLE      8
+#define TYPE_ALIGN_LONG_DOUBLE 16
+#define TYPE_ALIGN_FLOAT128    16
+#define TYPE_ALIGN_M64         8
+#define TYPE_ALIGN_M128        16
+#define TYPE_ALIGN_ENUM        4
+#define TYPE_ALIGN_POINTER     8
 
 #endif /* DEFINED_DEFINES_H */

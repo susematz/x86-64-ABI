@@ -4,16 +4,17 @@
 /* ABI testing is done for the following cases:
    1: Size and alignment -- sizal()
       Tests for correct sizeof of all basic types, structs and arrays. Also
-      tests for correct alignment of these.
-   2: Passing scalar arguments -- scalarargs()
+      tests for correct alignment of these. Also tests array alignments:
+      standalone and as members of structs, structure member alignments
+      and bitfields.
+   2: Passing and returning scalar arguments -- scalarargs()
       Tests that arguments of basic types are passed correctly.
-   3: Passing struct and union arguments -- struniargs()
+   3: Passing and returning struct and union arguments -- struniargs()
       Tests that arguments of struct and union types are passed correctly.
       Also tests for mixed struct/union/scalar types
    4: Passing a variable number of args -- variargs()
    5: Relocation types -- reloc()
       Tests all relocation types
-   6: Bitfields -- bitfields()
 
    For more information on the individual tests, see the file named like
    "testfunction.c".  */
@@ -51,7 +52,6 @@ main (int argc, char **argv)
     current_test = 3; struniargs();
     current_test = 4; variargs();
     current_test = 5; reloc();
-    current_test = 6; bitfields();
 
     clear_hardware_registers;
 

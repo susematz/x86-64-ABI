@@ -115,7 +115,7 @@ passingU (union Allocation u, char c)
 
 
 void
-bitfields ()
+test_bitfields ()
 {
   struct RightToLeft str1;
   struct BoundaryAlignment str2;

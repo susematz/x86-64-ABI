@@ -240,7 +240,7 @@ test_union_passing (void)
 void
 struniargs (void)
 {
-  test_struct_passing();
-  test_mixed_passing();
-  test_union_passing();
+  test_struct_passing ();
+  test_mixed_passing ();
+  test_union_passing ();
 }

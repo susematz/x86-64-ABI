@@ -1,8 +1,21 @@
+2001-01-26  Bo Thorsen  <bo@suse.de>
+
+	* sizal.c: Rearrange to increase granularity of the tests.
+	* macros.h (check_array_size_and_align): Fix for arrays of pointers.
+	(check_array_size_and_align): Add array in struct size and align test.
+	* defines.h: Make defines with size and alignment of scalar types.
+
 2001-01-25  Bo Thorsen  <bo@suse.de>
+
+	* Multiple files: Fix formatting.
+
+	* funcs.h (sizal2): Add sizal2 forward declaration.
 
 	* sizal.c (check_struct_and_union3): Remove CHECK_STRUCT_SIZE check.
 	* make_sizal2.c (main): Fix calculation of struct size.
 	(calculate_struct_size): Do calculation of struct size.
+	(main): Change output format to that of a complete c source file.
+
 	* defines.h: Removed no longer used CHECK_STRUCT_SIZE.
 
 2001-01-23  Bo Thorsen  <bo@suse.de>

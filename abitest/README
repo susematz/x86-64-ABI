@@ -4,7 +4,7 @@ What's this?
 This is an early abitestsuite for gcc and binutils for the x86-64
 architechture. It currently tests these things:
 
-   1: Size and alignment -- sizal()
+   1: Size and alignment -- sizal() and sizal2()
       Tests for correct sizeof of all basic types, structs and arrays. Also
       tests for correct alignment of these.
    2: Passing scalar arguments -- scalarargs()
@@ -13,9 +13,9 @@ architechture. It currently tests these things:
       Tests that arguments of struct and union types are passed correctly.
       Also tests for mixed struct/union/scalar types
    4: Passing a variable number of args -- variargs()
+   5: Tests bitfields' passing, size and alignments -- bitfields()
 
 These tests will be implemented shortly:
-- bitfields testing
 - relocation types
 
 Questions about the abitest can be directed to discuss@x86-64.org or to

@@ -5,89 +5,205 @@
 /* This is a very boring test. It starts by checking that all basic types
    has the correct size, and then starts checking combinations in structs
    and unions. Last it checks that alignments of all types are correct,
-   including combinations in structs.
- */
+   including combinations in structs.  */
 
-#define check_basic_struct_size_and_align(_type, _size, _align) { \
-  struct _str { _type dummy; }; \
-  struct _str _t; \
-  check_size(_t, _size); \
-  check_align(_t, _align); \
-}
-
-#define check_array_alignment_and_size(_type, _size, _align) { \
-  _type a[1], b[2], c[16]; \
-  check_align(a[0], _align); \
-  check_size(a, _size); \
-  check_size(b, (_size*2)); \
-  check_size(c, (_size*16)); \
-}
-
-#define check_type(_type, _size, _align) \
-  check_size(_type, _size); \
-  check_align(_type, _align); \
-  check_basic_struct_size_and_align(_type, _size, _align); \
-  check_array_alignment_and_size(_type, _size, _align);
-
-#define check_type_with_signs(_type, _size, _align) \
-  check_type(_type, _size, _align); \
-  check_type(signed _type, _size, _align); \
-  check_type(unsigned _type, _size, _align);
-
-/* This function tests things that does not fit in other tests.  */
-void
-misfits (void)
-{
-  enum dummytype { enumtype };
-  assert(sizeof(enumtype) == 4);
-  assert(__alignof__(enumtype) == 4);
-}
-
-/* Check size of a a struct and a union of three types. Struct.  */
-
-#define check_struct_and_union3(type1, type2, type3, struct_size, align_size) \
-{ \
-  struct _str { type1 t1; type2 t2; type3 t3; } _t; \
-  union _uni { type1 t1; type2 t2; type3 t3; } _u; \
-  check_size(_t, struct_size); \
-  check_size(_u, align_size); \
-}
-
+void test_scalar_size ();
+void test_scalar_alignment ();
+void test_simple_structs ();
+void test_arrays ();
+void test_simple_unions ();
+void test_struct_and_unions ();
+void test_bitfields ();
 
 void
 sizal (void)
 {
-  /* Check size, alignment, basic structs and arrays of simple types.  */
-  check_type_with_signs(char, 1, 1);
-  check_type_with_signs(short, 2, 2);
-  check_type_with_signs(int, 4, 4);
-  check_type_with_signs(long, 8, 8);
-  check_type_with_signs(long long, 8, 8);
+  test_scalar_size ();
+  test_scalar_alignment ();
+  test_simple_structs ();
+  test_arrays ();
+  test_simple_unions ();
+  test_struct_and_unions ();
+  test_bitfields ();
+}
+
+
+/* Used in size and alignment tests.  */
+enum dummytype { enumtype };
+
+/* Test size of all scalar types.  */
+void
+test_scalar_size ()
+{
+  /* Integral types.  */
+  run_signed_tests2(check_size, char, TYPE_SIZE_CHAR);
+  run_signed_tests2(check_size, short, TYPE_SIZE_SHORT);
+  run_signed_tests2(check_size, int, TYPE_SIZE_INT);
+  run_signed_tests2(check_size, long, TYPE_SIZE_LONG);
+  run_signed_tests2(check_size, long long, TYPE_SIZE_LONG_LONG);
 #ifdef CHECK_INT128
-  check_type_with_signs(__int128, 16, 8);  */
-#endif /* CHECK_INT128 */
+  run_signed_tests2(check_size, __int128, TYPE_SIZE_INT128);
+#endif
+  check_size(enumtype, TYPE_SIZE_ENUM);
 
-  check_type(float, 4, 4);
-  check_type(double, 8, 8);
+  /* Floating point types.  */
+  check_size(float, TYPE_SIZE_FLOAT);
+  check_size(double, TYPE_SIZE_DOUBLE);
 #ifdef CHECK_LONG_DOUBLE
-  check_type(long double, 16, 16);
-#endif /* CHECK_LONG_DOUBLE */
+  check_size(long double, TYPE_SIZE_LONG_DOUBLE);
+#endif
 #ifdef CHECK_FLOAT128
-  check_type(__float128, 16, 16);
-#endif /* CHECK_FLOAT128 */
+  check_size(__float128, TYPE_SIZE_FLOAT128);
+#endif
+
+  /* Packed types - MMX, 3DNow!, SSE and SSE2.  */
 #ifdef CHECK_M64_M128
-  check_type(__m64, 8, 8);
-  check_type(__m128, 16, 16);
-#endif /* CHECK_M64_M128 */
+  check_size(__m64, TYPE_SIZE_M64);
+  check_size(__m128, TYPE_SIZE_M128);
+#endif
 
-  /* Check size and alignment of pointers.  */
-  check_size(void *, 8);
-  check_align(void *, 8);
-  check_size(void (*)(), 8);
-  check_align(void (*)(), 8);
+  /* Pointer types.  */
+  check_size(void *, TYPE_SIZE_POINTER);
+  check_size(void (*)(), TYPE_SIZE_POINTER);
+}
 
-  misfits();
+/* Test alignment of all scalar types.  */
+void
+test_scalar_alignment ()
+{
+  /* Integral types.  */
+  run_signed_tests2(check_align, char, TYPE_ALIGN_CHAR);
+  run_signed_tests2(check_align, short, TYPE_ALIGN_SHORT);
+  run_signed_tests2(check_align, int, TYPE_ALIGN_INT);
+  run_signed_tests2(check_align, long, TYPE_ALIGN_LONG);
+  run_signed_tests2(check_align, long long, TYPE_ALIGN_LONG_LONG);
+#ifdef CHECK_INT128
+  run_signed_tests2(check_align, __int128, TYPE_ALIGN_INT128);
+#endif
+  check_align(enumtype, TYPE_ALIGN_ENUM);
 
-  /* Check structs of all permutations of 3 basic types.  */
-#include "sizal2.c"
+  /* Floating point types.  */
+  check_align(float, TYPE_ALIGN_FLOAT);
+  check_align(double, TYPE_ALIGN_DOUBLE);
+#ifdef CHECK_LONG_DOUBLE
+  check_align(long double, TYPE_ALIGN_LONG_DOUBLE);
+#endif
+#ifdef CHECK_FLOAT128
+  check_align(__float128, TYPE_ALIGN_FLOAT128);
+#endif
+
+  /* Packed types - MMX, 3DNow!, SSE and SSE2.  */
+#ifdef CHECK_M64_M128
+  check_align(__m64, TYPE_ALIGN_M64);
+  check_align(__m128, TYPE_ALIGN_M128);
+#endif
+
+  /* Pointer types.  */
+  check_align(void *, TYPE_ALIGN_POINTER);
+  check_align(void (*)(), TYPE_ALIGN_POINTER);
+}
+
+/* Test basic structs of one single scalar element.  */
+void
+test_simple_structs ()
+{
+  /* Integral types.  */
+  run_signed_tests3(check_basic_struct_size_and_align, char, TYPE_SIZE_CHAR, TYPE_ALIGN_CHAR);
+  run_signed_tests3(check_basic_struct_size_and_align, short, TYPE_SIZE_SHORT, TYPE_ALIGN_SHORT);
+  run_signed_tests3(check_basic_struct_size_and_align, int, TYPE_SIZE_INT, TYPE_ALIGN_INT);
+  run_signed_tests3(check_basic_struct_size_and_align, long, TYPE_SIZE_LONG, TYPE_ALIGN_LONG);
+  run_signed_tests3(check_basic_struct_size_and_align, long long, TYPE_SIZE_LONG_LONG, TYPE_ALIGN_LONG_LONG);
+#ifdef CHECK_INT128
+  run_signed_tests3(check_basic_struct_size_and_align, __int128, TYPE_SIZE_INT128, TYPE_ALIGN_INT128);
+#endif
+  check_basic_struct_size_and_align(enum dummytype, TYPE_SIZE_ENUM, TYPE_ALIGN_ENUM);
+
+  /* Floating point types.  */
+  check_basic_struct_size_and_align(float, TYPE_SIZE_FLOAT, TYPE_ALIGN_FLOAT);
+  check_basic_struct_size_and_align(double, TYPE_SIZE_DOUBLE, TYPE_ALIGN_DOUBLE);
+#ifdef CHECK_LONG_DOUBLE
+  check_basic_struct_size_and_align(long double, TYPE_SIZE_LONG_DOUBLE, TYPE_ALIGN_LONG_DOUBLE);
+#endif
+#ifdef CHECK_FLOAT128
+  check_basic_struct_size_and_align(__float128, TYPE_SIZE_FLOAT128, TYPE_ALIGN_FLOAT128);
+#endif
+
+  /* Packed types - MMX, 3DNow!, SSE and SSE2.  */
+#ifdef CHECK_M64_M128
+  check_basic_struct_size_and_align(__m64, TYPE_SIZE_M64, TYPE_ALIGN_M64);
+  check_basic_struct_size_and_align(__m128, TYPE_SIZE_M128, TYPE_ALIGN_M128);
+#endif
+
+  /* Pointer types. The function pointer doesn't work with these macros.  */
+  check_basic_struct_size_and_align(void *, TYPE_SIZE_POINTER, TYPE_ALIGN_POINTER);
+}
+
+/* Test arrays of scalars.  */
+void
+test_arrays ()
+{
+  /* Integral types.  */
+  run_signed_tests3(check_array_size_and_align, char, TYPE_SIZE_CHAR, TYPE_ALIGN_CHAR);
+  run_signed_tests3(check_array_size_and_align, short, TYPE_SIZE_SHORT, TYPE_ALIGN_SHORT);
+  run_signed_tests3(check_array_size_and_align, int, TYPE_SIZE_INT, TYPE_ALIGN_INT);
+  run_signed_tests3(check_array_size_and_align, long, TYPE_SIZE_LONG, TYPE_ALIGN_LONG);
+  run_signed_tests3(check_array_size_and_align, long long, TYPE_SIZE_LONG_LONG, TYPE_ALIGN_LONG_LONG);
+#ifdef CHECK_INT128
+  run_signed_tests3(check_array_size_and_align, __int128, TYPE_SIZE_INT128, TYPE_ALIGN_INT128);
+#endif
+  check_array_size_and_align(enum dummytype, TYPE_SIZE_ENUM, TYPE_ALIGN_ENUM);
+
+  /* Floating point types.  */
+  check_array_size_and_align(float, TYPE_SIZE_FLOAT, TYPE_ALIGN_FLOAT);
+  check_array_size_and_align(double, TYPE_SIZE_DOUBLE, TYPE_ALIGN_DOUBLE);
+#ifdef CHECK_LONG_DOUBLE
+  check_array_size_and_align(long double, TYPE_SIZE_LONG_DOUBLE, TYPE_ALIGN_LONG_DOUBLE);
+#endif
+#ifdef CHECK_FLOAT128
+  check_array_size_and_align(__float128, TYPE_SIZE_FLOAT128, TYPE_ALIGN_FLOAT128);
+#endif
+
+  /* Packed types - MMX, 3DNow!, SSE and SSE2.  */
+#ifdef CHECK_M64_M128
+  check_array_size_and_align(__m64, TYPE_SIZE_M64, TYPE_ALIGN_M64);
+  check_array_size_and_align(__m128, TYPE_SIZE_M128, TYPE_ALIGN_M128);
+#endif
+
+  /* Pointer types. The function pointer doesn't work with these macros.  */
+  check_array_size_and_align(void *, TYPE_SIZE_POINTER, TYPE_ALIGN_POINTER);
+}
+
+/* Test of simple unions, size and alignment.  */
+void
+test_simple_unions ()
+{
+  /* Integral types.  */
+  run_signed_tests3(check_basic_union_size_and_align, char, TYPE_SIZE_CHAR, TYPE_ALIGN_CHAR);
+  run_signed_tests3(check_basic_union_size_and_align, short, TYPE_SIZE_SHORT, TYPE_ALIGN_SHORT);
+  run_signed_tests3(check_basic_union_size_and_align, int, TYPE_SIZE_INT, TYPE_ALIGN_INT);
+  run_signed_tests3(check_basic_union_size_and_align, long, TYPE_SIZE_LONG, TYPE_ALIGN_LONG);
+  run_signed_tests3(check_basic_union_size_and_align, long long, TYPE_SIZE_LONG_LONG, TYPE_ALIGN_LONG_LONG);
+#ifdef CHECK_INT128
+  run_signed_tests3(check_basic_union_size_and_align, __int128, TYPE_SIZE_INT128, TYPE_ALIGN_INT128);
+#endif
+  check_basic_union_size_and_align(enum dummytype, TYPE_SIZE_ENUM, TYPE_ALIGN_ENUM);
+
+  /* Floating point types.  */
+  check_basic_union_size_and_align(float, TYPE_SIZE_FLOAT, TYPE_ALIGN_FLOAT);
+  check_basic_union_size_and_align(double, TYPE_SIZE_DOUBLE, TYPE_ALIGN_DOUBLE);
+#ifdef CHECK_LONG_DOUBLE
+  check_basic_union_size_and_align(long double, TYPE_SIZE_LONG_DOUBLE, TYPE_ALIGN_LONG_DOUBLE);
+#endif
+#ifdef CHECK_FLOAT128
+  check_basic_union_size_and_align(__float128, TYPE_SIZE_FLOAT128, TYPE_ALIGN_FLOAT128);
+#endif
+
+  /* Packed types - MMX, 3DNow!, SSE and SSE2.  */
+#ifdef CHECK_M64_M128
+  check_basic_union_size_and_align(__m64, TYPE_SIZE_M64, TYPE_ALIGN_M64);
+  check_basic_union_size_and_align(__m128, TYPE_SIZE_M128, TYPE_ALIGN_M128);
+#endif
+
+  /* Pointer types. The function pointer doesn't work with these macros.  */
+  check_basic_union_size_and_align(void *, TYPE_SIZE_POINTER, TYPE_ALIGN_POINTER);
 }
