@@ -24,3 +24,8 @@ pdf abi.pdf: $(ALL_FILES)
 
 ps abi.ps: abi.dvi
 	dvips abi.dvi -o abi.ps
+
+
+clean:
+	rm -f *.log *.aux *.dvi *.ilg *.ind *~ *.idx *.lof *.lot *.out *.pdf *.ps *.toc \#*\# *.rej
+
