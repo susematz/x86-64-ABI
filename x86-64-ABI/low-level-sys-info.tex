@@ -1,0 +1,196 @@
+
+\chapter{Low Level System Information}
+
+\section{Machine Interface}
+
+\subsection{Processor Architecture}
+
+The x86-64 architecture defines a new mode, referred to as 32/64-bit
+mode. See x86-64 Specification details. All information in this
+document is relevant only to 32/64-bit mode, unless stated otherwise.
+
+\editornote{Is this correct?}
+
+\subsection{Data Representation}
+
+In accordance with x86 tradition and x86-64 register names the terms
+byte, word, dword, qword and tword refer to the corresponding data
+objects of 8, 16, 32, 64 and 128 bits in size.
+
+\editornote{Is tword correct for 128 bits?  Elsewhere oword seems to
+  be used instead}
+
+\subsubsection{Fundamental Types}
+
+The basic types are specified in Table \ref{tab-basic-types}.  The
+\verb|__int128| and \verb|__mm64| types are optional.
+
+\begin{table}
+\caption{Basic Types}\label{tab-basic-types}
+\begin{tabular}{lrllr}
+\hline\noalign{\smallskip}
+% multicolumn is used to shrink the table
+&sizeof & type			&\multicolumn{2}{l}{C type\hfill alignment} \\
+\noalign{\smallskip}\hline\noalign{\smallskip}
+Integral:
+&1	& signed byte		&        char, signed char		& 1 \\
+&1	& unsigned byte		&        unsigned char, bool		& 1 \\
+&2	& signed word		&        short, singed short		& 2 \\
+&2	& unsigned word		&        unsigned short			& 2 \\
+&4	& signed dword		&        int, signed int, wchar		& 4 \\
+&4	& unsigned dword	&        unsigned int,	& 4 \\
+&       &                       &        unsigned wchar & \\
+&8	& signed qword		&        long, signed long, 	& 8 \\
+&        &                       &       long long, 		&  \\
+&        &                       &       signed long long		&  \\
+&8	& unsigned qword	&                unsigned long,		&	8 \\
+&        &                       &          unsigned long long		& \\
+&16	& signed tword		&        \verb|__int128|, & 16 \\
+&	& 		        &        signed \verb|__int128|	&  \\
+&16	& unsigned oword	&                unsigned \verb|__int128|	&	16 \\
+\hline
+Packed:
+&8	& MMX and 3DNOW		&	\verb|__mm64|				& 8 \\
+&16	& SSE and SSE-2		&	\verb|__m128|				& 16 \\
+\hline
+Pointer:
+&8	& unsigned qword	&		any type *		& 8 \\
+\hline
+Floating-
+&4	& single-precision (IEEE) &	float				& 4 \\
+point:&8	& double-precision (IEEE) &	double				& 8 \\
+&16	& extended-precision (IEEE) & 	long double			& 16 \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection{Aggregates and Unions}
+
+Structure members are "`naturally"' aligned.  Structures, arrays and
+unions assume the alignment of the most strictly aligned component
+(compare with Table \ref{tab-basic-types}). The size of aggregates is
+a multiple of the alignment.
+
+
+\subsubsection{Bit-Fields}
+
+Bit-fields are non-negative values with the range from 1 to 64 bits
+depending on the bit-field type. Bit ordering is equivalent to
+Intel386 specs.
+
+\editornote{This needs a bit (pun intended) more specificity.}
+
+\section{Function Calling Sequence}
+
+Function may expect at the entry and must preserve in the calls:
+\begin{enumerate}
+\item CPU in i387 mode (we generally want to replace MMX with SSE, on the other
+      hand, we want the same for i387.  i387 is still having advantage of 80bit
+      long double hardware support, so it is probably more usefull at the moment)
+\item direction flag to be clear (this will allow us to eliminate most of cli
+      instructions).  In gcc this will bring an complications with assembly
+      statements.  I suggest to define direction flag to be clear at the
+      statements exit.
+\item rsp to be stack pointer, rbp to be base pointer, rbx to be GOT pointer
+\item define FP control word value?
+\item define values of other cpu flags?
+\end{enumerate}
+Return value:
+\begin{enumerate}
+\item Integers come in rax, 128bits in rdx:rax
+\item Floats come in xmm0 (including the long double, that will require an
+      load from i387 stack, but would allow to forget about the stack in future)
+\item Structures up to 128bits are mapped to the rax/rdx
+      ??? We may define fields to be mapped to the corresponding register,
+      (so fp fields will be return in xmm register)
+      Other structures are returned in the area preallocated by the caller
+      obtained as the hidden first argument.
+\end{enumerate}
+
+Register usage:
+\begin{enumerate}
+\item rsp, rbp, rbx, xmm8-xmm15, r10b-r15b are preserved across
+      the function calls
+\item rax, rdx and xmm0 are return registers
+\item xmm0-5, rax, rdx, rsi, rdi, rcx and r8 are used for register passing
+    conventions.  Uppermost
+    bytes of the argument area are not pushed to the stack and mapped to the
+    registers instead. Xth oword from the top comes in the Xth register.
+    When prototype is present, Integer comes in the integers, fp and
+    packed types comes in floats.
+    For the ellipsis, everyting comes in the integer (and to in the floats).
+    For prototypeless calling convention, the floats and packed comes in
+    both.
+    Usually only 64bytes of each xmm register is used, long double comes in
+    single xmm register and the value of next xmm register is undefined.
+\end{enumerate}
+
+ Argument area:
+\begin{enumerate}
+\item Size of every value is rounded to 64bits, padded by caller, extended as
+    necesary by callee.
+    (??? Zero extend by caller?)
+\item 128bit values are padded to be aligned expecting the byte after
+      uppermost byte of the argument area is 16 byte aligned.
+\end{enumerate}
+
+\begin{table}
+\caption{General Registers}
+\begin{center}
+\begin{tabular}{ll}
+\hline\noalign{\smallskip}
+Register & Use \\
+\noalign{\smallskip}\hline\noalign{\smallskip}
+RAX & \\
+RBX & \\
+RCX & \\
+RDX & \\
+RDI & \\
+RSI & \\
+RBP & \\
+RSP & \\
+R8 & \\
+R9 & \\
+R10 & \\
+R11 & \\
+R12 & \\
+R13 & \\
+R14 & \\
+R15 & \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{table}
+\caption{Floating Point Registers}
+\begin{center}
+\begin{tabular}{ll}
+\hline\noalign{\smallskip}
+Register & Use \\
+\noalign{\smallskip}\hline\noalign{\smallskip}
+XMM0& \\
+XMM1 & \\
+XMM2 & \\
+XMM3 & \\
+XMM4 & \\
+XMM5 & \\
+XMM6 & \\
+XMM7 & \\
+XMM8 & \\
+XMM9 & \\
+XMM10 & \\
+XMM11 & \\
+XMM12 & \\
+XMM13 & \\
+XMM14 & \\
+XMM15 & \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "abi"
+%%% End: 

@@ -1,0 +1,28 @@
+% All macros
+
+%  First find out if we're running pdftex
+\newif\ifpdf
+
+\ifx\pdfoutput\undefined
+  \pdffalse
+\else
+  \pdftrue
+\fi
+
+\ifpdf
+\pdfcompresslevel 5
+\fi
+
+\usepackage{times}
+\usepackage[american]{babel}
+
+\usepackage[T1]{fontenc}
+
+\newcommand{\editornote}[1]{(\emph{Editor:}\/ #1)}
+
+% Use Hyperref for PDF support - this should be last
+\ifpdf
+\usepackage[pdftex]{hyperref}
+\else
+\usepackage[dvips]{hyperref}
+\fi
