@@ -1,3 +1,8 @@
+2000-12-19  Andreas Jaeger  <aj@suse.de>
+
+	* low-level-sys-info.tex: Add table describing usage of generic
+	registers.
+
 Mon Dec 11 15:11:21 MET 2000  Jan Hubicka  <jh@suse.cz>
 
 	* low-level-sys-info.tex: Make r11 global; dedicate r10 as static

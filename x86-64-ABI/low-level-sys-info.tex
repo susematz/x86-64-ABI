@@ -321,6 +321,48 @@ Any bytes not used by the value passed have undefined contents.
 If the structure has more than 8 bytes, then the process is repeated
 for the second doubleword.
 
+\begin{figure}
+\Hrule
+  \caption{Generic Register Usage}
+  \label{fig-reg-usage}
+  \begin{center}
+    \begin{tabular}{l|p{8cm}|l}
+      \noalign{\smallskip}
+      \multicolumn{1}{c}{} &
+      \multicolumn{1}{c}{}&
+      \multicolumn{1}{l}{\bf Preserved across} \\
+      \multicolumn{1}{c}{\bf Register} &
+      \multicolumn{1}{c}{\bf Usage}&
+      \multicolumn{1}{l}{\bf function calls} \\
+      \hline
+      \noalign{\smallskip}
+\RAX & temporary register; used also for variable arguments to pass
+information about the number of SSE registers used  & No \\
+\RBX & callee-saved register & Yes \\
+\RCX & used to pass 4$^{\rm th}$ integer argument to functions & No \\
+\RDX & used to pass 3$^{\rm rd}$ argument to functions & No \\
+\RSP & stack pointer & Yes. \\
+\RBP & callee-saved register & Yes \\
+\RSI & used to pass 2$^{\rm nd}$  argument to functions & No \\
+\RDI & used to pass 1$^{\rm st}$  argument to functions & No \\
+\reg{r8} & used to pass 5$^{\rm th}$  argument to functions & No \\
+\reg{r9} & used to pass 6$^{\rm th}$  argument to functions & No \\
+\reg{r10} & temporary register, used for passing a function's static
+chain pointer & No \\
+\reg{r11} & temporary register & No\\
+\reg{r12} & callee-saved register & Yes \\
+\reg{r13} & callee-saved register & Yes \\
+\reg{r14} & callee-saved register & Yes \\
+\reg{r15} & callee-saved register & Yes \\
+\noalign{\medskip}
+\cline{1-1}\multicolumn{3}{l}{\small Note: Register assignment is right to left.}\\
+    \end{tabular}
+
+  \end{center}
+\Hrule
+\end{figure}
+
+
 \subsection{Functions Returning Scalars or No Value}
 
 If a function returns a scalar of type \code{__m64}, the value is
