@@ -1,3 +1,7 @@
+2001-03-19  Geert Bosch  <bosch@gnat.com>
+
+	* libraries.tex: (Unwind Library Interface): New section.
+
 2001-03-19  Andreas Jaeger  <aj@suse.de>
 
 	* conventions.tex,low-level-sys-info.tex,object-files.tex: Fix
