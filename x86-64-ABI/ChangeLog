@@ -1,3 +1,8 @@
+2000-09-25  Mark Mitchell  <mark@codesourcery.com>
+
+	* low-level-sys-info.tex: Tweak register allocation for
+	parameter-passing.
+
 2000-09-24  Andreas Jaeger  <aj@suse.de>
 
 	* low-level-sys-info.tex: Fix typos in red zone description.

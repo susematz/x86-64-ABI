@@ -253,8 +253,8 @@ If the argument is a scalar type, other than \code{__m64} or
 \code{__int128}, then it is placed in the next available register
 suitable for its type.  In particular, arguments of integral or
 pointer type are placed in the next available general purpose
-register, taken in the order \RAX, \RDX, \RCX, \RBX, \RSI, and \RDI.
-\footnote{Note that \reg{r8} and \reg{r9} are not required to be
+register, taken in the order \RBX, \RCX, \RDX, \RSI, \RDI, and \reg{r8}.
+\footnote{Note that \RAX and \reg{r9} are not required to be
   preserved, nor are they used to pass arguments.  Making these
   registers available as scratch registers means that code in the PLT
   need not spill any registers when computing the address to which
@@ -333,14 +333,14 @@ argument of that same structure type.
 If a function returns a structure or union whose size is greater than
 16 bytes, or, for C++, if the structure or union is a non-POD, then
 the caller provides space for the return value and passes the address
-of this address in \RAX as if it were the first argument to the
+of this storage in \RBX as if it were the first argument to the
 function.  In effect, this address becomes a ``hidden'' first
 argument.
 
-In this case, the function also sets \RAX to the value of the original
+In this case, the function also sets \RBX to the value of the original
 address in the calle's area before it returns.  Thus when the caller
 receives control again, the address of the returned object resides in
-register \RAX and can be used to access the object.
+register \RBX and can be used to access the object.
   
 If a function returns a structure or union whose size is less than or
 equal to 16 bytes, and, for C++, the structure or union is a POD, then
