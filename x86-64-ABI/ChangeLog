@@ -1,3 +1,7 @@
+2000-10-18  Andreas Jaeger  <aj@suse.de>
+
+	* object-files.tex: Use R_X86_64 instead of R_X8664.
+
 2000-10-17  Mark Mitchell  <mark@codesourcery.com>
 
 	* low-level-sys-info.tex: Do not align arrays inside structures on
