@@ -16,7 +16,7 @@ ISO C 99 defines the floating point environment functions from
 separate control words, the programming environment has to keep the
 control values in sync.  On the other hand this means that routines
 accessing the control words only need to access one unit, and the SSE
-unit is the unit that should be accessed in these casese.  The
+unit is the unit that should be accessed in these cases.  The
 function \codeindex{fegetround} therefore only needs to report the
 rounding value of the SSE unit and can ignore the x87 unit.
 
