@@ -300,9 +300,10 @@ Possibilities are:
    \code{terminate()} in this case.
 \end{description}
 
-If the unwinder encounters an unexpected error during phase 2,
-it should return \code{\_URC\_FATAL\_PHASE2\_ERROR} to its caller.
-In C++, this will usually be \code{\_\_cxa\_throw}, which will call terminate().
+If the unwinder encounters an unexpected error during phase 2, it
+should return \code{\_URC\_FATAL\_PHASE2\_ERROR} to its caller.  In
+C++, this will usually be \code{\_\_cxa\_throw}, which will call
+\code{terminate()}.
 
 The unwind runtime will likely have modified the stack (e.g. popped
 frames from it) or register context, or landing pad code may have
