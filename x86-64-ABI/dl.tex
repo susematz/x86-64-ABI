@@ -52,6 +52,9 @@ No changes required.
   details need to filled in, like the number of reserved entries and
   the exact algorithm used.}
 
+
+\bigskip\hrule
+
 \paragraph{Proposal 1: RW-PLT}
 
 % This has been copied from the i386 ABI and the SPARC ABI.
@@ -135,6 +138,8 @@ ptr = name;               movl ptr@GOTPC(%rip), %rax
 \editornote{The costs for a call are (after fixing the PLT): one call
   and one direct jmp, giving an overhead of one jump.  The problem is
   that we have self modifying code.}
+
+\bigskip\hrule
 
 \paragraph{Proposal 2: RO-PLT}
 
@@ -222,6 +227,54 @@ ptr = name;               movl ptr@GOTPC(%rip), %rax
 \editornote{The costs for a call are (after fixing the PLT): one call
   and one memory indirect jmp, giving an overhead of one jump and one
   memory reference.}
+
+Following the steps below, the dynamic linker and the program
+``cooperate'' to resolve symbolic references through the procedure
+linkage table and the global offset table.
+
+\begin{enumerate}
+\item When first creating the memory image of the program, the dynamic
+  linker sets the second and the third entries in the global offset
+  table to special values.  Steps below explain more about these
+  values.
+\item Each shared object file in the process image has its own
+  procedure linkage table, and control transfers to a procedure
+  linkage table entry only from within the same object file.
+\editornote{Should we remove this completely?}
+\item For illustration, assume the program calls \code{name1}, which
+  transfers control to the label \code{.PLT1}.
+\item The first instruction jumps to the address in the global offset
+  table entry for \code{name1}.  Initially the global offset table
+  holds the address of the following \code{pushl} instruction, not the
+  real address of \code{name1}.
+\item After pushing the relocation offset, the program then jumps to
+  \code{.PLT0}, the first entry in the procedure linkage table.  The
+  \code{pushl} instruction places the value of the second global
+  offset table entry (GOT+8) on the stack, thus giving the dynamic
+  linker one word of identifying information.  The program then jumps
+  to the address in the third global offset table entry (GOT+16),
+  which transfers control to the dynamic linker.
+\item When the dynamic linker receives control, it unwinds the stack,
+  looks at the designated relocation entry, finds the symbol's value,
+  stores the ``real'' address for \code{name1} in its global offset
+  table entry, and transfers control to the desired destination.
+\item Subsequent executions of the procedure linkage table entry will
+  transfer directly to \code{name1}, without calling the dynamic
+  linker a second time.  That is, the \code{jmp} instruction at
+  \code{.PLT1} will transfer to \code{name1}, instead of ``falling
+  through'' to the \code{pushl} instruction.
+\end{enumerate}
+
+The \code{LD_BIND_NOW} environment variable can change the dynamic
+linking behavior.  If its value is non-null, the dynamic linker
+evaluates procedure linkage table entries before transferring control
+to the program.  That is, the dynamic linker processes relocation
+entries of type \code{R_X8664_JMP_SLOT} \index{R_X8664_JMP_SLOT}
+during process initialization.  Otherwise, the dynamic linker
+evaluates procedure linkage table entries lazily, delaying symbol
+resolution and relocation until the first execution of a table entry.
+
+\bigskip\hrule
 
 \paragraph{Proposal 3: Indirect Calls}
 
@@ -313,6 +366,8 @@ Other ABIs & Sparc & i386 & None? \\
 \end{center}
 \end{figure}
                                 
+
+\bigskip\hrule
 
 % common stuff
 \subsection{Program Interpreter}
