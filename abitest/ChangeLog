@@ -1,5 +1,6 @@
 2001-01-23  Bo Thorsen  <bo@suse.de>
 
+	* macros.h: Added file. Moved a couple of macros to this file.
 	* bitfields.c: Added test for bitfield structs and unions.
 	* main.c (main): Added bitfield test.
 
