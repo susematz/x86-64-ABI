@@ -45,44 +45,19 @@ The link editor cannot resolve execution transfers (such as function
 calls) from one executable or shared object to another.  Consequently,
 the link editor arranges to have the program transfer control to
 entries in the procedure linkage table.  On the \xARCH architecture,
-procedure linkage tables reside in shared text, but they use address
+procedure linkage tables reside in shared text, but they use addresses
 in the private global offset table.  The dynamic linker determines the
 destinations' absolute addresses and modifies the global offset
 table's memory image accordingly.  The dynamic linker thus can
 redirect the entries without compromising the position-independence
 and shareability of the program's text.  Executable files and shared
-object files have separate procedure linkage tables.
-
-
-\begin{figure}[H]
-\Hrule
-\caption{Absolute Procedure Linkage Table}
-\begin{center}
-\begin{tabular}{|lll|}
-\hline
-.PLT0: & pushq & got\_plus\_8; GOT[1]\\
-& jmp &got\_plus\_16 ; GOT[2] \\
-& nop & \\
-& nop & \\
-& nop & \\
-& nop & \\
-.PLT1: & jmp & *name1\_in\_GOT\\
-.PLT1a& pushl & \$offset \\
-&jmp &.PLT0@PC \\
-.PLT2: & jmp& *name2\_in\_GOT\\
-&pushl & \$offset \\
-& jmp & .PLT0@PC \\
-&\dots&\\
-\hline
-\end{tabular}
-\end{center}
-\Hrule
-\end{figure}
-
+object files have separate procedure linkage tables.  Unlike
+\intelabi, this ABI uses the same procedure linkage table for both
+programs and shared objects.
 
 \begin{figure}[H]
 \Hrule
-\caption{Position-Independent Procedure Linkage Table}
+\caption{Procedure Linkage Table}
 \begin{center}
 \begin{tabular}{|lll|}
 \hline
@@ -93,10 +68,10 @@ object files have separate procedure linkage tables.
 & nop & \\
 & nop & \\
 .PLT1: & jmp &*name1@GOTPC(\%rip)\\
-& pushl & \$offset \\
+& pushq & \$\textit{index} \\
 &jmp &.PLT0@PC \\
 .PLT2: & jmp&*name2@GOTPC(\%rip)\\
-&pushl & \$offset \\
+&pushq & \$\textit{index} \\
 & jmp & .PLT0@PC \\
 &\dots &\\
 \hline
@@ -117,14 +92,24 @@ linkage table and the global offset table.
 \item Each shared object file in the process image has its own
   procedure linkage table, and control transfers to a procedure
   linkage table entry only from within the same object file.
-\editornote{Should we remove this completely?}
 \item For illustration, assume the program calls \code{name1}, which
   transfers control to the label \code{.PLT1}.
 \item The first instruction jumps to the address in the global offset
   table entry for \code{name1}.  Initially the global offset table
   holds the address of the following \code{pushl} instruction, not the
   real address of \code{name1}.
-\item After pushing the relocation offset, the program then jumps to
+\item Now the program pushes a relocation index (\textit{index}) on
+  the stack. The relocation index is a 32-bit, non-negative index into
+  the relocation table addressed by the \codeindex{DT_JMPREL} dynamic
+  section entry.  The designated relocation entry will have type
+  \codeindex{R_X86_64_JMP_SLOT}, and its offset will specify the
+  global offset table entry used in the previous \code{jmp}
+  instruction.  The relocation entry contains a symbol table index
+  that will reference the appropriate symbol, \code{name1} in the
+  example.
+% Note that index is sign-extended.  Since the GOT will only have
+% 2^29 entries (see chapter 4), this is no problem.
+\item After pushing the relocation index, the program then jumps to
   \code{.PLT0}, the first entry in the procedure linkage table.  The
   \code{pushl} instruction places the value of the second global
   offset table entry (GOT+8) on the stack, thus giving the dynamic
