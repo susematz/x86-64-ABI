@@ -672,18 +672,17 @@ registers to the \emph{register save area}.  Each argument register
 has a fixed offset in the register save area as defined in the figure
 \ref{fig-reg-save}.
 
-Only registers possibly used by argument passed as
-variable arguments needs to be saved.  Other fields may not be accessed and can
-be used for other purposes.
-In the case a function is known to never accept arguments passed
-in registers\footnote{This fact may be determined either by exploring types
-used by the \code{va_arg} macro, or by the fact that the named arguments already
-are exhausted the argument registers entirely},
+Only registers that might be used to pass arguments need to be saved.
+Other registers are not accessed and can be used for other purposes.  If a
+function is known to never accept arguments passed in
+registers\footnote{This fact may be determined either by exploring
+  types used by the \code{va_arg} macro, or by the fact that the named
+  arguments already are exhausted the argument registers entirely},
 the register save area may be omitted entirely.
 
-The prologue should use
-\RAX to avoid saving of unnecesary XMM registers.  This is especially important
-to avoid integer only programs from initializing the XMM unit.
+The prologue should use \RAX to avoid unnecessarily saving XMM
+registers.  This is especially important for integer only programs to
+prevent the initialization of the XMM unit.
 
 
 \begin{figure}[H]
@@ -747,10 +746,10 @@ The \code{va_start} macro initializes the structure as follows:
 \begin{description}
 \item [reg_save_area]
 The element points to the start of the register save area.
-\item [overflow_arg_area]
-This pointer is used to fetch arguments passed on the stack.  It is initialized to the
-address of the first argument passed on the stack, if any, and then always updated
-to point to the start of the next stack argument.
+\item [overflow_arg_area] This pointer is used to fetch arguments
+  passed on the stack.  It is initialized with the address of the
+  first argument passed on the stack, if any, and then always updated
+  to point to the start of the next argument on the stack.
 \item [gp_offset] The element holds the offset in bytes from
   \code{reg_save_area} to the place where the next available general
   purpose argument register is saved.  In case all argument registers
@@ -774,12 +773,12 @@ Determine whether \code{type} may be passed in the registers.  If not go to step
 Compute \code{num_gp} to hold the number of general purpose registers needed to pass \code{type}
 and \code{num_fp} to hold the number of floating point registers needed.
 \item
-Verify whether arguments fits into registers.
+Verify whether arguments fit into registers.
 In the case:
 $$\code{l->gp_offset} > 48 - \code{num_gp} * 8$$ or $$\code{l->fp_offset} > 304 - \code{num_fp} * 16$$
 go to step \ref{stack}.
 \item
-  Fetch \code{type} from \code{l->reg_save_area} offsetted by
+  Fetch \code{type} from \code{l->reg_save_area} with an offset of
   \code{l->gp_offset} and/or \code{l->fp_offset}.  This may require
   copying to a temporary location in case the parameter is passed in
   different register classes or requires an alignment greater than 8 for

@@ -1,8 +1,13 @@
+2001-01-15  Andreas Jaeger  <aj@suse.de>
+
+	* low-level-sys-info.tex: Spelling fixes as suggested by Philipp
+	Thomas.
+
 2001-01-14  Andreas Jaeger  <aj@suse.de>
 
 	* low-level-sys-info.tex: Clean up va_* changes.
 
-Sun Jan 14 13:58:08 MET 2001  Jan hubicka  <jh@suse.cz>
+Sun Jan 14 13:58:08 MET 2001  Jan Hubicka  <jh@suse.cz>
 
 	* low-level-sys-info.tex: Document va_* machinery.
 
@@ -18,7 +23,7 @@ Sun Jan 14 13:58:08 MET 2001  Jan hubicka  <jh@suse.cz>
 2001-01-10  Andreas Jaeger  <aj@suse.de>
 
 	* object-files.tex: Replace R_X86_64_JMP_SLOT with R_X86_64_JUMP_SLOT.
-	Use PLT32 instead 64. 
+	Use PLT32 instead 64.
 
 	* dl.tex: Likewise.
 
