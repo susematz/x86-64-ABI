@@ -22,4 +22,4 @@ pdf abi.pdf: $(ALL_FILES)
 	pdflatex abi
 
 ps abi.ps: abi.dvi
-	dvips $< -o $@ 
+	dvips abi.dvi -o abi.ps
