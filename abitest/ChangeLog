@@ -1,3 +1,10 @@
+2000-12-17  Bo Thorsen  <bo@suse.de>
+
+	* defines.h: Enabled more tests and added new CHECK_STRUCT_SIZE.
+	* sizal.c: Fixed alignment/size testing for arrays and structs.
+	* struniargs.c: Fix testing larger structs, larger unions and
+	mixed passing.
+
 2000-12-15  Bo Thorsen  <bo@suse.de>
 
 	* variargs.c, defines.h: Enable varargs test

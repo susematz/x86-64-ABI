@@ -18,26 +18,13 @@
   check_align(_t, _align); \
 }
 
-#ifdef CHECK_LARGER_ARRAY_ALIGNMENT
 #define check_array_alignment_and_size(_type, _size, _align) { \
   _type a[1], b[2], c[16]; \
-  if (_size >= 16) check_align(a, 16); else check_align(a, (_align)); \
-  if (_size < 8) check_align(b, _align); else assert(__alignof__(b) >= 16); \
-  assert(__alignof__(c) >= 16); \
+  check_align(a[0], _align); \
   check_size(a, _size); \
   check_size(b, (_size*2)); \
   check_size(c, (_size*16)); \
 }
-#else /* not CHECK_LARGER_ARRAY_ALIGNMENT */
-#define check_array_alignment_and_size(_type, _size, _align) { \
-  _type a[1], b[2], c[16]; \
-  if (_size >= 16) check_align(a, 16); else check_align(a, (_align)); \
-  if (_size < 8) check_align(b, _align); \
-  check_size(a, _size); \
-  check_size(b, (_size*2)); \
-  check_size(c, (_size*16)); \
-}
-#endif /* not CHECK_LARGER_ARRAY_ALIGNMENT */
 
 #define check_type(_type, _size, _align) \
   check_size(_type, _size); \
@@ -66,21 +53,21 @@ misfits (void)
 }
 
 /* Check size of a struct and a union of three types.  */
-#ifdef CHECK_LARGER_STRUCTS
+#ifdef CHECK_STRUCT_SIZE
 #define check_struct_and_union3(_type1, _type2, _type3, _size) \
 { \
   struct _str { _type1 t1; _type2 t2; _type3 t3; }; struct _str _t; \
   check_size(_t, (_size*3)); \
   union _uni { _type1 t1; _type2 t2; _type3 t3; }; union _uni _u; \
-  check_size(_u, _size); \
+ check_size(_u, _size); \
 }
-#else /* not CHECK_LARGER_STRUCTS */
+#else /* not CHECK_STRUCT_SIZE */
 #define check_struct_and_union3(_type1, _type2, _type3, _size) \
 { \
   union _uni { _type1 t1; _type2 t2; _type3 t3; }; union _uni _u; \
   check_size(_u, _size); \
 }
-#endif /* not CHECK_LARGER_STRUCTS */
+#endif /* not CHECK_STRUCT_SIZE */
 
 
 void

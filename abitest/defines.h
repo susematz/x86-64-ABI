@@ -19,13 +19,13 @@
 /* #define CHECK_M64_M128 */
 
 /* Structs with size >= 16.  */
-/* #define CHECK_LARGER_STRUCTS */
+#define CHECK_LARGER_STRUCTS
 
-/* Alignments of arrays with size >= 16.  */
-/* #define CHECK_LARGER_ARRAY_ALIGNMENT */
+/* Check struct sizeof.  */
+/* #define CHECK_STRUCT_SIZE */
 
 /* Union passing with not-extremely-simple unions.  */
-/* #define CHECK_LARGER_UNION_PASSING */
+#define CHECK_LARGER_UNION_PASSING
 
 /* Variable args.  */
 #define CHECK_VARARGS
