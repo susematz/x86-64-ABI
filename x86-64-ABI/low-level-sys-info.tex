@@ -196,12 +196,13 @@ calling function wants to preserve such a register value across a
 function call, it must save the value in its local stack frame.
 
 The CPU shall be in x87 mode upon entry to a function.  Therefore,
-every function that uses the \MMX registers is required to issue
-an \op{emms} or \op{femms} instruction before accessing the \MMX
-registers.\footnote{All x87 registers are caller-saved, so
-  callees that make use of the \MMX registers may use the faster
-  \op{femms} instruction.}  The direction flag in the \reg{eflags}
-register must be clear on function entry, and on function return.
+every function that uses the \MMX registers is required to issue an
+\op{emms} or \op{femms} instruction after using \MMX registers, before
+returning or calling another function.  \footnote{All x87 registers
+are caller-saved, so callees that make use of the \MMX registers may
+use the faster \op{femms} instruction.}  The direction flag in the
+\reg{eflags} register must be clear on function entry, and on function
+return.
 
 \subsection{The Stack Frame}
 

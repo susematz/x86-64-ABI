@@ -1,3 +1,12 @@
+2003-12-18  Andreas Jaeger  <aj@suse.de>
+
+	* low-level-sys-info.tex (subsection{Registers and the Stack
+	Frame}): Clarify x87 mode.  Patch by Hans Peter Anvin.
+
+	* macros.tex: Increase version.
+
+	* abi.tex (section*{Revision History}): Add new entry.
+
 2003-04-22  Andreas Jaeger  <aj@suse.de>
 
 	* low-level-sys-info.tex: Describe passing of complex types.
