@@ -205,6 +205,7 @@ use the faster \op{femms} instruction.}  The direction flag in the
 return.
 
 \subsection{The Stack Frame}
+\label{sec-stack-frame}
 
 In addition to registers, each function has a frame on the run-time
 stack.  This stack grows downwards from high addresses.  Figure
@@ -255,7 +256,7 @@ handlers.\footnote{Locations within 128 bytes can be addressed using
 temporary data that is not needed across function calls.  In
 particular, leaf functions may use this area for their entire stack
 frame, rather than adjusting the stack pointer in the prologue and
-epilogue.
+epilogue.  This area is known as \textindex{red zone}.
 
 \subsection{Parameter Passing}
 \label{sec-calling-conventions}
@@ -393,7 +394,7 @@ left-to-right order) for passing as follows:
    registers are taken in the order from \reg{xmm0} to \reg{xmm7}.
 
 \item If the class is SSEUP, the \eightbyte is passed in the upper
-   half of the least used SSE register.
+   half of the last used SSE register.
 
 \item If the class is X87, X87UP or COMPLEX\_X87, it is passed in memory.
 \end{enumerate}
