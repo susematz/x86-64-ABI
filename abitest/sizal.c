@@ -34,12 +34,6 @@
   check_type(signed _type, _size, _align); \
   check_type(unsigned _type, _size, _align);
 
-void
-check_bitfields (void)
-{
-  /* TODO */
-}
-
 /* This function tests things that does not fit in other tests.  */
 void
 misfits (void)
@@ -49,22 +43,15 @@ misfits (void)
   assert(__alignof__(enumtype) == 4);
 }
 
-/* Check size of a struct and a union of three types.  */
-#ifdef CHECK_STRUCT_SIZE
-#define check_struct_and_union3(_type1, _type2, _type3, _size) \
+/* Check size of a a struct and a union of three types. Struct.  */
+
+#define check_struct_and_union3(type1, type2, type3, struct_size, align_size) \
 { \
-  struct _str { _type1 t1; _type2 t2; _type3 t3; }; struct _str _t; \
-  check_size(_t, (_size*3)); \
-  union _uni { _type1 t1; _type2 t2; _type3 t3; }; union _uni _u; \
- check_size(_u, _size); \
+  struct _str { type1 t1; type2 t2; type3 t3; } _t; \
+  union _uni { type1 t1; type2 t2; type3 t3; } _u; \
+  check_size(_t, struct_size); \
+  check_size(_u, align_size); \
 }
-#else /* not CHECK_STRUCT_SIZE */
-#define check_struct_and_union3(_type1, _type2, _type3, _size) \
-{ \
-  union _uni { _type1 t1; _type2 t2; _type3 t3; }; union _uni _u; \
-  check_size(_u, _size); \
-}
-#endif /* not CHECK_STRUCT_SIZE */
 
 
 void
@@ -98,8 +85,6 @@ sizal (void)
   check_align(void *, 8);
   check_size(void (*)(), 8);
   check_align(void (*)(), 8);
-
-  check_bitfields();
 
   misfits();
 

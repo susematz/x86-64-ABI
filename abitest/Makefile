@@ -29,7 +29,7 @@ sizal2.c: make_sizal2
 	make_sizal2 > sizal2.c
 
 make_sizal2: make_sizal2.c
-	gcc -o make_sizal2 make_sizal2.c
+	gcc -g -Wall -o make_sizal2 make_sizal2.c
 
 backup:
 	$(MAKE) clean

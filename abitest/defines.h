@@ -21,9 +21,6 @@
 /* Structs with size >= 16.  */
 #define CHECK_LARGER_STRUCTS
 
-/* Check struct sizeof.  */
-/* #define CHECK_STRUCT_SIZE */
-
 /* Union passing with not-extremely-simple unions.  */
 #define CHECK_LARGER_UNION_PASSING
 

@@ -1,4 +1,5 @@
 #include "defines.h"
+#include <stdio.h>
 
 /* These defines control the building of the list of types to check. There
    is a string identifying the type (with a comma after), a size of the type
@@ -33,13 +34,66 @@
 #define CMM_I
 #endif
 
+/* Find the maximum of three integers.  */
+int
+max3 (int integers[])
+{
+  int max = (integers[0] > integers[1] ? integers[0] : integers[1]);
+  return (max > integers[2] ? max : integers[2]);
+}
+
+/* This function calculates the size of a struct when elements have size
+   and alignment of the list items.  Structs have a basic alignment like
+   the largest alignment of it's single elements. Structs are layed out so
+   they always fill in as much in the single alignment slots as possible.  */
 
 int
-max3 (int a, int b, int c)
+calculate_struct_size (int element_count, int size[], int alignment[])
 {
-  int max = a > b ? a : b;
-  return max > c ? max : c;
+  int struct_size = 0, struct_alignment = 0, current_alignment = 0;
+  int i;
+
+  /* Find alignment of the struct elements.  */
+  for (i=0; i<element_count; i++)
+    if (struct_alignment < alignment[i])
+      struct_alignment = alignment[i];
+
+  for (i=0; i<element_count; i++) {
+    /* Update size with minimum value.  */
+    struct_size += size[i];
+    current_alignment += size[i];
+
+    if (current_alignment > struct_alignment)
+      {
+	/* This element doesn't fit within this alignment, make padding.  */
+	struct_size += (struct_alignment - (current_alignment - size[i]));
+
+	/* Set current_alignment to the base of this alignment.  */
+	current_alignment = size[i];
+      }
+    else
+      if ((current_alignment % alignment[i]) != 0)
+	{
+	  /* Pad for the alignment of this type. Can happen for structs
+	     like { char, short, int }.  */
+	  int padding = alignment[i] - (current_alignment % alignment[i]);
+
+	  struct_size += padding;
+	  current_alignment += padding;
+	}
+
+    if (current_alignment == struct_alignment)
+      /* Current element fills alignment slot. Start over.  */
+      current_alignment = 0;
+  }
+
+  /* Add final padding.  */
+  if (current_alignment != 0)
+    struct_size += (struct_alignment - current_alignment);
+
+  return struct_size;
 }
+
 
 /* This constructs the test for size of structs and unions with three scalar
    types.  */
@@ -54,9 +108,20 @@ main (int argc, char **argv)
 
   for (i=0; i<maxcheck; i++)
     for (j=0; j<maxcheck; j++)
-      for (k=0; k<maxcheck; k++)
-	printf("check_struct_and_union3(%s, %s, %s, %d);\n", types[i],
-	       types[j], types[k], max3(sizes[i], sizes[j], sizes[k]));
+      for (k=0; k<maxcheck; k++) {
+	int element_sizes[3], struct_size, union_size;
+
+	element_sizes[0] = sizes[i];
+	element_sizes[1] = sizes[j];
+	element_sizes[2] = sizes[k];
+
+	/* There is no difference between size and alignment in the abi.  */
+	struct_size = calculate_struct_size (3, element_sizes, element_sizes);
+	union_size = max3(element_sizes);
+
+	printf ("check_struct_and_union3(%s, %s, %s, %d, %d);\n", types[i],
+		types[j], types[k], struct_size, union_size);
+      }
 
   return 0;
 }

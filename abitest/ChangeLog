@@ -1,8 +1,17 @@
+2001-01-25  Bo Thorsen  <bo@suse.de>
+
+	* sizal.c (check_struct_and_union3): Remove CHECK_STRUCT_SIZE check.
+	* make_sizal2.c (main): Fix calculation of struct size.
+	(calculate_struct_size): Do calculation of struct size.
+	* defines.h: Removed no longer used CHECK_STRUCT_SIZE.
+
 2001-01-23  Bo Thorsen  <bo@suse.de>
 
 	* macros.h: Added file. Moved a couple of macros to this file.
 	* bitfields.c: Added test for bitfield structs and unions.
 	* main.c (main): Added bitfield test.
+	* funcs.h: Likewise.
+	* sizal.c: Removed bitfield test.
 
 2000-12-17  Bo Thorsen  <bo@suse.de>
 
