@@ -1,5 +1,7 @@
 2000-07-27  Mark Mitchell  <mark@codesourcery.com>
 
+	* low-level-sys-info.tex (Fundamental Types): Tidy up.
+
 	* object-files.tex (Relocation Types): Update GOT relocations.
 
 2000-07-27  Andreas Jaeger  <aj@suse.de>

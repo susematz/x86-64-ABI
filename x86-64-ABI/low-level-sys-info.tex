@@ -13,63 +13,62 @@ document is relevant only to 32/64-bit mode, unless stated otherwise.
 
 \subsection{Data Representation}
 
-In accordance with x86 tradition and \xARCH register names the terms
-byte, word, dword, qword and tword refer to the corresponding data
-objects of 8, 16, 32, 64 and 128 bits in size.
-
-\editornote{Is tword correct for 128 bits?  Elsewhere oword seems to
-  be used instead}
+Within this specification, the term \emph{halfword} refers to a 16-bit
+object, the term \emph{word} refers to a 32-bit object, the term
+\emph{doubleword} refers to a 64-bit object, and the term
+\emph{quadword} refers to a 128-bit object.
 
 \subsubsection{Fundamental Types}
 
-The basic types are specified in Table \ref{tab-basic-types}.  The
-\verb|__int128| and \verb|__mm64| types are optional.
+Figure~\ref{basic-types} shows the correspondence between ANSI C's
+scalar types and the processor's.
 
-\begin{table}
-  \caption{Basic Types}\label{tab-basic-types}
-  \begin{tabular}{lrllr}
+\begin{figure}
+  \caption{Scalar Types}\label{basic-types}
+  \begin{tabular}{l|l|c|c|l}
     \hline\noalign{\smallskip}
-    % multicolumn is used to shrink the table
-    &sizeof & type			&\multicolumn{2}{l}{C type\hfill alignment} \\
-    \noalign{\smallskip}\hline\noalign{\smallskip}
-    Integral:
-    &1	& signed byte		& char, signed char		& 1 \\
-    &1	& unsigned byte		& unsigned char, bool		& 1 \\
-    &2	& signed word		& short, singed short		& 2 \\
-    &2	& unsigned word		& unsigned short		& 2 \\
-    &4	& signed dword		& int, signed int, wchar	& 4 \\
-    &4	& unsigned dword	& unsigned int,			& 4 \\
-    &	&                       & unsigned wchar		& \\
-    &8	& signed qword		& long, signed long, 		& 8 \\
-    &	&                       & long long, 			& \\
-    &	&                       & signed long long		& \\
-    &8	& unsigned qword	& unsigned long,		& 8 \\
-    &	&                       & unsigned long long		& \\
-    &16	& signed tword		& \verb|__int128|, 		& 16 \\
-    &	& 		        & signed \verb|__int128|	&  \\
-    &16	& unsigned oword	& unsigned \verb|__int128|&	16 \\
+     & &  & \multicolumn{1}{c|}{Alignment} & \multicolumn{1}{c|}{x86-64} \\
+    \multicolumn{1}{c|}{Type} & \multicolumn{1}{c|}{C}
+     &  \texttt{sizeof} & (bytes)   
+     & \multicolumn{1}{c|}{Architecture}  \\
     \hline
-    Packed:
-    &8	& \MMX{} and 3DNOW	& \verb|__mm64|			& 8 \\
-    &16	& SSE and SSE-2		& \verb|__m128|			& 16 \\
+    & \texttt{char}        & 1 & 1 & signed byte \\
+    & \texttt{signed char} & & \\
+    \cline{2-5}
+    & \texttt{unsigned char} & 1 & 1 & unsigned byte \\
+    \cline{2-5}
+    & \texttt{short} & 2 & 2 & signed halfword \\
+    & \texttt{signed short} & & \\
+    \cline{2-5}
+    & \texttt{unsigned short} & 2 & 2 & unsigned halfword \\
+    \cline{2-5}
+    & \texttt{int} & 4 & 4 & signed word \\
+    Integral & \texttt{signed int} & & \\
+    & \texttt{enum} & & \\
+    \cline{2-5}
+    & \texttt{unsigned int} & 4 & 4 & unsigned word \\
+    \cline{2-5}
+    & \texttt{long} & 8 & 8 & signed doubleword \\
+    & \texttt{signed long} & & \\
+    & \texttt{long long} & & \\
+    & \texttt{signed long long} & & \\
+    \cline{2-5}
+    & \texttt{unsigned long} & 8 & 8 & unsigned doubleword \\
+    & \texttt{unsigned long long} & 8 & 8 & unsigned doubleword \\
     \hline
-    Pointer:
-    &8	& unsigned qword	& any type *			& 8 \\
+    Pointer & \texttt{\textit{any-type} *} & 8 & 8 & unsigned doubleword \\
+    & \texttt{\textit{any-type} (*)()} & & \\
     \hline
-    Floating-
-    &4	& single-precision (IEEE) & float			& 4 \\
-    point:&8	& double-precision (IEEE) & double		& 8 \\
-    &16	& extended-precision (IEEE) & long double		& 16 \\
+    & \texttt{float} & 4 & 4 & single-precision (IEEE) \\
+    Floating-point & \texttt{double} & 8 & 8 & double-precision (IEEE) \\
+    & \texttt{long double} & 16 & 16 & double extended-precision (IEEE) \\
     \hline
+    Packed & \texttt{__m64} & 8 & 8 & \MMX{} and 3DNow! \\
+    & \texttt{__m128} & 16 & 16 & SSE and SSE-2 \\
   \end{tabular}
-\end{table}
-
-The IEEE extended-precision type uses a 15 bits exponent, 113 bits for
-the mantissa (the high order significant bit is implicit) and an
-exponent bias of 16383.  This type is optional and needs software
-emulation.
-\editornote{Is it really optional? - probably not (HH)}
-\editornote{define optional 80-bit fp type?}
+\end{figure}
+\editornote{Should we define __int128?}
+\editornote{Why do we use 16-byte long doubles instead of 12?}
 
 A null pointer (for all types) has value zero.
 
@@ -381,8 +380,8 @@ arguments onto the stack and/or loads them into registers.
     \item[SSE-Integer type argument]
       SSE-Integer type argument is one of the following:
       \begin{itemize}
-	\item Aggregates and unions greater than 8~bytes and smaller than 17~bytes with class of first qword \emph{SSE}
-	  and second qword \emph{Int}
+        \item Aggregates and unions greater than 8~bytes and smaller than 17~bytes with class of first qword \emph{SSE}
+          and second qword \emph{Int}
       \end{itemize}
       If $\verb|sr| >= 6$ or $\verb|gr| >= 6$ go to other, otherwise pick \verb|sr|-th register from
       the sequence:
