@@ -488,6 +488,109 @@ arrangement appears in figure \ref{fig-cfg}.
 
 The following sections show only the difference to the i386 ABI.
 
+\subsection{Architectural Constraints}
+
+The \xARCH architecture usually does not allow to encode arbitrary
+64bit constants as immediate operand of the instruction.  Most
+instructions accept 32-bit immediates that are sign extended to the
+64-bit ones.  Additionally the 32-bit operations with register
+destinations implicitly perform zero extension making loads of 64-bit
+immediates with upper half set to 0 even cheaper.
+
+Additionally the branch instructions accept 32-bit immediate operands
+that are sign extended and used to adjust instruction pointer.
+Similarly an instruction pointer relative addressing mode exists for
+data accesses with equivalent limitations.
+
+In order to improve performance and reduce code size, it is desirable
+to use different \textindex{code models} depending on the
+requirements.
+
+Code models define constraints for symbolic values that allow the
+compiler to generate better code.  Basically code models differ in
+addressing (absolute versus position independent), code size, data
+size and address range.  We define only a small number of code models
+that are of general interest:
+
+\begin{description}
+\item[\textindex{small code model}] 
+  The virtual address of code executed is known at link time.
+  Additionally all symbols are known to be located in the virtual
+  addresses in the range from $0$ to $2^{31}-2^{10} - 1$.
+  
+  This allows the compiler to encode symbolic references with offsets
+  in the range from $-2^{31}$ to $2^{10}$ directly in the sign
+  extended immediate operands, with offsets in the range from $0$ to
+  $2^{31}+2^{10}$ in the zero extended immediate operands and use
+  instruction pointer relative addressing for the symbols wit offsets
+  in the range $-2^{10}$ to $2^{10}$.
+  
+  This is the fastest code model and we expect it to be suitable for
+  the vast majority of programs.
+
+\item[\textindex{kernel code model}]
+  
+  The kernel of an operating system is usually rather small but runs
+  in the negative half of the address space.  So we define all symbols
+  to be in the range from $2^{64}-2^{31}$ to $2^{64}-2^{10}$.
+  
+  This code model has advantages similar to those of the small model,
+  but allows encoding of zero extended symbolic references only for
+  offsets from $2^{31}$ to $2^{31}+2^{10}$. The range offsets for
+  sign extended reference changes to $0$--$2^{31}+2^{10}$.
+
+\item[\textindex{medium code model}]
+  
+  The medium code model does not make any assumptions about the range
+  of symbolic references to data sections. Size and address of the
+  text section have the same limits as the small code model.
+  
+  This model requires the compiler to use \code{movabs} instructions
+  to access static data and to load addresses into register, but keeps
+  the advantages of the small code model for manipulation of addresses
+  to the text section (specially needed for branches).
+
+\item[\textindex{large code model}]
+  
+  The large code model makes no assumptions about addresses and sizes
+  of sections.
+  
+  The compiler is required to use the \code{movabs} instruction, as in
+  the medium code model, even for dealing with addresses inside the
+  text section.  Additionally, indirect branches are needed when
+  branching to addresses whose offset from the current instruction
+  pointer is unknown.
+  
+  It is possible to avoid the limitation for the text section by
+  breaking up the program into multiple shared libraries, so we do not
+  expect this model to be needed in the foreseeable future.
+
+\item[\textindex{Small position independent code model} (\textindex{PIC})]
+  
+  Unlike the previous models, the virtual addresses of instructions
+  and data are not known until dynamic link time.  So all addresses
+  have to be relative to the instruction pointer.
+  
+  Additionally the maximum distance between a symbol and the end of an
+  instruction is limited to $2^{31}-2^{10}-1$, allowing the compiler
+  to use instruction pointer relative branches and addressing modes
+  supported by the hardware for every symbol with an offset in the
+  range $-2^{10}$ to $2^{10}$.
+
+\item[\textindex{Medium position independent code model}
+  (\textindex{PIC})]
+  
+  This model is like the previous model, but makes no assumptions
+  about the distance of symbols to the data section.
+  
+\item[\textindex{Large position independent code model}
+  (\textindex{PIC})]
+  
+  This model is like the previous model, but makes no assumptions
+  about the distance of symbols.
+
+\end{description}
+
 \subsection{Position-Independend Function Prologue}
 
 \xARCH does not need any function prologue for calculating the global
