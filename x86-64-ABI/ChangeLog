@@ -1,3 +1,8 @@
+2000-08-01  Mark Mitchell  <mark@codesourcery.com>
+
+	* object-files.tex (Machine Information): Set machine id.
+	(Relocations): Change R_X8664_GOTPC to X8664_GOTPCREL.
+
 2000-07-31  Andreas Jaeger  <aj@suse.de>
 
 	* dl.tex (Proposal 1: RW-PLT): Rewrite.
