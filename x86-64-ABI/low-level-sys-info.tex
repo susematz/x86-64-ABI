@@ -159,7 +159,7 @@ mode as a 64-bit register.  All of these registesr are global to all
 procedures in a running program.
 
 This subsection discusses usage of each register.  Registers \RBP and
-\reg{r8} through \reg{r15} ``belong'' to the calling function and the
+\reg{r10} through \reg{r15} ``belong'' to the calling function and the
 called function is required to preserve their values.  In other words,
 a called function must preserve these registers' values for its
 caller.  Remaining registers ``belong'' to the called
@@ -173,7 +173,8 @@ every function that uses the x87 register stack is required to issue
 an \op{emms} or \op{femms} instruction before accessing the x87
 register stack.\footnote{All \MMX{} registers are caller-saved, so
   callees that make use of the x87 register stack may use the fsater
-  \op{femms} instruction.}
+  \op{femms} instruction.}  The direction flag in the \reg{eflags}
+register must be clear on function entry, and on function return.
 
 \subsection{The Stack Frame}
 In addition to registers, each function has a frame on the run-time
@@ -200,7 +201,9 @@ stack.  This stack grows downwards from high addresses.  Figure
       \cline{2-2}
       \code{-8(\RBP)} & unspecified & Current \\ 
       & \dots & \\ 
-      \code{0(\RSP)} & variable size
+      \code{0(\RSP)} & variable size \\
+      \cline{2-2}
+      \code{128(\RSP)} & red zone\\
     \end{tabular}
   \end{center}
 \Hrule
@@ -209,12 +212,21 @@ stack.  This stack grows downwards from high addresses.  Figure
 The end of the input argument area shall be aligned on a 16 byte
 boundary.  In other words, the value $(\RSP - 8)$ is always a multiple
 of $16$ when control is transferred to the function entry point.  The
-stack pointer, \RSP, always point to the end of the latest allocated
+stack pointer, \RSP, always points to the end of the latest allocated
 stack frame.  \footnote{The conventional use of \RBP{} as a frame
   pointer for the stack frame may be avoided by using \RSP (the stack
   pointer) to index into the stack frame.  This technique saves two
   instructions in the prologue and epilogue and makes one additional
   general-purpose register (\RBP) available.}
+
+The 128-byte area beyond the location pointed to by \RSP is considered
+shall not be modified by signal or interrupt
+handlers.\footnote{Locations within 128 bytes can be addressed using
+  one-byte displacements.}  Therefore, functions may use this area for
+temporary data that is not needed across function calls.  In
+particular, leaf functions may use this area for their entire stack
+frame, rather than ajdusting the stack pointer in the prologue and
+epilogue.
 
 \subsection{Parameter Passing}
 
@@ -242,17 +254,23 @@ If the argument is a scalar type, other than \code{__m64} or
 suitable for its type.  In particular, arguments of integral or
 pointer type are placed in the next available general purpose
 register, taken in the order \RAX, \RDX, \RCX, \RBX, \RSI, and \RDI.
-Arguments of floating point type and of type \code{__m128}, are placed
-in the next available SSE register, taken in order from \reg{xmm0} to
-\reg{xmm15}.  If no registers are available, the values are placed on
-the stack.
+\footnote{Note that \reg{r8} and \reg{r9} are not required to be
+  preserved, nor are they used to pass arguments.  Making these
+  registers available as scratch registers means that code in the PLT
+  need not spill any registers when computing the address to which
+  control needs to be transferred.}  Arguments of floating point type
+and of type \code{__m128}, are placed in the next available SSE
+register, taken in order from \reg{xmm0} to \reg{xmm15}.  If no
+registers are available, the values are placed on the stack.
 
-Scalar values of type \code{__int128} are handled as they consisted
-of two separate 64-bit arguments of type \code{long}.  The 64
-low-order bits are considered to be the first argument, and therefore
-processed second.\footnote{Thus, if all 128 bits are placed on the
-  stack, the low-order bits will be at a lower address, which allows
-  the caller to access the value normally.}
+Scalar values of type \code{__int128} are handled almost as if they
+consisted of two separate 64-bit arguments of type \code{long}.  The
+64 low-order bits are considered to be the first argument, and
+therefore processed second.\footnote{Thus, if the value is placed on
+  the stack, the low-order bits will be at a lower address, which
+  allows the caller to access the value normally.}  If there are not
+sufficiently manly registers available to allow passing both arguments
+in registers, then the value is passed on the stack.
 
 Scalar values of type \code{__m64} are always placed on the stack.
 
@@ -272,22 +290,34 @@ types,\footnote{A non-POD object cannot be returned in registers
 required by the alignment of the structure or union type being passed.
 Then, the structure value is copied onto the stack.
 
-Structure or union objects that contain fewer than 16 bytes, do not
+Structure or union objects that contain no more than 16 bytes, do not
 contain any scalar components of type \code{__m64}, and, in C++, are
 PODs, are passed in registers, if registers are available.  If the
 entire structure cannot be placed in registers as described below,
-then the structure is passed on the stack, as above.  If the structure
-contains a single scalar component, then it is passed as if it were a
-single argument of that scalar type.  Otherwise, the first (or only,
-if the structure has fewer than 8 bytes), doubleword of the sturcture
-is passed first.  If the first doubleword consists of a single scalar
-component of floating point type, the first doubleword is passed as if
-it were an argument of that floating point type.  Otherwise, the
-doubleword is passed as if it were a single integer argument, using
-the smallest type sufficient to contain the argument.  Any bytes not
-used by the value passed have undefined contents.  If the structure
-has more than 8 bytes, then the process is repeated for the second
-doubleword.
+then the structure is passed on the stack, as above.  
+
+If the structure contains a single scalar component, then it is passed
+as if it were a single argument of that scalar type.
+
+Otherwise, the first (or only, if the structure has no more than 8
+bytes), doubleword of the sturcture is passed first.  If all scalar
+components in the first are of floating point type, the first
+doubleword is passed as if it were an argument of floating point type.
+If there is only one component, the argument is passed as if it were
+an argument of that type.  If all the components begin at the same
+address, then the component is passed as if it were an argument of the
+longest floating point type used by these components.  Otherwise, the
+argument is passed as if it were an argument of type
+\code{__float128}.\footnote{In this case, there will be no padding
+  bits, because this case can only occur if there is a value of type
+  \code{float} in the second word of the doubleword.}
+
+Otherwise, the doubleword is passed as if it were a single integer
+argument, using the smallest type sufficient to contain the argument.
+Any bytes not used by the value passed have undefined contents.  
+
+If the structure has more than 8 bytes, then the process is repeated
+for the second doubleword.
 
 \subsection{Functions Returning Scalars or No Value}
 

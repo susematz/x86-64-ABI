@@ -1,3 +1,11 @@
+2000-09-23  Jan Hubicka  <jh@suse.cz>
+            Mark Mitchell  <mark@codesourcery.com>
+
+	* low-level-sys-info.tex: Allow R8 and R9 to be scratch registers.
+	Add red zone.  Allow structures containing multiple floating
+	point values in a single doubleword to be passed in an SSE
+	register.
+
 2000-09-22  Mark Mitchell  <mark@codesourcery.com>
 
 	* low-level-sys-info.tex: Make all XMM registers caller-saved.
