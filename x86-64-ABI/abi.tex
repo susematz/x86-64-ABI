@@ -19,16 +19,20 @@ Draft Version \version}}
 \section*{Revision History}
 
 \begin{description}
-\item[0.19 --- 2002-03-27] Set name of Linux dynamic linker, mention
-  \reg{fs}.
-  Incorporate changes from H. Peter Anvin <hpa@zytor.com>
-  for booleans and define handling of sub-64-bit integer types in
-  registers.
+\item[0.21] Define \code{__int128} as class INTEGER in register
+  passing.  Mention that \reg{al} is used for variadic argument lists.  Fix
+  some textual problems.  Thanks to H. Peter Anvin, Bo Thorsen, and
+  Michael Matz.
 \item[0.20 --- 2002-07-11] Change DWARF register number values of
   \RBX, \RSI, \RSI (thanks to Michal Ludvig).  Fix footnotes for
   fundamental types (thanks to H. Peter Anvin). Specify \code{size\_t}
   (thanks to Bo Thorsen and Andreas Schwab).  Add new section on
   floating point environment functions.
+\item[0.19 --- 2002-03-27] Set name of Linux dynamic linker, mention
+  \reg{fs}.
+  Incorporate changes from H. Peter Anvin <hpa@zytor.com>
+  for booleans and define handling of sub-64-bit integer types in
+  registers.
 \end{description}
 
 \include{introduction}

@@ -1,3 +1,10 @@
+2002-09-04  Andreas Jaeger  <aj@suse.de>
+
+	* Various textual fixes from Michael Matz.
+	* low-level-sys-info.tex (paragraph{Classification}): Clarify that
+	__int128 is passed in registers.
+	(paragraph{Passing}): %al is used for varargs.
+
 2002-07-11  Andreas Jaeger  <aj@suse.de>
 
 	* libraries.tex (subsection{Floating Point Environment

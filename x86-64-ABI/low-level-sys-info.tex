@@ -298,7 +298,18 @@ The basic types are assigned their natural classes:
 \item The 64-bit mantissa of arguments of type \code{long double}
   belongs to class X87, the 16-bit exponent plus 6 bytes of padding
   belongs to class X87UP.
-\item Arguments of type \code{__int128} are in the MEMORY class.
+\item Arguments of type \code{__int128} offer the same operations as
+INTEGERs, yet they do not fit into one general purpose register but
+require two registers.  For
+classification purposes \code{__int128} is treated as if it
+were implemented as:
+\begin{code}
+typedef struct {
+  long low, high;
+} __int128;
+\end{code}
+with the exception that arguments of type \code{__int128} that are
+stored in memory must be aligned on a 16-byte boundary.
 \end{itemize}
 
 
@@ -309,9 +320,9 @@ types works as follows:
 \item If the size of an object is larger than two \eightbytes, or
     in C++, is a non-\textindex{POD}%
 \footnote{The term POD is from the ANSI/ISO C++ Standard, and
-    stands for Plain Ol' Data.  Although the exact definition is
+    stands for Plain Old Data.  Although the exact definition is
     technical, a POD is essentially a structure or union that could
-    could have been written in C; there cannot be any member
+    have been written in C; there cannot be any member
     functions, or base classes, or similar C++ extensions.}
   structure or union type, or contains unaligned fields, it has class
   MEMORY.%
@@ -430,17 +441,21 @@ on the stack in reversed (right-to-left\footnote{Right-to-left order
 
 For calls that may call functions that use varargs or stdargs
 (prototype-less calls or calls to functions containing ellipsis
-(\dots) in the declaration) \RAX is used as hidden argument to specify
-the number of SSE registers used. The contents of \RAX do not need to
+(\dots) in the declaration) \reg{al}
+\footnote{Note that the rest of \RAX is undefined, only the contents
+  of \reg{al} is defined.}
+ is used as hidden argument to specify
+the number of SSE registers used. The contents of \reg{al} do not need to
 match exactly the number of registers, but must be an upper bound on
-the number of SSE registers used and is in the range 0--7 inclusive.
+the number of SSE registers used and is in the range 0--8 inclusive.
+
 
 \paragraph{Returning of Values}
 The returning of values is done according to the following algorithm:
 \begin{enumerate}
-\item Classify the return value with the classification algorithm.
+\item Classify the return type with the classification algorithm.
 
-\item If the value has class MEMORY, then the caller provides space for
+\item If the type has class MEMORY, then the caller provides space for
    the return value and passes the address of this storage in \RDI as
    if it were the first argument to the function.  In effect, this
    address becomes a ``hidden'' first argument.
@@ -456,7 +471,7 @@ The returning of values is done according to the following algorithm:
    sequence \reg{xmm0}, \reg{xmm1} is used.
 
 \item If the class is SSEUP, the \eightbyte is passed in the upper half of the
-   least used SSE register.
+   last used SSE register.
 
 \item If the class is X87, the value is returned on the X87 stack in
    \reg{st0} as 80-bit x87 number.
@@ -774,8 +789,6 @@ specified as follows:
   real group id of the process.
 \item[AT_EGID] The \code{a_val} member of this entry holds the
   effective group id of the process.
-\item[AT_EUID] The \code{a_val} member of this entry holds the
-  effective user id of the process.
 \end{description}
 
 
@@ -1262,11 +1275,11 @@ requires processor-specific address class codes to be defined.
 
 \subsection{DWARF Register Number Mapping}
 
-Table \ref{tbl-reg-num-map} outlines the register number mapping
-for the \xARCH processor family.%
+Table \ref{tbl-reg-num-map}\footnote{The table defines Return Address
+  to have a register number, even though the address is stored in
+  0(\RSP) and not in a physical register.}  outlines the register
+number mapping for the \xARCH processor family.%
 \footnote{This document does not define mappings for privileged registers.}%
-\footnote{The table defines Return Address to have a register number, even
-though the address is stored in 0(\RSP) and not in a physical register.}
 
 \begin{figure}
 \caption{DWARF Register Number Mapping} \label{tbl-reg-num-map}
