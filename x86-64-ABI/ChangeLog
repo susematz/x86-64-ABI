@@ -1,3 +1,7 @@
+2000-12-06  Andreas Jaeger  <aj@suse.de>
+
+	* libraries.tex (subsection{Global Data Symbols}): New section.
+
 2000-11-13  Andreas Jaeger  <aj@suse.de>
 
 	* low-level-sys-info.tex: Fix typos, clarify return registers.
