@@ -245,7 +245,5 @@ struniargs ()
 {
   test_struct_passing ();
   test_mixed_passing ();
-
-  /* FIXME: This doesn't work right now??  */
   test_union_passing ();
 }
