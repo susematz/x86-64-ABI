@@ -60,7 +60,7 @@ object files have separate procedure linkage tables.
 \begin{center}
 \begin{tabular}{|lll|}
 \hline
-.PLT0: & pushl & got\_plus\_8; GOT[1]\\
+.PLT0: & pushq & got\_plus\_8; GOT[1]\\
 & jmp &got\_plus\_16 ; GOT[2] \\
 & nop & \\
 & nop & \\
@@ -86,7 +86,7 @@ object files have separate procedure linkage tables.
 \begin{center}
 \begin{tabular}{|lll|}
 \hline
-.PLT0: & pushl & GOT+8(\%rip); GOT[1]\\
+.PLT0: & pushq & GOT+8(\%rip); GOT[1]\\
 & jmp &GOT+16(\%rip) ; GOT[2] \\
 & nop & \\
 & nop & \\
@@ -146,7 +146,7 @@ The \code{LD_BIND_NOW} environment variable can change the dynamic
 linking behavior.  If its value is non-null, the dynamic linker
 evaluates procedure linkage table entries before transferring control
 to the program.  That is, the dynamic linker processes relocation
-entries of type \codeindex{R_X8664_JMP_SLOT}
+entries of type \codeindex{R_X86_64_JMP_SLOT}
 during process initialization.  Otherwise, the dynamic linker
 evaluates procedure linkage table entries lazily, delaying symbol
 resolution and relocation until the first execution of a table entry.
