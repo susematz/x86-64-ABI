@@ -252,7 +252,7 @@ described in the following sections.
 
 \paragraph{Definitions}
 We first define a number of classes to classify arguments.  The
-classes correspondend to x86-64 register classes and are:
+classes are corresponding to x86-64 register classes and defined as:
 
 \begin{description}
 \item[INTEGER] This class consists of integral types that fit into one of
@@ -281,8 +281,8 @@ The basic types are assigned their natural classes:
 \item Arguments of types \code{float}, \code{double} and \code{__m64}
   are in class SSE.
 \item Arguments of types \code{__float128} and \code{__m128} are split
-  into two halfs.  The least significant ones belong to class SSE, the
-  most significand one to class SSEUP.
+  into two halves.  The least significant ones belong to class SSE, the
+  most significant one to class SSEUP.
 \item The 64-bit mantissa of arguments of type \code{long double}
   belongs to class X87, the 16-bit exponent plus 6 bytes of padding
   belongs to class X87UP.
@@ -300,7 +300,7 @@ types works as follows:
     stands for Plain Ol' Data.  Although the exact definition is
     technical, a POD is essentially a structure or union that could
     could have been written in C; there cannot be any member
-    functions, or base classes, or similar C++ extensions.} 
+    functions, or base classes, or similar C++ extensions.}
   structure or union type, or contains unaligned fields, it has class
   MEMORY.%
    \footnote{A non-POD object cannot be passed in registers
@@ -352,7 +352,7 @@ left-to-right order) for passing as follows:
 
 \item If the class is SSE, the next available SSE register is used, the
    registers are taken in the order from \reg{xmm0} to \reg{xmm15}.
-   
+
 item If the class is SSEUP, the \eightbyte is passed in the upper
    half of the least used SSE register.
 
@@ -430,7 +430,7 @@ The returning of values is done according to the following algorithm:
    the return value and passes the address of this storage in \RDI as
    if it were the first argument to the function.  In effect, this
    address becomes a ``hidden'' first argument.
-   
+
 \item If the class is INTEGER, the next available register of the
    sequence \RAX, \RDX is used.
 
@@ -580,7 +580,7 @@ generate a bounds check fault in long mode.
 
 The \xARCH architecture defines floating point instructions.  At
 process startup the two floating point units, SSE2 and x87, both have
-all floating-point excection status flags cleared.  The status of the
+all floating-point exception status flags cleared.  The status of the
 control words is as defined in tables \ref{x87-fpucw} and
 \ref{mxcsr-status}.
 
@@ -596,7 +596,7 @@ control words is as defined in tables \ref{x87-fpucw} and
       \texttt{RC} & 0 & Round to nearest\\
       \texttt{PC} & 11& Double extended precision\\
       \texttt{PM} & 1& Precision masked\\
-      \texttt{UM} & 1& Undeflow masked\\
+      \texttt{UM} & 1& Underflow masked\\
       \texttt{OM} & 1& Overflow masked\\
       \texttt{ZM} & 1& Zero divide masked\\
       \texttt{DM} & 1& Denormal operand masked\\
@@ -614,15 +614,15 @@ control words is as defined in tables \ref{x87-fpucw} and
     \begin{tabular}[t]{l|l|l}
       \multicolumn{1}{c}{Field} & \multicolumn{1}{c}{Value}& \multicolumn{1}{c}{Note} \\
       \hline
-      \texttt{FZ} & 0 & Flush to zero\\
+      \texttt{FZ} & 0 & Do not flush to zero\\
       \texttt{RC} & 0 & Round to nearest\\
       \texttt{PM} & 1& Precision masked\\
-      \texttt{UM} & 1& Undeflow masked\\
+      \texttt{UM} & 1& Underflow masked\\
       \texttt{OM} & 1& Overflow masked\\
       \texttt{ZM} & 1& Zero divide masked\\
       \texttt{DM} & 1& Denormal operand masked\\
       \texttt{IM} & 1& Invalid operation masked\\
-      \texttt{DAZ} & 0 & Denormals are zero\\
+      \texttt{DAZ} & 0 & Denormals are not zero\\
     \end{tabular}
   \end{center}
 \Hrule

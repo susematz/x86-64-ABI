@@ -1,4 +1,3 @@
-
 \chapter{Libraries}
 
 A further review of the \intelabi is needed.
@@ -13,12 +12,12 @@ are not provided by the \xARCH ABI.
 \section{Unwind Library Interface}
 
 This section defines the \textindex{Unwind Library interface}%
-\footnote{The overall structure and the external interface is derived 
-from the IA-64 UNIX System V ABI}, 
-expected to be provided by any \xARCH psABI-compliant system. 
-This is the interface on which the C++ ABI exception-handling 
+\footnote{The overall structure and the external interface is derived
+from the IA-64 UNIX System V ABI},
+expected to be provided by any \xARCH psABI-compliant system.
+This is the interface on which the C++ ABI exception-handling
 facilities are built. We assume as a basis the
-\textindex{Call Frame Information tables} described in the 
+\textindex{Call Frame Information tables} described in the
 \textindex{DWARF Debugging Information Format} document.
 
 This section is meant to specify a language-independent interface that
@@ -50,7 +49,7 @@ requiring exception processing. The personality routine is called by
 the unwinder to handle language-specific tasks such as identifying the
 frame handling a particular exception.
 
-\subsection{Exception Handler Framework} 
+\subsection{Exception Handler Framework}
 
 \subsubsection{Reasons for Unwinding}
 There are two major reasons for unwinding the stack:
@@ -73,7 +72,7 @@ whether ``native'' or ``foreign''.  Some guidelines for ``acting properly''
 are given below.
 
 \item During ``forced unwinding'', on the other hand, an external agent is
-driving the unwinding. For instance, this can be the \texttt{longjump}
+driving the unwinding. For instance, this can be the \texttt{longjmp}
 routine. This external agent, not each personality routine,
 knows when to stop unwinding. The fact that a personality routine is
 not given a choice about whether unwinding will proceed is indicated by the
@@ -86,11 +85,11 @@ under control of the personality routines. \codeindex{\_Unwind\_ForcedUnwind},
 on the other hand, performs unwinding, but gives an external agent the
 opportunity to intercept calls to the personality routine. This is done using
 a proxy personality routine, that intercepts calls to the personality routine,
-letting the external agent override the defaults of the stack frame's 
+letting the external agent override the defaults of the stack frame's
 personality routine.
 
-As a consequence, it is not necessary for each personality routine to know 
-about any of the possible external agents that may cause an unwind. For 
+As a consequence, it is not necessary for each personality routine to know
+about any of the possible external agents that may cause an unwind. For
 instance, the C++ personality routine need deal only with C++ exceptions
 (and possibly disguising foreign exceptions), but it does not need to know
 anything specific about unwinding done on behalf of \texttt{longjmp} or
@@ -116,11 +115,11 @@ the API.
 \item If the search phase reports a failure, e.g. because no handler was
 found, it will call \codeindex{terminate()} rather than commence phase 2.
 
-If the search phase reports success, the framework restarts in the 
+If the search phase reports success, the framework restarts in the
 \emph{cleanup} phase. Again, it repeatedly calls the personality
 routine, with the \codeindex{\_UA\_CLEANUP\_PHASE} flag as described
 below, first for the current \RIP and register state, and then unwinding
-a frame to a new \RIP at each step, until it gets to the frame with 
+a frame to a new \RIP at each step, until it gets to the frame with
 an identified handler. At that point, it restores the register state,
 and control is transferred to the user landing pad code.
 \end {itemize}
@@ -163,7 +162,7 @@ is described in the following sections.
 
 \subsubsection{Reason Codes}
 
-The unwind interface uses reason codes in several contexts to identify the 
+The unwind interface uses reason codes in several contexts to identify the
 reasons for failures or other actions, defined as follows:
 
 \code{
@@ -182,7 +181,7 @@ reasons for failures or other actions, defined as follows:
 \end{tabular}
 }
 
-The interpretations of these codes are described below. 
+The interpretations of these codes are described below.
 
 \subsubsection{Exception Header}
 
@@ -211,56 +210,56 @@ by the unwind interface, defined as follows:
 \end{tabular}
 }
 
-An \_Unwind\_Exception object must be double-word aligned.  The first
+An \code{\_Unwind\_Exception} object must be \eightbyte aligned.  The first
 two fields are set by user code prior to raising the exception, and the
 latter two should never be touched except by the runtime.
 
-The exception\_class field is a language- and implementation-specific
+The \code{exception\_class} field is a language- and implementation-specific
 identifier of the kind of exception. It allows a personality routine
 to distinguish between native and foreign exceptions, for example.
 By convention, the high 4 bytes indicate the vendor (for instance
 AMD$\backslash$0), and the low 4 bytes indicate the language.  For the C++
 ABI described in this document, the low four bytes are C++$\backslash$0.
 
-The exception\_cleanup routine is called whenever an exception object 
+The \code{exception\_cleanup} routine is called whenever an exception object
 needs to be destroyed by a different runtime than the runtime
-which created the exception object, for instance if a Java exception 
+which created the exception object, for instance if a Java exception
 is caught by a C++ catch handler. In such a case, a reason code (see
-above) indicates why the exception object needs to be deleted: 
+above) indicates why the exception object needs to be deleted:
 
 \begin{description}
-\item[\_URC\_FOREIGN\_EXCEPTION\_CAUGHT = 1] This indicates that a 
-     different runtime caught this exception. Nested foreign exceptions, 
-     or rethrowing a foreign exception, result in undefined behavior. 
+\item[\code{\_URC\_FOREIGN\_EXCEPTION\_CAUGHT = 1}] This indicates that a
+     different runtime caught this exception. Nested foreign exceptions,
+     or rethrowing a foreign exception, result in undefined behavior.
 
-\item[\_URC\_FATAL\_PHASE1\_ERROR = 3] The personality routine encountered 
-     an error during phase 1, other than the specific error codes defined. 
+\item[\code{\_URC\_FATAL\_PHASE1\_ERROR = 3}] The personality routine encountered
+     an error during phase 1, other than the specific error codes defined.
 
-\item[\_URC\_FATAL\_PHASE2\_ERROR = 2] The personality routine encountered 
-     an error during phase 2, for instance a stack corruption.
+\item[\code{\_URC\_FATAL\_PHASE2\_ERROR = 2}] The personality routine
+  encountered an error during phase 2, for instance a stack corruption.
 \end{description}
 
-Normally, all errors should be reported during phase 1 by returning 
-from \_Unwind\_RaiseException. However, landing pad code could cause 
-stack corruption between phase 1 and phase 2. For a C++ exception, 
-the runtime should call terminate() in that case. 
+Normally, all errors should be reported during phase 1 by returning
+from \code{\_Unwind\_RaiseException}. However, landing pad code could cause
+stack corruption between phase 1 and phase 2. For a C++ exception,
+the runtime should call \code{terminate()} in that case.
 
-The private unwinder state (private\_1 and private\_2) in an exception
+The private unwinder state (\code{private\_1} and \code{private\_2}) in an exception
 object should be neither read by nor written to by personality routines or
 other parts of the language-specific runtime.  It is used by the specific
 implementation of the unwinder on the host to store internal information,
 for instance to remember the final handler frame between unwinding phases.
 
 In addition to the above information, a typical runtime such as the
-C++ runtime will add language-specific information used to process
-the exception.  This is expected to be a contiguous area of memory
-after the \_Unwind\_Exception object, but this is not required as long
-as the matching personality routines know how to deal with it, and the
-exception\_cleanup routine de-allocates it properly.
+C++ runtime will add language-specific information used to process the
+exception.  This is expected to be a contiguous area of memory after
+the \code{\_Unwind\_Exception} object, but this is not required as
+long as the matching personality routines know how to deal with it,
+and the \code{exception\_cleanup} routine de-allocates it properly.
 
 \subsubsection{Unwind Context}
 
-The \_Unwind\_Context type is an opaque type used to refer to a
+The \code{\_Unwind\_Context} type is an opaque type used to refer to a
 system-specific data structure used by the system unwinder.  This context
 is created and destroyed by the system, and passed to the personality
 routine during unwinding.
@@ -271,7 +270,7 @@ struct \_Unwind\_Context\\
 
 \subsection{Throwing an Exception}
 
-\subsubsection{\_Unwind\_RaiseException}
+\subsubsection{\code{\_Unwind\_RaiseException}}
 
 \code{
 \begin{tabular}{l}
@@ -281,36 +280,36 @@ struct \_Unwind\_Context\\
 }
 
 Raise an exception, passing along the given exception object,
-which should have its exception\_class and exception\_cleanup fields
+which should have its \code{exception\_class} and \code{exception\_cleanup} fields
 set. The exception object has been allocated by the language-specific
 runtime, and has a language-specific format, except that it must
-contain an \_Unwind\_Exception struct (see Exception Header above).
-\_Unwind\_RaiseException does not return, unless an error condition is
+contain an \code{\_Unwind\_Exception} struct (see Exception Header above).
+\code{\_Unwind\_RaiseException} does not return, unless an error condition is
 found (such as no handler for the exception, bad stack format, etc.).
-In such a case, an \_Unwind\_Reason\_Code value is returned.
+In such a case, an \code{\_Unwind\_Reason\_Code} value is returned.
 
-Possibilities are: 
+Possibilities are:
 \begin{description}
-\item[\_URC\_END\_OF\_STACK] The unwinder encountered the end of the 
-   stack during phase 1, without finding a handler. The unwind runtime 
-   will not have modified the stack. The C++ runtime will normally call 
-   uncaught\_exception() in this case. 
-\item[\_URC\_FATAL\_PHASE1\_ERROR] The unwinder encountered an unexpected 
-   error during phase 1, e.g. stack corruption. The unwind runtime will 
-   not have modified the stack. The C++ runtime will normally call 
-   terminate() in this case. 
+\item[\code{\_URC\_END\_OF\_STACK}] The unwinder encountered the end of the
+   stack during phase 1, without finding a handler. The unwind runtime
+   will not have modified the stack. The C++ runtime will normally call
+   \code{uncaught\_exception()} in this case.
+\item[\code{\_URC\_FATAL\_PHASE1\_ERROR}] The unwinder encountered an unexpected
+   error during phase 1, e.g. stack corruption. The unwind runtime will
+   not have modified the stack. The C++ runtime will normally call
+   \code{terminate()} in this case.
 \end{description}
 
-If the unwinder encounters an unexpected error during phase 2, 
-it should return \_URC\_FATAL\_PHASE2\_ERROR to its caller. 
-In C++, this will usually be \_\_cxa\_throw, which will call terminate(). 
+If the unwinder encounters an unexpected error during phase 2,
+it should return \code{\_URC\_FATAL\_PHASE2\_ERROR} to its caller.
+In C++, this will usually be \code{\_\_cxa\_throw}, which will call terminate().
 
-The unwind runtime will likely have modified the stack (e.g. popped 
-frames from it) or register context, or landing pad code may have 
-corrupted them. As a result, the the caller of \_Unwind\_RaiseException 
-can make no assumptions about the state of its stack or registers. 
+The unwind runtime will likely have modified the stack (e.g. popped
+frames from it) or register context, or landing pad code may have
+corrupted them. As a result, the the caller of \code{\_Unwind\_RaiseException}
+can make no assumptions about the state of its stack or registers.
 
-\subsubsection{\_Unwind\_ForcedUnwind}
+\subsubsection{\code{\_Unwind\_ForcedUnwind}}
 
 \code{
 \begin{tabular}{l}
@@ -334,65 +333,64 @@ can make no assumptions about the state of its stack or registers.
 }
 
 Raise an exception for forced unwinding, passing along the given
-exception object, which should have its exception\_class and
-exception\_cleanup fields set. The exception object has been allocated
+exception object, which should have its \code{exception\_class} and
+\code{exception\_cleanup} fields set. The exception object has been allocated
 by the language-specific runtime, and has a language-specific format,
-except that it must contain an \_Unwind\_Exception struct (see Exception
+except that it must contain an \code{\_Unwind\_Exception} struct (see Exception
 Header above).
 
 Forced unwinding is a single-phase process (phase 2 of the normal
-exception-handling process). The stop and stop\_parameter parameters
-control the termination of the unwind process, instead of the usual
-personality routine query. The stop function parameter is called for each
-unwind frame, with the parameters described for the usual personality
-routine below, plus an additional stop\_parameter.
+exception-handling process). The \code{stop} and
+\code{stop\_parameter} parameters control the termination of the
+unwind process, instead of the usual personality routine query. The
+\code{stop} function parameter is called for each unwind frame, with
+the parameters described for the usual personality routine below, plus
+an additional \code{stop\_parameter}.
 
-When the stop function identifies the destination frame, it
+When the \code{stop} function identifies the destination frame, it
 transfers control (according to its own, unspecified, conventions)
 to the user code as appropriate without returning, normally after
-calling \_Unwind\_DeleteException. If not, it should return an
-\_Unwind\_Reason\_Code value as follows:
+calling \code{\_Unwind\_DeleteException}. If not, it should return an
+\code{\_Unwind\_Reason\_Code} value as follows:
 
 \begin{description}
-\item[\_URC\_NO\_REASON] 
-     This is not the destination frame. The unwind 
+\item[\code{\_URC\_NO\_REASON}]
+     This is not the destination frame. The unwind
      runtime will call the frame's personality routine with the
-     \_UA\_FORCE\_UNWIND and \_UA\_CLEANUP\_PHASE flags set in actions, 
-     and then unwind to the next frame and call the stop function again. 
+     \code{\_UA\_FORCE\_UNWIND} and \code{\_UA\_CLEANUP\_PHASE} flags set in actions,
+     and then unwind to the next frame and call the stop function again.
 
-\item[\_URC\_END\_OF\_STACK] In order to allow \_Unwind\_ForcedUnwind 
-     to perform special processing when it reaches the end of the stack, 
-     the unwind runtime will call it after the last frame is rejected, 
-     with a NULL stack pointer in the context, and the stop function must 
-     catch this condition (i.e. by noticing the NULL stack pointer). 
-     It may return this reason code if it cannot handle end-of-stack. 
+\item[\code{\_URC\_END\_OF\_STACK}] In order to allow \code{\_Unwind\_ForcedUnwind}
+     to perform special processing when it reaches the end of the stack,
+     the unwind runtime will call it after the last frame is rejected,
+     with a \code{NULL} stack pointer in the context, and the stop function must
+     catch this condition (i.e. by noticing the \code{NULL} stack pointer).
+     It may return this reason code if it cannot handle end-of-stack.
 
-\item[\_URC\_FATAL\_PHASE2\_ERROR] The stop function may return this code 
-     for other fatal conditions, e.g. stack corruption. 
+\item[\code{\_URC\_FATAL\_PHASE2\_ERROR}] The stop function may return this code
+     for other fatal conditions, e.g. stack corruption.
 \end{description}
 
-If the stop function returns any reason code other than \_URC\_NO\_REASON, 
-the stack state is indeterminate from the point of view of the caller of 
-\_Unwind\_ForcedUnwind. Rather than attempt to return, therefore, 
-the unwind library should return \_URC\_FATAL\_PHASE2\_ERROR to its caller. 
+If the stop function returns any reason code other than \code{\_URC\_NO\_REASON},
+the stack state is indeterminate from the point of view of the caller of
+\code{\_Unwind\_ForcedUnwind}. Rather than attempt to return, therefore,
+the unwind library should return \code{\_URC\_FATAL\_PHASE2\_ERROR} to its caller.
 
-\code{
-     Example: longjmp\_unwind()\\
-}
+\paragraph{Example: \code{longjmp\_unwind()}\\}
 
-The expected implementation of longjmp\_unwind() is as follows.
-The setjmp() routine will have saved the state to be restored in its
-customary place, including the frame pointer. The longjmp\_unwind()
-routine will call \_Unwind\_ForcedUnwind with a stop function that
+The expected implementation of \code{longjmp\_unwind()} is as follows.
+The \code{setjmp()} routine will have saved the state to be restored in its
+customary place, including the frame pointer. The \code{longjmp\_unwind()}
+routine will call \code{\_Unwind\_ForcedUnwind} with a stop function that
 compares the frame pointer in the context record with the saved frame
-pointer. If equal, it will restore the setjmp() state as customary,
-and otherwise it will return \_URC\_NO\_REASON or \_URC\_END\_OF\_STACK.
+pointer. If equal, it will restore the \code{setjmp()} state as customary,
+and otherwise it will return \code{\_URC\_NO\_REASON} or \code{\_URC\_END\_OF\_STACK}.
 
 If a future requirement for two-phase forced unwinding were identified,
 an alternate routine could be defined to request it, and an actions
 parameter flag defined to support it.
 
-\subsubsection{\_Unwind\_Resume}
+\subsubsection{\code{\_Unwind\_Resume}}
 
 \code{
 \begin{tabular}{l}
@@ -406,19 +404,19 @@ code in a partially unwound stack. A call to this routine is inserted
 at the end of a landing pad that performed cleanup, but did not resume
 normal execution. It causes unwinding to proceed further.
 
-\_Unwind\_Resume should not be used to implement rethrowing.  To the
-unwinding runtime, the catch code that rethrows was a handler, and the
-previous unwinding session was terminated before entering it. Rethrowing
-is implemented by calling \_Unwind\_RaiseException again with the same
-exception object.
+\code{\_Unwind\_Resume} should not be used to implement rethrowing.
+To the unwinding runtime, the catch code that rethrows was a handler,
+and the previous unwinding session was terminated before entering it.
+Rethrowing is implemented by calling \code{\_Unwind\_RaiseException}
+again with the same exception object.
 
-This is the only routine in the unwind library which is expected 
-to be called directly by generated code: it will be called at the 
-end of a landing pad in a "landing-pad" model. 
+This is the only routine in the unwind library which is expected
+to be called directly by generated code: it will be called at the
+end of a landing pad in a "landing-pad" model.
 
 \subsection{Exception Object Management}
 
-\subsubsection{\_Unwind\_DeleteException}
+\subsubsection{\code{\_Unwind\_DeleteException}}
 
 \code{
 \begin{tabular}{l}
@@ -430,8 +428,8 @@ end of a landing pad in a "landing-pad" model.
 Deletes the given exception object. If a given runtime resumes normal
 execution after catching a foreign exception, it will not know how to
 delete that exception. Such an exception will be deleted by calling
-\_Unwind\_DeleteException. This is a convenience function that calls
-the function pointed to by the exception\_cleanup field of the exception
+\code{\_Unwind\_DeleteException}. This is a convenience function that calls
+the function pointed to by the \code{exception\_cleanup} field of the exception
 header.
 
 \subsection{Context Management}
@@ -443,7 +441,7 @@ include routines to read or set the context record images of registers in
 the stack frame corresponding to a given unwind context, and to identify
 the location of the current unwind descriptors and unwind frame.
 
-\subsubsection{\_Unwind\_GetGR}
+\subsubsection{\code{\_Unwind\_GetGR}}
 
 \code{
 \begin{tabular}{l}
@@ -452,12 +450,12 @@ the location of the current unwind descriptors and unwind frame.
 \end{tabular}
 }
 
-This function returns the 64-bit value of the given general register. 
+This function returns the 64-bit value of the given general register.
 The register is identified by its index as given in \ref{tbl-reg-num-map}.
 
 During the two phases of unwinding, no registers have a guaranteed value.
 
-\subsubsection{\_Unwind\_SetGR}
+\subsubsection{\code{\_Unwind\_SetGR}}
 
 \code{
 \begin{tabular}{l}
@@ -468,17 +466,17 @@ During the two phases of unwinding, no registers have a guaranteed value.
 \end{tabular}
 }
 
-This function sets the 64-bit value of the given register, identified by 
-its index as for \_Unwind\_GetGR.
+This function sets the 64-bit value of the given register, identified by
+its index as for \code{\_Unwind\_GetGR}.
 
-The behavior is guaranteed only if the function is called during phase 2 
-of unwinding, and applied to an unwind context representing a handler frame, 
-for which the personality routine will return \_URC\_INSTALL\_CONTEXT. 
-In that case, only registers \RDI, \RSI, \RDX, \RCX should be used. 
-These scratch registers are reserved for passing arguments between the 
-personality routine and the landing pads. 
+The behavior is guaranteed only if the function is called during phase 2
+of unwinding, and applied to an unwind context representing a handler frame,
+for which the personality routine will return \code{\_URC\_INSTALL\_CONTEXT}.
+In that case, only registers \RDI, \RSI, \RDX, \RCX should be used.
+These scratch registers are reserved for passing arguments between the
+personality routine and the landing pads.
 
-\subsubsection{\_Unwind\_GetIP}
+\subsubsection{\code{\_Unwind\_GetIP}}
 
 \code{
 \begin{tabular}{l}
@@ -487,15 +485,15 @@ personality routine and the landing pads.
 \end{tabular}
 }
 
-This function returns the 64-bit value of the instruction pointer (IP). 
+This function returns the 64-bit value of the instruction pointer (IP).
 
 During unwinding, the value is guaranteed to be the address of the
 instruction immediately following the call site in the function
 identified by the unwind context. This value may be outside of the
 procedure fragment for a function call that is known to not return
-(such as \_Unwind\_Resume).
+(such as \code{\_Unwind\_Resume}).
 
-\subsubsection{\_Unwind\_SetIP}
+\subsubsection{\code{\_Unwind\_SetIP}}
 \code{
 \begin{tabular}{l}
     void \_Unwind\_SetIP\\
@@ -504,16 +502,16 @@ procedure fragment for a function call that is known to not return
 \end{tabular}
 }
 
-This function sets the value of the instruction pointer (IP) for the 
-routine identified by the unwind context. 
+This function sets the value of the instruction pointer (IP) for the
+routine identified by the unwind context.
 
-The behavior is guaranteed only when this function is called for an 
+The behavior is guaranteed only when this function is called for an
 unwind context representing a handler frame, for which the personality
-routine will return \_URC\_INSTALL\_CONTEXT. In this case, control will 
-be transferred to the given address, which should be the address of a 
-landing pad. 
+routine will return \code{\_URC\_INSTALL\_CONTEXT}. In this case, control will
+be transferred to the given address, which should be the address of a
+landing pad.
 
-\subsubsection{\_Unwind\_GetLanguageSpecificData}
+\subsubsection{\code{\_Unwind\_GetLanguageSpecificData}}
 
 \code{
 \begin{tabular}{l}
@@ -522,17 +520,17 @@ landing pad.
 \end{tabular}
 }
 
-This routine returns the address of the language-specific data area for 
-the current stack frame. 
+This routine returns the address of the language-specific data area for
+the current stack frame.
 
-This routine is not strictly required: it could be accessed through 
-\_Unwind\_GetIP using the documented format of the DWARF Call Frame 
-Information Tables, but since this work has been done for finding the 
-personality routine in the first place, it makes sense to cache the 
-result in the context. 
-We could also pass it as an argument to the personality routine. 
+This routine is not strictly required: it could be accessed through
+\code{\_Unwind\_GetIP} using the documented format of the DWARF Call Frame
+Information Tables, but since this work has been done for finding the
+personality routine in the first place, it makes sense to cache the
+result in the context.
+We could also pass it as an argument to the personality routine.
 
-\subsubsection{\_Unwind\_GetRegionStart}
+\subsubsection{\code{\_Unwind\_GetRegionStart}}
 
 \code{
 \begin{tabular}{l}
@@ -541,8 +539,8 @@ We could also pass it as an argument to the personality routine.
 \end{tabular}
 }
 
-This routine returns the address of the beginning of the procedure or 
-code fragment described by the current unwind descriptor block. 
+This routine returns the address of the beginning of the procedure or
+code fragment described by the current unwind descriptor block.
 
 This information is required to access any data stored relative to the
 beginning of the procedure fragment. For instance, a call site table
@@ -573,36 +571,36 @@ and hence it has no psABI-specified name.
 
 \subsubsection{Parameters}
 
-The personality routine parameters are as follows: 
+The personality routine parameters are as follows:
 
 \begin{description}
-\item[version] Version number of the unwinding runtime, 
-   used to detect a mis-match between the unwinder conventions and the 
-   personality routine, or to provide backward compatibility. For the 
-   conventions described in this document, version will be 1. 
-\item[actions] Indicates what processing the personality routine 
-   is expected to perform, as a bit mask. The possible actions are 
-   described below. 
-\item[exceptionClass] An 8-byte identifier specifying the type of the 
-   thrown exception. By convention, the high 4 bytes indicate the vendor 
-   (for instance AMD$\backslash$0), and the low 4 bytes indicate 
-   the language.  For the C++ ABI described in this document, the low 
-   four bytes are C++$\backslash$0.  This is not a null-terminated string. 
-   Some implementations may use no null bytes. 
-\item[exceptionObject] The pointer to a memory location recording the 
-   necessary information for processing the exception according to the 
-   semantics of a given language (see the Exception Header section above). 
-\item[context] Unwinder state information for use by the personality routine. 
+\item[\code{version}] Version number of the unwinding runtime,
+   used to detect a mis-match between the unwinder conventions and the
+   personality routine, or to provide backward compatibility. For the
+   conventions described in this document, version will be 1.
+\item[\code{actions}] Indicates what processing the personality routine
+   is expected to perform, as a bit mask. The possible actions are
+   described below.
+\item[\code{exceptionClass}] An 8-byte identifier specifying the type of the
+   thrown exception. By convention, the high 4 bytes indicate the vendor
+   (for instance AMD$\backslash$0), and the low 4 bytes indicate
+   the language.  For the C++ ABI described in this document, the low
+   four bytes are C++$\backslash$0.  This is not a null-terminated string.
+   Some implementations may use no null bytes.
+\item[\code{exceptionObject}] The pointer to a memory location recording the
+   necessary information for processing the exception according to the
+   semantics of a given language (see the Exception Header section above).
+\item[\code{context}] Unwinder state information for use by the personality routine.
    This is an opaque handle used by the personality routine in particular
-   to access the frame's registers (see the Unwind Context section above). 
-\item[return value] The return value from the personality routine indicates 
-   how further unwind should happen, as well as possible error conditions. 
-   See the following section. 
+   to access the frame's registers (see the Unwind Context section above).
+\item[return value] The return value from the personality routine indicates
+   how further unwind should happen, as well as possible error conditions.
+   See the following section.
 \end{description}
 
 \subsubsection{Personality Routine Actions}
 
-The actions argument to the personality routine is a bitwise OR of one or 
+The actions argument to the personality routine is a bitwise OR of one or
 more of the following constants: \\
 \code{
     typedef int \_Unwind\_Action;\\
@@ -613,105 +611,105 @@ more of the following constants: \\
 }
 
 \begin{description}
-\item[\_UA\_SEARCH\_PHASE] Indicates that the personality routine should 
+\item[\code{\_UA\_SEARCH\_PHASE}] Indicates that the personality routine should
    check if the current frame contains a handler, and if so return
-   \_URC\_HANDLER\_FOUND, or otherwise return \_URC\_CONTINUE\_UNWIND. 
-   \_UA\_SEARCH\_PHASE cannot be set at the same time as \_UA\_CLEANUP\_PHASE. 
+   \code{\_URC\_HANDLER\_FOUND}, or otherwise return \code{\_URC\_CONTINUE\_UNWIND}.
+   \code{\_UA\_SEARCH\_PHASE} cannot be set at the same time as \code{\_UA\_CLEANUP\_PHASE}.
 
-\item[\_UA\_CLEANUP\_PHASE] Indicates that the personality routine should 
-   perform cleanup for the current frame. The personality routine can perform 
-   this cleanup itself, by calling nested procedures, and return 
-   \_URC\_CONTINUE\_UNWIND. Alternatively, it can setup the registers 
-   (including the IP) for transferring control to a "landing pad", and 
-   return \_URC\_INSTALL\_CONTEXT. 
+\item[\code{\_UA\_CLEANUP\_PHASE}] Indicates that the personality routine should
+   perform cleanup for the current frame. The personality routine can perform
+   this cleanup itself, by calling nested procedures, and return
+   \code{\_URC\_CONTINUE\_UNWIND}. Alternatively, it can setup the registers
+   (including the IP) for transferring control to a "landing pad", and
+   return \code{\_URC\_INSTALL\_CONTEXT}.
 
-\item[\_UA\_HANDLER\_FRAME]
-   During phase 2, indicates to the personality routine that the current 
-   frame is the one which was flagged as the handler frame during phase 1. 
-   The personality routine is not allowed to change its mind between phase 1 
-   and phase 2, i.e. it must handle the exception in this frame in phase 2. 
+\item[\code{\_UA\_HANDLER\_FRAME}]
+   During phase 2, indicates to the personality routine that the current
+   frame is the one which was flagged as the handler frame during phase 1.
+   The personality routine is not allowed to change its mind between phase 1
+   and phase 2, i.e. it must handle the exception in this frame in phase 2.
 
-\item[\_UA\_FORCE\_UNWIND] During phase 2, indicates that no language is 
-   allowed to "catch" the exception. This flag is set while unwinding the 
-   stack for longjmp or during thread cancellation. User-defined code in a 
+\item[\code{\_UA\_FORCE\_UNWIND}] During phase 2, indicates that no language is
+   allowed to "catch" the exception. This flag is set while unwinding the
+   stack for \code{longjmp} or during thread cancellation. User-defined code in a
    catch clause may still be executed, but the catch clause must resume
-   unwinding with a call to \_Unwind\_Resume when finished. 
+   unwinding with a call to \code{\_Unwind\_Resume} when finished.
 \end{description}
 
 \subsubsection{Transferring Control to a Landing Pad}
 
-If the personality routine determines that it should transfer control to a 
+If the personality routine determines that it should transfer control to a
 landing pad (in phase 2), it may set up registers (including IP) with
-suitable values for entering the landing pad (e.g. with landing pad 
+suitable values for entering the landing pad (e.g. with landing pad
 parameters), by calling the context management routines above. It then
-returns \_URC\_INSTALL\_CONTEXT. 
+returns \code{\_URC\_INSTALL\_CONTEXT}.
 
-Prior to executing code in the landing pad, the unwind library restores 
+Prior to executing code in the landing pad, the unwind library restores
 registers not altered by the personality routine, using the context
-record, to their state in that frame before the call that threw the exception, 
-as follows. All registers specified as callee-saved by the base ABI are 
-restored, as well as scratch registers \RDI, \RSI, \RDX, \RCX (see below). 
-Except for those exceptions, scratch (or caller-saved) registers are not 
-preserved, and their contents are undefined on transfer. 
+record, to their state in that frame before the call that threw the exception,
+as follows. All registers specified as callee-saved by the base ABI are
+restored, as well as scratch registers \RDI, \RSI, \RDX, \RCX (see below).
+Except for those exceptions, scratch (or caller-saved) registers are not
+preserved, and their contents are undefined on transfer.
 
 The landing pad can either resume normal execution (as, for instance, at
-the end of a C++ catch), or resume unwinding by calling \_Unwind\_Resume and
-passing it the exceptionObject argument received by the personality routine. 
-\_Unwind\_Resume will never return. 
+the end of a C++ catch), or resume unwinding by calling \code{\_Unwind\_Resume} and
+passing it the \code{exceptionObject} argument received by the personality routine.
+\code{\_Unwind\_Resume} will never return.
 
-\_Unwind\_Resume should be called if and only if the personality routine 
-did not return \_Unwind\_HANDLER\_FOUND during phase 1.  As a result, 
-the unwinder can allocate resources (for instance memory) and keep track 
-of them in the exception object reserved words. It should then free these 
-resources before transferring control to the last (handler) landing pad. 
-It does not need to free the resources before entering non-handler 
-landing-pads, since \_Unwind\_Resume will ultimately be called. 
+\code{\_Unwind\_Resume} should be called if and only if the personality routine
+did not return \code{\_Unwind\_HANDLER\_FOUND} during phase 1.  As a result,
+the unwinder can allocate resources (for instance memory) and keep track
+of them in the exception object reserved words. It should then free these
+resources before transferring control to the last (handler) landing pad.
+It does not need to free the resources before entering non-handler
+landing-pads, since \code{\_Unwind\_Resume} will ultimately be called.
 
-The landing pad may receive arguments from the runtime, typically passed 
-in registers set using \_Unwind\_SetGR by the personality routine. 
-For a landing pad that can call to \_Unwind\_Resume, one argument must 
-be the exceptionObject pointer, which must be preserved to be passed to 
-\_Unwind\_Resume. 
+The landing pad may receive arguments from the runtime, typically passed
+in registers set using \code{\_Unwind\_SetGR} by the personality routine.
+For a landing pad that can call to \code{\_Unwind\_Resume}, one argument must
+be the \code{exceptionObject} pointer, which must be preserved to be passed to
+\code{\_Unwind\_Resume}.
 
-The landing pad may receive other arguments, for instance a switch value 
-indicating the type of the exception. Four scratch registers are reserved 
-for this use (\RDI, \RSI, \RDX, \RCX). 
+The landing pad may receive other arguments, for instance a switch value
+indicating the type of the exception. Four scratch registers are reserved
+for this use (\RDI, \RSI, \RDX, \RCX).
 
 \subsubsection{Rules for Correct Inter-Language Operation}
 
 The following rules must be observed for correct operation between
 languages and/or runtimes from different vendors:
 
-An exception which has an unknown class must not be altered by the 
+An exception which has an unknown class must not be altered by the
 personality routine. The semantics of foreign exception processing
-depend on the language of the stack frame being unwound. This covers 
+depend on the language of the stack frame being unwound. This covers
 in particular how exceptions from a foreign language are mapped to
-the native language in that frame. 
+the native language in that frame.
 
-If a runtime resumes normal execution, and the caught exception was 
-created by another runtime, it should call \_Unwind\_DeleteException. 
-This is true even if it understands the exception object format 
-(such as would be the case between different C++ runtimes). 
+If a runtime resumes normal execution, and the caught exception was
+created by another runtime, it should call \code{\_Unwind\_DeleteException}.
+This is true even if it understands the exception object format
+(such as would be the case between different C++ runtimes).
 
-A runtime is not allowed to catch an exception if the 
-\_UA\_FORCE\_UNWIND flag was passed to the personality routine. 
+A runtime is not allowed to catch an exception if the
+\code{\_UA\_FORCE\_UNWIND} flag was passed to the personality routine.
 
-\paragraph{Example: Foreign Exceptions in C++.} In C++, foreign exceptions can be 
+\paragraph{Example: Foreign Exceptions in C++.} In C++, foreign exceptions can be
 caught by a \code{catch(\dots)} statement. They can also be caught as if they
 were of a \code{\_\_foreign\_exception} class, defined in \code{<exception>}. The
 \code{\_\_foreign\_exception} may have subclasses, such as
 \code{\_\_java\_exception} and \code{\_\_ada\_exception}, if the runtime is capable
 of identifying some of the foreign languages.
 
-The behavior is undefined in the following cases: 
+The behavior is undefined in the following cases:
 \begin{itemize}
-\item A \code{\_\_foreign\_exception} catch argument is accessed in any way 
-     (including taking its address). 
+\item A \code{\_\_foreign\_exception} catch argument is accessed in any way
+     (including taking its address).
 
-\item A \code{\_\_foreign\_exception} is active at the same time as another 
+\item A \code{\_\_foreign\_exception} is active at the same time as another
      exception (either there is a nested exception while catching the
-     foreign exception, or the foreign exception was itself nested). 
-     
+     foreign exception, or the foreign exception was itself nested).
+
 \item \code{uncaught\_exception()}, \code{set\_terminate()},
      \code{set\_unexpected()}, \code{terminate()}, or
      \code{unexpected()} is called at a time a foreign exception
@@ -719,15 +717,15 @@ The behavior is undefined in the following cases:
      unwinding of a foreign exception).
 \end{itemize}
 
-All these cases might involve accessing C++ specific content of the 
-thrown exception, for instance to chain active exceptions. 
+All these cases might involve accessing C++ specific content of the
+thrown exception, for instance to chain active exceptions.
 
-Otherwise, a catch block catching a foreign exception is allowed: 
+Otherwise, a catch block catching a foreign exception is allowed:
 \begin{itemize}
-\item to resume normal execution, thereby stopping propagation of 
-      the foreign exception and deleting it, or 
-\item to rethrow the foreign exception. In that case, the original 
-      exception object must be unaltered by the C++ runtime. 
+\item to resume normal execution, thereby stopping propagation of
+      the foreign exception and deleting it, or
+\item to rethrow the foreign exception. In that case, the original
+      exception object must be unaltered by the C++ runtime.
 \end{itemize}
 
 A catch-all block may be executed during forced unwinding.  For
@@ -736,10 +734,10 @@ stack unwinding. However, if this happens, unwinding will proceed at
 the end of the catch-all block, whether or not there is an explicit
 rethrow.
 
-Setting the low 4 bytes of exception class to C++$\backslash$0 is reserved 
-for use by C++ runtimes compatible with the common C++ ABI. 
+Setting the low 4 bytes of exception class to C++$\backslash$0 is reserved
+for use by C++ runtimes compatible with the common C++ ABI.
 
-%%% Local Variables: 
+%%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "abi"
-%%% End: 
+%%% End:

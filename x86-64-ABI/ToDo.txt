@@ -14,8 +14,6 @@ This file documents a number of open topics in the ABI:
 
 - Should we declare some global XMM registers?
 
-- Define values of FPU control words
-
 - The figure "Stack Frame" should be clarified: %rbp is optional
 
 - Is vararg passing really the same as non-vararg passing?  Is this
@@ -28,8 +26,6 @@ This file documents a number of open topics in the ABI:
 - Add more examples
 
 - sizeof (long double) is 16 - is this still needed?
-
-- use better terms than doubleword etc.
 
 - Ideas for passing of arguments:
 
@@ -64,5 +60,5 @@ This file documents a number of open topics in the ABI:
 
 
 
-Status: March, 7th 2001
+Status: May, 13th 2001
 Andreas Jaeger
