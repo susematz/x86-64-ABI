@@ -260,19 +260,21 @@ and faster prologues and epilogues allowing to allocate and deallocate
 the outgoing arguments area by the same instruction used to
 (de)allocate the \emph{local save area}.
 
-The usage of \RBP{} as base pointer may be avoided by using \RSP{} instead
-to save two instructions in the prologue and epilogue and get global general
-purpose register.  See details about stack traceback algorithm for conditions
-when this optimization is allowed.
+The usage of \RBP{} as a frame pointer may be avoided by using \RSP{}
+instead.  This saves two instructions in the prologue and epilogue and
+gives another global general purpose register.  See details about
+stack traceback algorithm for conditions when this optimization is
+allowed.  \editornote{The stack traceback algorithm has not been
+  specified yet and we are not sure if we need one at all}
 
 \subsection{Classes}
 
 The \xARCH CPU has three register classes available for parameter and
-return value passing --- the integer (general purpose)
-registers, SSE registers and \MMX{} registers.  All integral types and
-pointer belong to the class \emph{Int}, all floating point values
-(including the 128bit type) and type \verb|__m128| belongs to the class
-\emph{SSE} and finally the type \verb|__mm64| to class \emph{MMX}.
+return value passing --- the integer (general purpose) registers, SSE
+registers and \MMX{} registers.  All integral types and pointer belong
+to the class \emph{Int}, all floating point values (including the
+128bit type) and type \verb|__m128| belongs to the class \emph{SSE}
+and finally the type \verb|__mm64| to class \emph{MMX}.
 
 Aggregate and union types are split to doublewords and each doubleword has
 assigned its own class. To assign the class of doubleword \emph{X} the
@@ -666,7 +668,7 @@ No other changes required.
 
 \subsection{Virtual Address Assignments}
 
-Conceptually processes have the full 48-bit address space available.
+Conceptually processes have the full address space available.
 In practice, however, several factors limit the size of a process.
 \begin{itemize}
   \item The system reserves configuration dependent amount of virtual space.
