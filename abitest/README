@@ -1,0 +1,64 @@
+What's this?
+------------
+
+This is an early abitestsuite for gcc and binutils for the x86-64
+architechture. It currently tests these things:
+
+   1: Size and alignment -- sizal()
+      Tests for correct sizeof of all basic types, structs and arrays. Also
+      tests for correct alignment of these.
+   2: Passing scalar arguments -- scalarargs()
+      Tests that arguments of basic types are passed correctly.
+   3: Passing struct and union arguments -- structargs()
+      Tests that arguments of struct and union types are passed correctly.
+      Also tests for mixed struct/union/scalar types
+   4: Passing a variable number of args -- variargs()
+
+Relocation types should also be tested but this hasn't been implemented yet.
+
+Questions about the abitest can be directed to discuss@x86-64.org or to
+Bo Thorsen <bo@sonofthor.dk>.
+
+
+Documentation (or the lack of it)
+-------------
+
+No setup is being done yet, so if the defaults here doesn't suit your setup,
+edit the Makefile.
+
+To build the test just run `make`. This will overwrite your current
+/usr/local/share/simnow/images/start64.ram so if this is a problem, you
+should edit the Makefile before `make`ing. To run it then call
+`simnow /usr/local/share/simnow/images/snippet.bsd`.
+
+To make it successfully you need to have simnowlink in /opt/x86-64/bin and
+ldscr.lds, ldscr2.lds, libc.a and start64.o in /opt/x86-64/lib. All these
+files can be found in the runtime directory on the x86-64.org cvs server.
+
+
+Makefile targets
+----------------
+
+`make` will produce a a.out executable which you probably won't be able to
+use for anything for now. It also produces start64.ram in simnow/images,
+which is used by snippet.bsd for running programs in the simulator.
+
+If you want to see the assembler source of file.c produced by gcc, just run
+`make file.s`. Note that `make clean` will remove these files.
+
+
+Known bugs in GCC now
+---------------------
+
+This is a list of bugs in either GCC or the abi test:
+
+- long double is 12 bytes and not 16 as the abi says
+
+- arrays with total size => 16 should have an alignment of 16 but is aligned
+  as the type of the elements
+
+- passing two longs looks wrong and doesn't pass in rdi and rsi as it should
+  see structargs.c
+
+- variable number of arguments looks broken
+

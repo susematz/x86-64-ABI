@@ -1,0 +1,7 @@
+*~
+*.o
+*.s
+sizal2.c
+make_sizal2
+core
+a.out
