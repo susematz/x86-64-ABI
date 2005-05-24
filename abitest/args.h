@@ -91,8 +91,8 @@ extern struct FloatRegisters fregs;
 		       "jne abort\n\t" \
 		       "cmpq %%r15, iregs+104(%%rip)\n\t" \
 		       "jne abort\n" ::: "memory"); \
-  __asm__ __volatile__("cmpq %%rdi, %0\n\t" \
-                       "jne abort\n" :: "g" (iregs.rdi) : "memory");
+  __asm__ __volatile__("cmpq %%rdi, iregs+40(%%rip)\n\t" \
+                       "jne abort\n" :: : "memory");
 
 /* Clear register struct.  */
 #define clear_struct_registers \

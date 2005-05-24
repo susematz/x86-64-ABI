@@ -1,3 +1,10 @@
+2005-05-24  Michael Matz  <matz@suse.de>
+
+	* Makefile: Don't expect PATH to contain "." .
+	* args.h (check_int_register_contents): Don't use a general operand.
+	* abitest: Don't use Simics.
+	* abitest.simics: Old abitest using Simics.
+
 2001-05-16  Bo Thorsen  <bo@suse.co.uk>
 
 	* abitest: Tests which can not run when optimized can now with

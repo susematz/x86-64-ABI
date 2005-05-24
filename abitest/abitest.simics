@@ -1,16 +1,20 @@
 #!/bin/bash
 
-CC=gcc
-LD=gcc
+# Change these to reflect your setup
+SIMICS_DIR=/work/simics
+X86_64_DIR=/opt/x86-64
+
+
 # Do not set this flag to anything. It is being set by the different passes
 CFLAGS=
 
-trap : SIGABRT
 
 # Run a test
 function runtest() {
-  ./the-test > test.out 2>&1
-  if [ $? -ne 0 ] ; then
+  echo -e "run\ncpu0.pregs\nquit" | \
+    ./simics -x abitest.runtime >/tmp/simics.out 2>/dev/null
+
+  if [ "`grep eeeeeeee /tmp/simics.out`" == "" ] ; then
     echo "*** Fail! ***"
   else
     echo "Ok."
@@ -19,12 +23,13 @@ function runtest() {
 
 # Build the new test
 function build() {
-  rm -f the-test
+  rm -f a.out
   rm -f /tmp/test.o
   rm -f /tmp/image.simics
 
-  $CC -c $* $CFLAGS -o /tmp/test.o -DSTACK_SIZE=1024
-  $LD /tmp/test.o -o the-test
+  x86_64-unknown-linux-gcc -I /usr/include -c $* $CFLAGS -o /tmp/test.o -DSTACK_SIZE=1024
+  x86_64-unknown-linux-ld -T $X86_64_DIR/lib/ldscr2.lds $X86_64_DIR/lib/start64.o $X86_64_DIR/lib/libc.a /tmp/test.o $X86_64_DIR/lib/libc.a -o a.out
+  x86_64-unknown-linux-ld -T $X86_64_DIR/lib/ldscr.lds a.out -o /tmp/image.simics
 }
 
 # Test a file
@@ -34,8 +39,10 @@ function test_file() {
     echo "Skipped."
   else
     build $*
-    if [ -f the-test ] ; then
+    if [ -f /tmp/image.simics ] ; then
+      pushd $SIMICS_DIR/home/x86-test-machine >/dev/null
       runtest
+      popd >/dev/null
       return
     else
       echo "Compile error"
