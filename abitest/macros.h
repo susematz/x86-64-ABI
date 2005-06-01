@@ -37,7 +37,7 @@
   _function(signed _arg1, _arg2, _arg3); \
   _function(unsigned _arg1, _arg2, _arg3);
 
-/* Check size of a a struct and a union of three types.  */
+/* Check size of a struct and a union of three types.  */
 
 #define check_struct_and_union3(type1, type2, type3, struct_size, align_size) \
 { \

@@ -80,7 +80,7 @@ make_size_test ()
 
   printf ("/* Check structs and unions of all permutations of 3 basic ");
   printf ("types.  */\n");
-  printf ("int\nmain (int argc, char **argv)\n{\n");
+  printf ("int\nmain (void)\n{\n");
   for (i=0; i<typecount; i++)
     for (j=0; j<typecount; j++)
       for (k=0; k<typecount; k++) {
@@ -100,6 +100,7 @@ make_size_test ()
 	printf ("  check_struct_and_union3(%s, %s, %s, %d, %d);\n", types[i],
 		types[j], types[k], struct_size, union_size);
       }
+  printf ("  return 0;\n");
 }
 
 /* This constructs the test for size of structs and unions with three scalar

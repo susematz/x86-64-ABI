@@ -56,7 +56,7 @@ aj_ld_times2 (__complex__ long double x)
 }
 
 int
-main (int argc, char **argv)
+main (void)
 {
 #ifdef CHECK_COMPLEX
   _Complex float fc, fd;

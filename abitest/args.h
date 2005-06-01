@@ -60,6 +60,7 @@ struct FloatRegisters
 /* Implemented in scalarargs.c  */
 extern struct IntegerRegisters iregs;
 extern struct FloatRegisters fregs;
+extern unsigned int num_iregs, num_fregs;
 
 /* This is not nice, but __asm__ statements doesn't like >= 10 args.  */
 #define check_int_register_contents \
@@ -90,9 +91,31 @@ extern struct FloatRegisters fregs;
 		       "cmpq %%r14, iregs+96(%%rip)\n\t" \
 		       "jne abort\n\t" \
 		       "cmpq %%r15, iregs+104(%%rip)\n\t" \
-		       "jne abort\n" ::: "memory"); \
-  __asm__ __volatile__("cmpq %%rdi, iregs+40(%%rip)\n\t" \
-                       "jne abort\n" :: : "memory");
+		       "jne abort\n" ::: "memory");
+
+#define ONE_IARG(NUM,REG,OFS) \
+  "cmpl $" #NUM ", num_iregs(%%rip)\n\t" \
+  "jbe 2f\n\t" \
+  "cmpq %%" #REG ", iregs+" #OFS "(%%rip)\n\t" \
+  "jne 1f\n\t"
+
+#define check_int_arguments do { \
+  unsigned int _result; \
+  __asm__ __volatile__( \
+    ONE_IARG (0, rdi, 40) \
+    ONE_IARG (1, rsi, 32) \
+    ONE_IARG (2, rdx, 24) \
+    ONE_IARG (3, rcx, 16) \
+    ONE_IARG (4, r8, 48) \
+    ONE_IARG (5, r9, 56) \
+    "   jmp 2f\n\t" \
+    "1: mov $1, %%eax\n\t" \
+    "   jmp 3f\n\t" \
+    "2: mov $0, %%eax\n\t" \
+    "3:\n" : "=a" (_result) :: "memory"); \
+  if (_result) \
+    abort (); \
+  } while (0)
 
 /* Clear register struct.  */
 #define clear_struct_registers \
@@ -113,6 +136,9 @@ extern struct FloatRegisters fregs;
 
 /* TODO: Do the checking.  */
 #define check_float_register_contents
+
+/* TODO: Do the checking.  */
+#define check_float_arguments
 
 /* TODO: Do the clearing.  */
 #define clear_float_hardware_registers

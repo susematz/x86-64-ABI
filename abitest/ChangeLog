@@ -1,3 +1,8 @@
+2005-06-01  Michael Matz  <matz@suse.de>
+
+	Cleanup, support -W -Wall, make all testcases work also with
+	-O1 and -O2.
+
 2005-05-24  Michael Matz  <matz@suse.de>
 
 	* Makefile: Don't expect PATH to contain "." .

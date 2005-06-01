@@ -56,7 +56,8 @@ open_file (char *filename, int use_ints, int use_floats)
   fprintf (file, "#include \"args.h\"\n\n");
 
   fprintf (file, "struct IntegerRegisters iregs;\n");
-  fprintf (file, "struct FloatRegisters fregs;\n\n");
+  fprintf (file, "struct FloatRegisters fregs;\n");
+  fprintf (file, "unsigned int num_iregs, num_fregs;\n\n");
 
   /* Make the struct for checking the parameter values.  */
   fprintf (file, "/* This struct holds values for argument checking.  */\n");
@@ -93,7 +94,7 @@ make_checking_function (int test_type, char *type, int arg_count)
   for (i=0 ; i<arg_count; i++) {
     if (i != 0)
       fprintf (file, ", ");
-    fprintf (file, "%s %c%d", type, arg_prefix, i);
+    fprintf (file, "%s %c%d ATTRIBUTE_UNUSED", type, arg_prefix, i);
   }
   fprintf (file, ")\n{\n");
   fprintf (file, "  /* Check argument values.  */\n");
@@ -106,11 +107,11 @@ make_checking_function (int test_type, char *type, int arg_count)
   for (i=0 ; i<arg_count; i++) {
     if (i != 0)
       fprintf (file, ", ");
-    fprintf (file, "%s %c%d", type, arg_prefix, i);
+    fprintf (file, "%s %c%d ATTRIBUTE_UNUSED", type, arg_prefix, i);
   }
   fprintf (file, ")\n{\n");
   fprintf (file, "  /* Check register contents.  */\n");
-  fprintf (file, "  check_%s_register_contents;\n}\n\n", type_str);
+  fprintf (file, "  check_%s_arguments;\n}\n\n", type_str);
 }
 
 
@@ -147,6 +148,7 @@ make_checking_define (int test_type, int arg_count)
   for (i=0; i<arg_count && i<max_regs; i++)
     fprintf (file, "  %cregs.%c%d = _%c%d; \\\n", arg_prefix, reg_prefix, i,
 	    arg_prefix, i);
+  fprintf (file, "  num_%cregs = %d; \\\n", arg_prefix, i);
 
   /* Make function call.  */
   fprintf (file, "  _func2 (");
@@ -259,13 +261,14 @@ make_int_tests ()
   make_empty_tests ("int128");
 #endif
 
-  fprintf (file, "\nint\nmain (int argc, char **argv)\n{\n");
+  fprintf (file, "\nint\nmain (void)\n{\n");
   fprintf (file, "  test_ints_on_stack ();\n");
   fprintf (file, "  test_too_many_ints ();\n");
   fprintf (file, "  test_longs_on_stack ();\n");
   fprintf (file, "  test_too_many_longs ();\n");
   fprintf (file, "  test_int128s_on_stack ();\n");
-  fprintf (file, "  test_too_many_int128s ();\n}\n");
+  fprintf (file, "  test_too_many_int128s ();\n");
+  fprintf (file, "  return 0;\n}\n");
 
   fclose (file);
 }
@@ -321,7 +324,7 @@ make_float_tests ()
   make_empty_tests ("float128");
 #endif
 
-  fprintf (file, "\nint\nmain (int argc, char **argv)\n{\n");
+  fprintf (file, "\nint\nmain (void)\n{\n");
   fprintf (file, "  test_floats_on_stack ();\n");
   fprintf (file, "  test_too_many_floats ();\n");
 
@@ -332,7 +335,8 @@ make_float_tests ()
   fprintf (file, "  test_too_many_long_doubles ();\n");
 
   fprintf (file, "  test_float128s_on_stack ();\n");
-  fprintf (file, "  test_too_many_float128s ();\n}\n");
+  fprintf (file, "  test_too_many_float128s ();\n");
+  fprintf (file, "  return 0;\n}\n");
 
   fclose (file);
 }

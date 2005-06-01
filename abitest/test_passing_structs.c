@@ -1,6 +1,6 @@
 /* This tests passing of structs. Only integers are tested.  */
 
-/* Don't test optimization levels -O1 and -O2.  With optimization the
+/* Use -fno-omit-frame-pointer for this.  With optimization the
    test for passing the struct on the stack can't be run because the
    optimization removes the stackpointer setup normally done in a
    function.  */
@@ -11,6 +11,7 @@
 
 struct IntegerRegisters iregs;
 struct FloatRegisters fregs;
+unsigned int num_iregs, num_fregs;
 
 struct int_struct
 {
@@ -35,25 +36,25 @@ struct long3_struct
 
 /* Check that the struct is passed as the individual members in iregs.  */
 void
-check_struct_passing1 (struct int_struct is)
+check_struct_passing1 (struct int_struct is ATTRIBUTE_UNUSED)
 {
-  check_int_register_contents;
+  check_int_arguments;
 }
 
 void
-check_struct_passing2 (struct long_struct ls)
+check_struct_passing2 (struct long_struct ls ATTRIBUTE_UNUSED)
 {
-  check_int_register_contents;
+  check_int_arguments;
 }
 
 void
-check_struct_passing3 (struct long2_struct ls)
+check_struct_passing3 (struct long2_struct ls ATTRIBUTE_UNUSED)
 {
-  check_int_register_contents;
+  check_int_arguments;
 }
 
 void
-check_struct_passing4 (struct long3_struct ls)
+check_struct_passing4 (struct long3_struct ls ATTRIBUTE_UNUSED)
 {
   /* Check the passing on the stack by comparing the address of the
      stack elements to the expected place on the stack.  */
@@ -71,7 +72,7 @@ check_struct_passing4 (struct long3_struct ls)
 
 
 int
-main (int argc, char **argv)
+main (void)
 {
   struct int_struct is = { 48 };
   struct long_struct ls = { 49 };
@@ -82,11 +83,13 @@ main (int argc, char **argv)
 
   clear_struct_registers;
   iregs.I0 = is.i;
+  num_iregs = 1;
   clear_int_hardware_registers;
   check_struct_passing1(is);
 
   clear_struct_registers;
   iregs.I0 = ls.l;
+  num_iregs = 1;
   clear_int_hardware_registers;
   check_struct_passing2(ls);
 
@@ -94,6 +97,7 @@ main (int argc, char **argv)
   clear_struct_registers;
   iregs.I0 = l2s.l1;
   iregs.I1 = l2s.l2;
+  num_iregs = 2;
   clear_int_hardware_registers;
   check_struct_passing3(l2s);
   check_struct_passing4(l3s);

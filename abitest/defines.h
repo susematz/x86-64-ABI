@@ -114,7 +114,15 @@
 /* Used in size and alignment tests.  */
 enum dummytype { enumtype };
 
+extern void abort (void);
+
 /* Assertion macro.  */
 #define assert(test) if (!(test)) abort()
+
+#ifdef __GNUC__
+#define ATTRIBUTE_UNUSED __attribute__((__unused__))
+#else
+#define ATTRIBUTE_UNUSED
+#endif
 
 #endif /* DEFINED_DEFINES_H */

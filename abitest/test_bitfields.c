@@ -115,7 +115,7 @@ passingU (union Allocation u, char c)
 
 
 int
-main (int argc, char **argv)
+main (void)
 {
   struct RightToLeft str1;
   struct BoundaryAlignment str2;

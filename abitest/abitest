@@ -23,7 +23,7 @@ function build() {
   rm -f /tmp/test.o
   rm -f /tmp/image.simics
 
-  $CC -c $* $CFLAGS -o /tmp/test.o -DSTACK_SIZE=1024
+  $CC -c $* $CFLAGS -W -Wall -o /tmp/test.o -DSTACK_SIZE=1024
   $LD /tmp/test.o -o the-test
 }
 
@@ -33,7 +33,12 @@ function test_file() {
   if [ "$CFLAGS" != "" ] && [ "`grep 'optimization level' $1 | grep -e $CFLAGS`" != "" ] ; then
     echo "Skipped."
   else
+    old_CFLAGS="$CFLAGS"
+    if grep 'fno-omit-frame-pointer' $1 > /dev/null 2>&1; then
+      CFLAGS="$CFLAGS -fno-omit-frame-pointer"
+    fi
     build $*
+    CFLAGS="$old_CFLAGS"
     if [ -f the-test ] ; then
       runtest
       return

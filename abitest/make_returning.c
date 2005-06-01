@@ -71,7 +71,7 @@ make_test_scalar_returning ()
   int i;
 
   /* Print out the header of the function.  */
-  printf ("int\nmain (int argc, char **argv)\n{\n");
+  printf ("int\nmain (void)\n{\n");
 
   /* Make the tests.  */
   for (i=0; i<typecount; i++) {
@@ -81,7 +81,7 @@ make_test_scalar_returning ()
     printf (", %s, (%s) %d, %d);\n", types[i], types[i], i+64, i+64);
   }
 
-  printf ("}\n");
+  printf ("  return 0;\n}\n");
 }
 
 void

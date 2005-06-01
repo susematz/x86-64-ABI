@@ -5,7 +5,7 @@
 
 
 int
-main (int argc, char **argv)
+main (void)
 {
   /* Integral types.  */
   run_signed_tests2(check_size, char, TYPE_SIZE_CHAR);

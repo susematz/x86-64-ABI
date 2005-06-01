@@ -73,7 +73,7 @@ my_noprintf (char *format, ...)
 }
 
 int
-main (int argc, char **argv)
+main (void)
 {
 #ifdef CHECK_VARARGS
   struct arg al[5];
