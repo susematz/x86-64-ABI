@@ -1,5 +1,5 @@
 TARGETS = test_3_element_struct_and_unions.c test_passing_integers.c \
-	test_passing_floats.c test_basic_returning.c
+	test_passing_floats.c test_basic_returning.c asm-support.o
 
 AUTOEXECS = make_3esau make_passing_tests make_returning
 
@@ -19,6 +19,8 @@ test_basic_returning.c: make_returning.c typelist.h typelist.c defines.h args.h
 	gcc -o make_returning make_returning.c typelist.c && \
 	./make_returning > test_basic_returning.c
 
+asm-support.o: asm-support.S
+	gcc -c $<
 
 clean:
 	$(RM) *.o *~ core make_sizal2 $(TARGETS) $(AUTOEXECS) a.out

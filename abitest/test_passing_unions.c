@@ -1,9 +1,5 @@
 /* This tests passing of structs. Only integers are tested.  */
 
-/* Use -fno-omit-frame-pointer for this.  See test_passing_structs.c
-   for an explanation.  */
-
-
 #include "defines.h"
 #include "args.h"
 
@@ -59,6 +55,10 @@ check_union_passing3(union un3 u ATTRIBUTE_UNUSED)
 {
   check_int_arguments;
 }
+
+#define check_union_passing1 WRAP_CALL(check_union_passing1)
+#define check_union_passing2 WRAP_CALL(check_union_passing2)
+#define check_union_passing3 WRAP_CALL(check_union_passing3)
 
 int
 main (void)

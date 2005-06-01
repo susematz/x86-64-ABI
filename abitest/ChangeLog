@@ -1,5 +1,24 @@
 2005-06-01  Michael Matz  <matz@suse.de>
 
+	* Authors: Mention myself.
+	* TOCHECK: New file containing things to check for.
+	* asm-support.S: New file.
+	* Makefile (asm-support.o): New target.
+	* abitest: Add asm-support.o to link command.
+	Let user override CC and LD, list failed tests at the end.
+
+	* args.h: Support for the asm wrapper.
+	(WRAP_CALL): New macro.
+	(callthis, rax - r15): Declare.
+	(check_int_register_contents): Remove.
+	(check_int_arguments): Adjust for asm wrapper.
+	* make_passing_tests.c (make_checking_define): Use WRAP_CALL.
+	* test_passing_structs.c: Adjust for asm wrapper.
+	* test_passing_structs_and_unions.c: Ditto.
+	* test_passing_unions.c: Ditto.
+
+2005-06-01  Michael Matz  <matz@suse.de>
+
 	* macros.h (check_align_lv): New macro.
 	(check_basic_struct_size_and_align, check_array_size_and_align,
 	check_basic_union_size_and_align): Use it.

@@ -25,6 +25,12 @@
 #define F14 xmm14
 #define F15 xmm15
 
+extern void (*callthis)(void);
+extern unsigned long rax,rbx,rcx,rdx,rsi,rdi,rsp,rbp,r8,r9,r10,r11,r12,r13,r14,r15;
+extern void snapshot (void);
+#define WRAP_CALL(N) \
+  (callthis = (void (*)()) (N), (typeof (&N)) snapshot)
+
 /* Clear all integer registers.  */
 #define clear_int_hardware_registers \
   asm __volatile__ ("xor %%rax, %%rax\n\t" \
@@ -48,7 +54,7 @@
    these are used or even really available.  */
 struct IntegerRegisters
 {
-  long rax, rbx, rcx, rdx, rsi, rdi, r8, r9, r10, r11, r12, r13, r14, r15;
+  unsigned long rax, rbx, rcx, rdx, rsi, rdi, r8, r9, r10, r11, r12, r13, r14, r15;
 };
 struct FloatRegisters
 {
@@ -62,59 +68,13 @@ extern struct IntegerRegisters iregs;
 extern struct FloatRegisters fregs;
 extern unsigned int num_iregs, num_fregs;
 
-/* This is not nice, but __asm__ statements doesn't like >= 10 args.  */
-#define check_int_register_contents \
-  __asm__ __volatile__("cmpq %%rax, iregs(%%rip)\n\t" \
-		       "jne abort\n\t" \
-		       "cmpq %%rbx, iregs+8(%%rip)\n\t" \
-		       "jne abort\n\t" \
-		       "cmpq %%rcx, iregs+16(%%rip)\n\t" \
-		       "jne abort\n\t" \
-		       "cmpq %%rdx, iregs+24(%%rip)\n\t" \
-		       "jne abort\n\t" \
-		       "cmpq %%rsi, iregs+32(%%rip)\n\t" \
-		       "jne abort\n\t" \
-		       "cmpq %%rdi, iregs+40(%%rip)\n\t" \
-		       "jne abort\n\t" \
-		       "cmpq %%r8, iregs+48(%%rip)\n\t" \
-		       "jne abort\n\t" \
-		       "cmpq %%r9, iregs+56(%%rip)\n\t" \
-		       "jne abort\n\t" \
-		       "cmpq %%r10, iregs+64(%%rip)\n\t" \
-		       "jne abort\n\t" \
-		       "cmpq %%r11, iregs+72(%%rip)\n\t" \
-		       "jne abort\n\t" \
-		       "cmpq %%r12, iregs+80(%%rip)\n\t" \
-		       "jne abort\n\t" \
-		       "cmpq %%r13, iregs+88(%%rip)\n\t" \
-		       "jne abort\n\t" \
-		       "cmpq %%r14, iregs+96(%%rip)\n\t" \
-		       "jne abort\n\t" \
-		       "cmpq %%r15, iregs+104(%%rip)\n\t" \
-		       "jne abort\n" ::: "memory");
-
-#define ONE_IARG(NUM,REG,OFS) \
-  "cmpl $" #NUM ", num_iregs(%%rip)\n\t" \
-  "jbe 2f\n\t" \
-  "cmpq %%" #REG ", iregs+" #OFS "(%%rip)\n\t" \
-  "jne 1f\n\t"
-
 #define check_int_arguments do { \
-  unsigned int _result; \
-  __asm__ __volatile__( \
-    ONE_IARG (0, rdi, 40) \
-    ONE_IARG (1, rsi, 32) \
-    ONE_IARG (2, rdx, 24) \
-    ONE_IARG (3, rcx, 16) \
-    ONE_IARG (4, r8, 48) \
-    ONE_IARG (5, r9, 56) \
-    "   jmp 2f\n\t" \
-    "1: mov $1, %%eax\n\t" \
-    "   jmp 3f\n\t" \
-    "2: mov $0, %%eax\n\t" \
-    "3:\n" : "=a" (_result) :: "memory"); \
-  if (_result) \
-    abort (); \
+  assert (num_iregs <= 0 || iregs.I0 == I0); \
+  assert (num_iregs <= 1 || iregs.I1 == I1); \
+  assert (num_iregs <= 2 || iregs.I2 == I2); \
+  assert (num_iregs <= 3 || iregs.I3 == I3); \
+  assert (num_iregs <= 4 || iregs.I4 == I4); \
+  assert (num_iregs <= 5 || iregs.I5 == I5); \
   } while (0)
 
 /* Clear register struct.  */
@@ -122,6 +82,8 @@ extern unsigned int num_iregs, num_fregs;
   iregs.rax = iregs.rbx = iregs.rcx = iregs.rdx = iregs.rsi = iregs.rdi \
     = iregs.r8 = iregs.r9 = iregs.r10 = iregs.r11 = iregs.r12 = iregs.r13 \
     = iregs.r14 = iregs.r15 = 0; \
+  rax = rbx = rcx = rdx = rdi = rsi = rbp = rsp \
+    = r8 = r9 = r10 = r11 = r12 = r13 = r14 = r15 = 0; \
   fregs.mm0 = fregs.mm1 = fregs.mm2 = fregs.mm3 = fregs.mm4 = fregs.mm5 \
     = fregs.mm6 = fregs.mm7 = fregs.st0 = fregs.st1 = fregs.st2 = fregs.st3 \
     = fregs.st4 = fregs.st5 = fregs.st6 = fregs.st7 = fregs.xmm0 = fregs.xmm1 \

@@ -1,8 +1,5 @@
 /* This tests passing of structs. Only integers are tested.  */
 
-/* Use -fno-omit-frame-pointer for this.  See test_passing_structs.c
-   for an explanation.  */
-
 #include "defines.h"
 #include "args.h"
 
@@ -60,28 +57,13 @@ check_mixed_passing1 (char c1 ATTRIBUTE_UNUSED, struct int_struct is ATTRIBUTE_U
 void
 check_mixed_passing2 (char c1 ATTRIBUTE_UNUSED, struct long3_struct ls ATTRIBUTE_UNUSED, char c2 ATTRIBUTE_UNUSED)
 {
-  unsigned int result;
   check_int_arguments;
 
   /* Check the passing on the stack by comparing the address of the
      stack elements to the expected place on the stack.  */
-  __asm__ __volatile("leaq 16(%%rbp), %%r15\n\t"
-		     "cmp %1, %%r15\n\t"
-		     "jne 1f\n\t"
-		     "leaq 24(%%rbp), %%r15\n\t"
-		     "cmp %2, %%r15\n\t"
-		     "jne 1f\n\t"
-		     "leaq 32(%%rbp), %%r15\n\t"
-		     "cmp %3, %%r15\n\t"
-		     "jne 1f\n\t"
-		     "xor %%eax, %%eax\n\t"
-		     "jmp 2f\n\t"
-		     "1: mov $1, %%al\n\t"
-		     "2:\n"
-		     : "=a" (result)
-		     : "g" (&ls.l1), "g" (&ls.l2), "g" (&ls.l3) : "r15");
-  if (result)
-    abort ();
+  assert ((unsigned long)&ls.l1 == rsp+8);
+  assert ((unsigned long)&ls.l2 == rsp+16);
+  assert ((unsigned long)&ls.l3 == rsp+24);
 }
 
 int
@@ -98,7 +80,7 @@ main (void)
   iregs.I2 = 9;
   num_iregs = 3;
   clear_int_hardware_registers;
-  check_mixed_passing1(8, is, 9);
+  WRAP_CALL (check_mixed_passing1)(8, is, 9);
 
 #ifdef CHECK_LARGER_STRUCTS 
   clear_struct_registers;
@@ -106,7 +88,7 @@ main (void)
   iregs.I1 = 11;
   num_iregs = 2;
   clear_int_hardware_registers;
-  check_mixed_passing2(10, l3s, 11);
+  WRAP_CALL (check_mixed_passing2)(10, l3s, 11);
 #endif
 
   return 0;

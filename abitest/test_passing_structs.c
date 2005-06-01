@@ -1,11 +1,5 @@
 /* This tests passing of structs. Only integers are tested.  */
 
-/* Use -fno-omit-frame-pointer for this.  With optimization the
-   test for passing the struct on the stack can't be run because the
-   optimization removes the stackpointer setup normally done in a
-   function.  */
-
-
 #include "defines.h"
 #include "args.h"
 
@@ -58,16 +52,9 @@ check_struct_passing4 (struct long3_struct ls ATTRIBUTE_UNUSED)
 {
   /* Check the passing on the stack by comparing the address of the
      stack elements to the expected place on the stack.  */
-  __asm__ __volatile("leaq 16(%%rbp), %%r15\n\t"
-		     "cmp %0, %%r15\n\t"
-		     "jne abort\n\t"
-		     "leaq 24(%%rbp), %%r15\n\t"
-		     "cmp %1, %%r15\n\t"
-		     "jne abort\n\t"
-		     "leaq 32(%%rbp), %%r15\n\t"
-		     "cmp %2, %%r15\n\t"
-		     "jne abort\n"
-		     :: "g" (&ls.l1), "g" (&ls.l2), "g" (&ls.l3) : "r15");
+  assert ((unsigned long)&ls.l1 == rsp+8);
+  assert ((unsigned long)&ls.l2 == rsp+16);
+  assert ((unsigned long)&ls.l3 == rsp+24);
 }
 
 
@@ -85,13 +72,13 @@ main (void)
   iregs.I0 = is.i;
   num_iregs = 1;
   clear_int_hardware_registers;
-  check_struct_passing1(is);
+  WRAP_CALL (check_struct_passing1)(is);
 
   clear_struct_registers;
   iregs.I0 = ls.l;
   num_iregs = 1;
   clear_int_hardware_registers;
-  check_struct_passing2(ls);
+  WRAP_CALL (check_struct_passing2)(ls);
 
 #ifdef CHECK_LARGER_STRUCTS
   clear_struct_registers;
@@ -99,8 +86,8 @@ main (void)
   iregs.I1 = l2s.l2;
   num_iregs = 2;
   clear_int_hardware_registers;
-  check_struct_passing3(l2s);
-  check_struct_passing4(l3s);
+  WRAP_CALL (check_struct_passing3)(l2s);
+  WRAP_CALL (check_struct_passing4)(l3s);
 #endif
 
   return 0;

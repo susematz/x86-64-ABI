@@ -1,17 +1,21 @@
 #!/bin/bash
 
-CC=gcc
-LD=gcc
+test -z "$CC" && CC=gcc
+test -z "$LD" && LD=gcc
+
 # Do not set this flag to anything. It is being set by the different passes
 CFLAGS=
 
 trap : SIGABRT
+
+failed=
 
 # Run a test
 function runtest() {
   ./the-test > test.out 2>&1
   if [ $? -ne 0 ] ; then
     echo "*** Fail! ***"
+    failed="$failed $1"
   else
     echo "Ok."
   fi
@@ -24,7 +28,7 @@ function build() {
   rm -f /tmp/image.simics
 
   $CC -c $* $CFLAGS -W -Wall -o /tmp/test.o -DSTACK_SIZE=1024
-  $LD /tmp/test.o -o the-test
+  $LD /tmp/test.o asm-support.o -o the-test
 }
 
 # Test a file
@@ -40,7 +44,7 @@ function test_file() {
     build $*
     CFLAGS="$old_CFLAGS"
     if [ -f the-test ] ; then
-      runtest
+      runtest $1
       return
     else
       echo "Compile error"
@@ -78,3 +82,9 @@ run_all_tests $*
 
 CFLAGS=-O2
 run_all_tests $*
+
+if test -n "$failed"; then
+  echo "failed: $failed"
+  exit 1
+fi
+exit 0

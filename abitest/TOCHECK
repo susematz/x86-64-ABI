@@ -1,0 +1,42 @@
+Not complete, and mentions some stuff which already is done
+
+3.1.2 Data representation
+  Fundamental types
+    - (IEEE) layout of float, double, long double, __float128
+    - _Bool traits
+    - check that 10 byte padding of long double doesn't affect semantic
+    - layout check for __int128 (little endian in memory)
+    - null pointer for all types has value zero
+    - size_t is defined to unsigned long
+    - layout of _Bools (0/1-ness), and when passing in regs as args (see
+      mail discussion)
+    - alignment of data is not needed but preferred --> check it
+    - alignment of __m128 is required
+
+  Aggregates and unions
+    - structs and unions assume alignment of most strictly aligned
+      member
+    - size of any object is always multiple of its alignment
+    - arrays > 16 bytes or VLA arrays have 16 byte alignment
+    - other arrays have same alignment as elements
+    - contents of padding is undefined (check that it doesn't change semantic)
+
+  Bitfields
+    - when not signed or unsigned, they are unsigned
+    - check ranges of bitfields?
+    - allocated from left to right
+    - in a storage unit appropriate for its declared type
+    - unnamed bitfields do not affect alignment of struct or union
+
+3.2.1 Registers and Stack Frame
+  - check caller/callee saveness (part asm)
+  - CPU shall be in x87 mode at function entry (asm)
+  - direction flag must be clear at function entry (asm)
+
+3.2.2 Stack Frame
+  - end of input area is 16-byte aligned (asm)
+  - check red zone is not destroyed by signal handlers (asm)?
+  - passing of structs where two eightbytes are in different classes
+  - passing of structs where multiple member are in one eightbyte
+  - passing of structs
+  - returning of structs (hidden param and %rax holding address)

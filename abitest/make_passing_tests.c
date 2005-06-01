@@ -134,7 +134,7 @@ make_checking_define (int test_type, int arg_count)
   /* Test actual parameters' values, also for those passed on the stack.  */
   for (i=0; i<arg_count; i++)
     fprintf (file, "  values.%c%d = _%c%d; \\\n", arg_prefix, i, arg_prefix, i);
-  fprintf (file, "  _func1 (");
+  fprintf (file, "  WRAP_CALL(_func1) (");
   for (i=0; i<arg_count; i++)
     {
       if (i != 0)
@@ -151,7 +151,7 @@ make_checking_define (int test_type, int arg_count)
   fprintf (file, "  num_%cregs = %d; \\\n", arg_prefix, i);
 
   /* Make function call.  */
-  fprintf (file, "  _func2 (");
+  fprintf (file, "  WRAP_CALL(_func2) (");
   for (i=0; i<arg_count; i++)
     {
       if (i != 0)
