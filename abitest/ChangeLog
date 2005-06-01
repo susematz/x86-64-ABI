@@ -1,5 +1,12 @@
 2005-06-01  Michael Matz  <matz@suse.de>
 
+	* macros.h (check_align_lv): New macro.
+	(check_basic_struct_size_and_align, check_array_size_and_align,
+	check_basic_union_size_and_align): Use it.
+	* test_bitfields.c (main): Use check_align_lv.
+
+2005-06-01  Michael Matz  <matz@suse.de>
+
 	Cleanup, support -W -Wall, make all testcases work also with
 	-O1 and -O2.
 

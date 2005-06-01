@@ -133,12 +133,12 @@ main (void)
   check_size(u, 2);
 
   /* Check alignof's.  */
-  check_align(str1, 4);
-  check_align(str2, 4);
-  check_align(str3, 2);
-  check_align(str4, 1);
-  check_align(str5, 8);
-  check_align(u, 2);
+  check_align_lv(str1, 4);
+  check_align_lv(str2, 4);
+  check_align_lv(str3, 2);
+  check_align_lv(str4, 1);
+  check_align_lv(str5, 8);
+  check_align_lv(u, 2);
 
   /* Check passing.  */
   str1.j = str2.s = str3.c = str4.c = str5.l = 4;
