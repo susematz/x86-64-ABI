@@ -44,14 +44,14 @@ processor-specific section attribute flag for \code{sh\_flag}
     \begin{tabular}[t]{l|l}
       \multicolumn{1}{c}{Name} & \multicolumn{1}{c}{Value} \\
       \hline
-      \texttt{SHF_AMD64_LARGE} & \texttt{0x10000000}
+      \texttt{SHF_X86_64_LARGE} & \texttt{0x10000000}
     \end{tabular}
   \end{center}
 \Hrule
 \end{table}
 
 \begin{description}
- \item[\code{SHF\_AMD64\_LARGE}] If an object file section does
+ \item[\code{SHF\_X86_64\_LARGE}] If an object file section does
    {\em not} have
    this flag set, then it may not hold more than 2GB and
    can be freely referred to in objects using smaller code models.
@@ -123,21 +123,21 @@ by a system supporting the large code model.
        & \multicolumn{1}{c}{Attributes} \\
       \hline
       \texttt{.lbss} & \texttt{SHT_NOBITS} &
-         \texttt{SHF_ALLOC+SHF_WRITE+SHF_AMD64_LARGE} \\
+         \texttt{SHF_ALLOC+SHF_WRITE+SHF_X86_64_LARGE} \\
       \texttt{.ldata} & \texttt{SHT_PROGBITS} &
-         \texttt{SHF_ALLOC+SHF_WRITE+SHF_AMD64_LARGE} \\
+         \texttt{SHF_ALLOC+SHF_WRITE+SHF_X86_64_LARGE} \\
       \texttt{.ldata1} & \texttt{SHT_PROGBITS} &
-         \texttt{SHF_ALLOC+SHF_WRITE+SHF_AMD64_LARGE} \\
+         \texttt{SHF_ALLOC+SHF_WRITE+SHF_X86_64_LARGE} \\
       \texttt{.lgot} & \texttt{SHT_PROGBITS} &
-         \texttt{SHF_ALLOC+SHF_WRITE+SHF_AMD64_LARGE} \\
+         \texttt{SHF_ALLOC+SHF_WRITE+SHF_X86_64_LARGE} \\
       \texttt{.lplt} & \texttt{SHT_PROGBITS} &
-         \texttt{SHF_ALLOC+SHF_EXECINSTR+SHF_AMD64_LARGE} \\
+         \texttt{SHF_ALLOC+SHF_EXECINSTR+SHF_X86_64_LARGE} \\
       \texttt{.lrodata} & \texttt{SHT_PROGBITS} &
-         \texttt{SHF_ALLOC+SHF_AMD64_LARGE} \\
+         \texttt{SHF_ALLOC+SHF_X86_64_LARGE} \\
       \texttt{.lrodata1} & \texttt{SHT_PROGBITS} &
-         \texttt{SHF_ALLOC+SHF_AMD64_LARGE} \\
+         \texttt{SHF_ALLOC+SHF_X86_64_LARGE} \\
       \texttt{.ltext} & \texttt{SHT_PROGBITS} &
-         \texttt{SHF_ALLOC+SHF_EXECINSTR+SHF_AMD64_LARGE} \\
+         \texttt{SHF_ALLOC+SHF_EXECINSTR+SHF_X86_64_LARGE} \\
     \end{tabular}
   \end{center}
 \Hrule
@@ -158,7 +158,7 @@ models, the following section ordering is suggested:
 \label{sec_eh_frame}
 
 The call frame information needed for unwinding the stack is output in
-an ELF section(s) of type \code{SHT_AMD64_UNWIND}. In the simplest case there
+an ELF section(s) of type \code{SHT_X86_64_UNWIND}. In the simplest case there
 will be one such section per object file and it will be named
 \code{.eh_frame}.  An \code{.eh_frame} section consists of one or more
 subsections. Each subsection contains a CIE (Common Information Entry)

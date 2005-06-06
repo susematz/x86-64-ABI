@@ -1,3 +1,18 @@
+2005-06-06  Michael Matz  <matz@suse.de>
+
+	* macros.tex (version): Increase to 0.96.
+	* abi.tex (changelog): Describe 0.96.
+
+2005-06-06  Michael Matz  <matz@suse.de>
+
+	* low-level-sys-info.tex: Various grammatical issues noted
+	by mfhaigh@acm.org.  Plus, there are no global VLAs.
+
+2005-04-18  Michael Matz  <matz@suse.de>
+
+	By Evandro Menenez.
+	* object-files.tex: Use SHF_X86_64_LARGE instead of SHF_AMD64_LARGE.
+
 2004-11-09  Michael Matz  <matz@suse.de>
 
 	* development.tex (table): Rename title.

@@ -118,10 +118,10 @@ arguments on the stack, all 8 bytes of the register are significant;
 any nonzero value is considered \code{true}.
 
 Like the Intel386 architecture, the \xARCH architecture in general
-does not require all data access to be properly aligned.  Accessing
-misaligned data will be slower than accessing properly aligned data,
-but otherwise there is no difference.  The only exception here is that
-\code{__m128} always has to be aligned properly.
+does not require all data accesses to be properly aligned.  Misaligned
+data accesses are slower than aligned accesses
+but otherwise behave identically.  The only exception is that
+\code{__m128} must always be aligned properly.
 
 \subsubsection{Aggregates and Unions}
 
@@ -131,8 +131,8 @@ offset with the appropriate alignment.  The size of any object is always
 a multiple of the object`s alignment.
 
 An array uses the same alignment as its elements, except that a local
-or global array variable that requires at least 16 bytes, or a C99
-local or global variable-length array variable, always has alignment
+or global array variable of length at least 16 bytes or a C99
+variable-length array variable always has alignment
 of at least 16 bytes.\footnote{The alignment requirement allows the
   use of SSE instructions when operating on the array.  The compiler
   cannot in general calculate the size of a variable-length array (VLA), but
@@ -230,8 +230,7 @@ every function that uses the \MMX registers is required to issue an
 returning or calling another function.  \footnote{All x87 registers
 are caller-saved, so callees that make use of the \MMX registers may
 use the faster \op{femms} instruction.}  The direction flag in the
-\reg{eflags} register must be clear on function entry, and on function
-return.
+\reg{eflags} register must be clear on function entry and return.
 
 \subsection{The Stack Frame}
 \label{sec-stack-frame}
@@ -285,7 +284,7 @@ handlers.\footnote{Locations within 128 bytes can be addressed using
 temporary data that is not needed across function calls.  In
 particular, leaf functions may use this area for their entire stack
 frame, rather than adjusting the stack pointer in the prologue and
-epilogue.  This area is known as \textindex{red zone}.
+epilogue.  This area is known as the \textindex{red zone}.
 
 \subsection{Parameter Passing}
 \label{sec-calling-conventions}
