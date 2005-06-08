@@ -8,6 +8,7 @@ extern const char *types[];
 extern int sizes[];
 extern int aligns[];
 extern int typecount;
+extern const char *returns[];
 
 
 /* The following lists are subsets of the above defined.  */

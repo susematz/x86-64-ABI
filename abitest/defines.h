@@ -78,37 +78,45 @@
 #define CI128_STR "__int128",
 #define CI128_SIZ TYPE_SIZE_INT128,
 #define CI128_ALI TYPE_ALIGN_INT128,
+#define CI128_RET "???",
 #else
 #define CI128_STR
 #define CI128_SIZ
 #define CI128_ALI
+#define CI128_RET
 #endif
 #ifdef CHECK_LONG_DOUBLE
 #define CLD_STR "long double",
 #define CLD_SIZ TYPE_SIZE_LONG_DOUBLE,
 #define CLD_ALI TYPE_ALIGN_LONG_DOUBLE,
+#define CLD_RET "x87_regs[0].ld",
 #else
 #define CLD_STR
 #define CLD_SIZ
 #define CLD_ALI
+#define CLD_RET
 #endif
 #ifdef CHECK_FLOAT128
 #define CF128_STR "__float128",
 #define CF128_SIZ TYPE_SIZE_FLOAT128,
 #define CF128_ALI TYPE_ALIGN_FLOAT128, 
+#define CF128_RET "???",
 #else
 #define CF128_STR
 #define CF128_SIZ
 #define CF128_ALI
+#define CF128_RET
 #endif
 #ifdef CHECK_M64_M128
 #define CMM_STR "__m64", "__m128",
 #define CMM_SIZ TYPE_SIZE_M64, TYPE_SIZE_M128,
 #define CMM_ALI TYPE_ALIGN_M64, TYPE_ALIGN_M128,
+#define CMM_RET "???", "???",
 #else
 #define CMM_STR
 #define CMM_SIZ
 #define CMM_ALI
+#define CMM_RET
 #endif
 
 /* Used in size and alignment tests.  */

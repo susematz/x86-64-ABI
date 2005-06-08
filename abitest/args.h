@@ -1,6 +1,8 @@
 #ifndef INCLUDED_ARGS_H
 #define INCLUDED_ARGS_H
 
+#include <string.h>
+
 /* This defines the calling sequences for integers and floats.  */
 #define I0 rdi
 #define I1 rsi
@@ -25,11 +27,29 @@
 #define F14 xmm14
 #define F15 xmm15
 
+typedef union {
+  float f[4];
+  double d[2];
+  long l[2];
+  int i[4];
+} XMM_T;
+
+typedef union {
+  float f;
+  double d;
+  long double ld;
+  unsigned long ul[2];
+} X87_T;
 extern void (*callthis)(void);
 extern unsigned long rax,rbx,rcx,rdx,rsi,rdi,rsp,rbp,r8,r9,r10,r11,r12,r13,r14,r15;
+XMM_T xmm_regs[16];
+X87_T x87_regs[8];
 extern void snapshot (void);
+extern void snapshot_ret (void);
 #define WRAP_CALL(N) \
   (callthis = (void (*)()) (N), (typeof (&N)) snapshot)
+#define WRAP_RET(N) \
+  (callthis = (void (*)()) (N), (typeof (&N)) snapshot_ret)
 
 /* Clear all integer registers.  */
 #define clear_int_hardware_registers \
@@ -89,7 +109,9 @@ extern unsigned int num_iregs, num_fregs;
     = fregs.st4 = fregs.st5 = fregs.st6 = fregs.st7 = fregs.xmm0 = fregs.xmm1 \
     = fregs.xmm2 = fregs.xmm3 = fregs.xmm4 = fregs.xmm5 = fregs.xmm6 \
     = fregs.xmm7 = fregs.xmm8 = fregs.xmm9 = fregs.xmm10 = fregs.xmm11 \
-    = fregs.xmm12 = fregs.xmm13 = fregs.xmm14 = fregs.xmm15 = 0;
+    = fregs.xmm12 = fregs.xmm13 = fregs.xmm14 = fregs.xmm15 = 0; \
+  memset (xmm_regs, 0, sizeof (xmm_regs)); \
+  memset (x87_regs, 0, sizeof (x87_regs));
 
 /* Clear both hardware and register structs for integers.  */
 #define clear_int_registers \

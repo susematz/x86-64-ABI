@@ -1,3 +1,16 @@
+2005-06-08  Michael Matz  <matz@suse.de>
+
+	* args.h (XMM_T, X87_T): New types.
+	(xmm_regs, x87_regs): New arrays.
+	(WRAP_RET): New macro.
+	(clear_struct_registers): Clear new arrays.
+	* asm-support.S (snapshot_ret): New.
+	* defines.h (CI128_RET, CLD_RET, CF128_RET, CMM_RET): New defines.
+	* make_returning.c: Generated file now uses WRAP_RET to check the
+	return value.
+	* typelist.c (returns): New array;
+	* typelist.h (returns): Declare.
+
 2005-06-01  Michael Matz  <matz@suse.de>
 
 	* Authors: Mention myself.

@@ -45,8 +45,9 @@ make_testing_callee (const char *type, const char *args, const char *ret)
 void
 make_testing_caller ()
 {
-  printf ("#define def_test_returning_type(fun, type, args, ret) \\\n");
-  printf ("  assert (ret == (type) fun (args)); \\\n\n");
+  printf ("#define def_test_returning_type_xmm(fun, type, ret, reg) \\\n");
+  printf ("  WRAP_RET (fun) (); \\\n");
+  printf ("  assert (ret == (type) reg);\n");
 }
 
 void
@@ -54,11 +55,13 @@ make_test_functions ()
 {
   int i;
   char args[100];
+  char ret[100];
 
   /* Make scalar return test functions.  */
   for (i=0; i<typecount; i++) {
-    sprintf (args, "%s arg", types[i]);
-    make_testing_callee (types[i], args, "arg");
+    sprintf (args, "void");
+    sprintf (ret, "%d", i+64);
+    make_testing_callee (types[i], args, ret);
   }
 
   /* Make struct return test functions.  */
@@ -75,10 +78,10 @@ make_test_scalar_returning ()
 
   /* Make the tests.  */
   for (i=0; i<typecount; i++) {
-    printf ("  def_test_returning_type");
+    printf ("  def_test_returning_type_xmm");
     printf ("(fun_test_returning_");
     print_no_spaces (types[i]);
-    printf (", %s, (%s) %d, %d);\n", types[i], types[i], i+64, i+64);
+    printf (", %s, %d, %s);\n", types[i], i+64, returns[i]);
   }
 
   printf ("  return 0;\n}\n");
@@ -105,5 +108,3 @@ main (int argc, char **argv)
 
   return 0;
 }
-
-

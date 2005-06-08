@@ -1,4 +1,4 @@
-	.file	"snapshot.c"
+	.file	"snapshot.S"
 	.text
 	.p2align 4,,15
 .globl snapshot
@@ -24,6 +24,22 @@ snapshot:
 	jmp	*callthis(%rip)
 .LFE3:
 	.size	snapshot, .-snapshot
+
+	.p2align 4,,15
+.globl snapshot_ret
+	.type	snapshot_ret, @function
+snapshot_ret:
+	call	*callthis(%rip)
+	movq	%rax, rax(%rip)
+	movq	%rdx, rdx(%rip)
+	movdqu	%xmm0, xmm_regs+0(%rip)
+	movdqu	%xmm1, xmm_regs+16(%rip)
+	fstpt	x87_regs(%rip)
+	fstpt	x87_regs+16(%rip)
+	fldt	x87_regs+16(%rip)
+	fldt	x87_regs(%rip)
+	.size	snapshot_ret, .-snapshot_ret
+
 	.comm	callthis,8,8
 	.comm	rax,8,8
 	.comm	rbx,8,8
@@ -41,3 +57,5 @@ snapshot:
 	.comm	r13,8,8
 	.comm	r14,8,8
 	.comm	r15,8,8
+	.comm	xmm_regs,256,32
+	.comm	x87_regs,128,32
