@@ -92,7 +92,7 @@ of some entries in the dynamic structure.
 Position-independent code cannot, in general, contain absolute virtual
 addresses. Global offset tables hold absolute addresses in private
 data, thus making the addresses available without compromising the
-position-independence and sharability of a program's text. A program
+position-independence and shareability of a program's text. A program
 references its global offset table using position-independent
 addressing and extracts absolute values, thus redirecting
 position-independent references to absolute locations.
@@ -150,7 +150,7 @@ entry for that function in its associated symbol table entry. This
 will result in symbol table entries with section index of {\tt SHN_UNDEF}
 but a type of {\tt STT_FUNC} and a non-zero {\tt st_value}.  A reference to the
 address of a function from within a shared library will be satisfied
-by such a definition in the executible.
+by such a definition in the executable.
 
 Some relocations are associated with procedure linkage table
 entries. These entries are used for direct function calls rather than

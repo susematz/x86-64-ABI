@@ -1,3 +1,14 @@
+2005-06-10  Michael Matz  <matz@suse.de>
+
+	* introduction.tex: Correct typos, run ispell.
+	* kernel.tex: Ditto.
+	* libraries.tex: Ditto.
+	* dl.tex: Ditto.
+	* abi.tex: Ditto.
+	* low-level-sys-info.tex: Ditto.
+	* macros.tex: Ditto.
+	* object-files.tex: Ditto.
+
 2005-06-06  Michael Matz  <matz@suse.de>
 
 	* macros.tex (version): Increase to 0.96.
