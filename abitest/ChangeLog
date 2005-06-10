@@ -1,3 +1,34 @@
+2005-06-10  Michael Matz  <matz@suse.de>
+
+	Support for testing passing of floating point types.
+
+	* defines.h (ulong, ldouble): New typedefs.
+	(CHECK_FLOAT_DOUBLE_PASSING, CHECK_LARGE_SCALAR_PASSING): Define.
+	(CLD_RET): Adjust for new member name.
+	* args.h (XMM_T, X87_T): Rename members to "_type" form.
+	(FloatRegisters): Use XMM_T for xmm* members.
+	(check_char_arguments, check_short_arguments, check_long_arguments):
+	New macros.
+	(clear_struct_registers): Use memset instead of individual accesses.
+	(check_f_arguments): New macro.
+	(check_float_arguments): Use it.
+	(check_double_arguments, check_ldouble_arguments): New macros.
+	(clear_x87_hardware_registers, clear_x87_registers): New macros.
+	* asm-support.S (snapshot): Also save contents of xmm* registers.
+	* make_passing_tests.c (toplevel): Include defines.h.
+	(X87_TEST): New test type.
+	(test_setting): Enlarge to three elements.
+	(init_test_setting): Only 8 float args are passed in registers.
+	(open_file): Create separate values structure for each type.
+	(make_checking_function): Use it.
+	(make_checking_define): Add new parameter 'TYPE'.  Change code for
+	float tests.
+	(make_test_defs): Add new tests for type X87_TEST.
+	(make_test, make_test2): Call macro with additional type argument.
+	(make_float_tests): The long double test is called ldouble and is
+	a X87_TEST.
+	* typelist.c (returns): Adjust for new member names.
+	
 2005-06-08  Michael Matz  <matz@suse.de>
 
 	* args.h (XMM_T, X87_T): New types.
@@ -8,7 +39,7 @@
 	* defines.h (CI128_RET, CLD_RET, CF128_RET, CMM_RET): New defines.
 	* make_returning.c: Generated file now uses WRAP_RET to check the
 	return value.
-	* typelist.c (returns): New array;
+	* typelist.c (returns): New array.
 	* typelist.h (returns): Declare.
 
 2005-06-01  Michael Matz  <matz@suse.de>

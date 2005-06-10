@@ -1,6 +1,8 @@
 #ifndef DEFINED_DEFINES_H
 #define DEFINED_DEFINES_H
 
+typedef unsigned long ulong;
+typedef long double ldouble;
 
 /* These defines determines what part of the test should be run.  When
    GCC implements these parts, the defines should be uncommented to
@@ -25,7 +27,7 @@
 #define CHECK_LARGER_STRUCTS
 
 /* Checks for passing floats and doubles.  */
- #define CHECK_FLOAT_DOUBLE_PASSING
+#define CHECK_FLOAT_DOUBLE_PASSING
 
 /* Union passing with not-extremely-simple unions.  */
 #define CHECK_LARGER_UNION_PASSING
@@ -35,7 +37,7 @@
 
 /* Check argument passing and returning for scalar types with sizeof = 16.  */
 /* TODO: Implement these tests. Don't activate them for now.  */
-/* #define CHECK_LARGE_SCALAR_PASSING */
+#define CHECK_LARGE_SCALAR_PASSING
 
 /* Defines for sizing and alignment.  */
 
@@ -89,7 +91,7 @@
 #define CLD_STR "long double",
 #define CLD_SIZ TYPE_SIZE_LONG_DOUBLE,
 #define CLD_ALI TYPE_ALIGN_LONG_DOUBLE,
-#define CLD_RET "x87_regs[0].ld",
+#define CLD_RET "x87_regs[0]._ldouble",
 #else
 #define CLD_STR
 #define CLD_SIZ

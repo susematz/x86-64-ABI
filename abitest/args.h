@@ -18,27 +18,19 @@
 #define F5 xmm5
 #define F6 xmm6
 #define F7 xmm7
-#define F8 xmm8
-#define F9 xmm9
-#define F10 xmm10
-#define F11 xmm11
-#define F12 xmm12
-#define F13 xmm13
-#define F14 xmm14
-#define F15 xmm15
 
 typedef union {
-  float f[4];
-  double d[2];
-  long l[2];
-  int i[4];
+  float _float[4];
+  double _double[2];
+  long _long[2];
+  int _int[4];
 } XMM_T;
 
 typedef union {
-  float f;
-  double d;
-  long double ld;
-  unsigned long ul[2];
+  float _float;
+  double _double;
+  ldouble _ldouble;
+  ulong _ulong[2];
 } X87_T;
 extern void (*callthis)(void);
 extern unsigned long rax,rbx,rcx,rdx,rsi,rdi,rsp,rbp,r8,r9,r10,r11,r12,r13,r14,r15;
@@ -78,9 +70,10 @@ struct IntegerRegisters
 };
 struct FloatRegisters
 {
-  double mm0, mm1, mm2, mm3, mm4, mm5, mm6, mm7, st0, st1, st2, st3, st4, st5,
-    st6, st7, xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm8, xmm9,
-    xmm10, xmm11, xmm12, xmm13, xmm14, xmm15;
+  double mm0, mm1, mm2, mm3, mm4, mm5, mm6, mm7;
+  ldouble st0, st1, st2, st3, st4, st5, st6, st7;
+  XMM_T xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm8, xmm9,
+        xmm10, xmm11, xmm12, xmm13, xmm14, xmm15;
 };
 
 /* Implemented in scalarargs.c  */
@@ -97,19 +90,16 @@ extern unsigned int num_iregs, num_fregs;
   assert (num_iregs <= 5 || iregs.I5 == I5); \
   } while (0)
 
+#define check_char_arguments check_int_arguments
+#define check_short_arguments check_int_arguments
+#define check_long_arguments check_int_arguments
+
 /* Clear register struct.  */
 #define clear_struct_registers \
-  iregs.rax = iregs.rbx = iregs.rcx = iregs.rdx = iregs.rsi = iregs.rdi \
-    = iregs.r8 = iregs.r9 = iregs.r10 = iregs.r11 = iregs.r12 = iregs.r13 \
-    = iregs.r14 = iregs.r15 = 0; \
   rax = rbx = rcx = rdx = rdi = rsi = rbp = rsp \
     = r8 = r9 = r10 = r11 = r12 = r13 = r14 = r15 = 0; \
-  fregs.mm0 = fregs.mm1 = fregs.mm2 = fregs.mm3 = fregs.mm4 = fregs.mm5 \
-    = fregs.mm6 = fregs.mm7 = fregs.st0 = fregs.st1 = fregs.st2 = fregs.st3 \
-    = fregs.st4 = fregs.st5 = fregs.st6 = fregs.st7 = fregs.xmm0 = fregs.xmm1 \
-    = fregs.xmm2 = fregs.xmm3 = fregs.xmm4 = fregs.xmm5 = fregs.xmm6 \
-    = fregs.xmm7 = fregs.xmm8 = fregs.xmm9 = fregs.xmm10 = fregs.xmm11 \
-    = fregs.xmm12 = fregs.xmm13 = fregs.xmm14 = fregs.xmm15 = 0; \
+  memset (&iregs, 0, sizeof (iregs)); \
+  memset (&fregs, 0, sizeof (fregs)); \
   memset (xmm_regs, 0, sizeof (xmm_regs)); \
   memset (x87_regs, 0, sizeof (x87_regs));
 
@@ -119,18 +109,34 @@ extern unsigned int num_iregs, num_fregs;
   clear_int_hardware_registers
 
 /* TODO: Do the checking.  */
-#define check_float_register_contents
+#define check_f_arguments(T) { \
+  assert (num_fregs <= 0 || fregs.xmm0._ ## T [0] == xmm_regs[0]._ ## T [0]); \
+  assert (num_fregs <= 1 || fregs.xmm1._ ## T [0] == xmm_regs[1]._ ## T [0]); \
+  assert (num_fregs <= 2 || fregs.xmm2._ ## T [0] == xmm_regs[2]._ ## T [0]); \
+  assert (num_fregs <= 3 || fregs.xmm3._ ## T [0] == xmm_regs[3]._ ## T [0]); \
+  assert (num_fregs <= 4 || fregs.xmm4._ ## T [0] == xmm_regs[4]._ ## T [0]); \
+  assert (num_fregs <= 5 || fregs.xmm5._ ## T [0] == xmm_regs[5]._ ## T [0]); \
+  assert (num_fregs <= 6 || fregs.xmm6._ ## T [0] == xmm_regs[6]._ ## T [0]); \
+  assert (num_fregs <= 7 || fregs.xmm7._ ## T [0] == xmm_regs[7]._ ## T [0]); \
+  } while (0)
 
-/* TODO: Do the checking.  */
-#define check_float_arguments
+#define check_float_arguments check_f_arguments(float)
+#define check_double_arguments check_f_arguments(double)
+
+/* ldoubles are not passed in registers */
+#define check_ldouble_arguments
 
 /* TODO: Do the clearing.  */
 #define clear_float_hardware_registers
+#define clear_x87_hardware_registers
 
 #define clear_float_registers \
   clear_struct_registers \
   clear_float_hardware_registers
 
+#define clear_x87_registers \
+  clear_struct_registers \
+  clear_x87_hardware_registers
 
 
 #endif /* INCLUDED_ARGS_H  */

@@ -40,3 +40,6 @@ Not complete, and mentions some stuff which already is done
   - passing of structs where multiple member are in one eightbyte
   - passing of structs
   - returning of structs (hidden param and %rax holding address)
+
+3.2.3 Parameter Passing
+  - varargs set %al
