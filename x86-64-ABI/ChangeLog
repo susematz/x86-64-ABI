@@ -1,5 +1,16 @@
 2005-06-10  Michael Matz  <matz@suse.de>
 
+	* development.tex: Capitalization, spelling and wording fixes
+	from mfhaigh@acm.org.
+	* dl.tex: Ditto.
+	* introduction.tex: Ditto.
+	* kernel.tex: Ditto.
+	* libraries.tex: Ditto.
+	* low-level-sys-info.tex: Ditto.
+	* object-files.tex: Ditto.
+
+2005-06-10  Michael Matz  <matz@suse.de>
+
 	* introduction.tex: Correct typos, run ispell.
 	* kernel.tex: Ditto.
 	* libraries.tex: Ditto.

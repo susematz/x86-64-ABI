@@ -38,7 +38,7 @@ processor-specific section attribute flag for \code{sh\_flag}
 
 \begin{table}[H]
 \Hrule
-  \caption{\xARCH specific section header flag, \code{sh\_flags}}
+  \caption{\xARCH Specific Section Header Flag, \code{sh\_flags}}
   \label{sh_flags}
   \begin{center}
     \begin{tabular}[t]{l|l}
@@ -66,7 +66,7 @@ processor-specific section attribute flag for \code{sh\_flag}
 
 \begin{table}[H]
 \Hrule
-  \caption{Section header types}
+  \caption{Section Header Types}
   \begin{center}
     \begin{tabular}[t]{l|l}
       \multicolumn{1}{c}{sh_type name} & \multicolumn{1}{c}{Value} \\
@@ -84,7 +84,7 @@ processor-specific section attribute flag for \code{sh\_flag}
         Section \ref{sec_eh_frame} of this document.
 \end{description}
 
-\subsection{Special sections}
+\subsection{Special Sections}
 
 \begin{table}[H]
 \Hrule
@@ -115,7 +115,7 @@ by a system supporting the large code model.
 
 \begin{table}[H]
 \Hrule
-  \caption{Additional special sections for the large code model}
+  \caption{Additional Special Sections for the Large Code Model}
   \label{large_sections}
   \begin{center}
     \begin{tabular}[t]{l|l|l}
@@ -157,8 +157,9 @@ models, the following section ordering is suggested:
 \subsection{EH\_FRAME sections}
 \label{sec_eh_frame}
 
-The call frame information needed for unwinding the stack is output in
-an ELF section(s) of type \code{SHT_X86_64_UNWIND}. In the simplest case there
+The call frame information needed for unwinding the stack is output into
+one or more ELF sections of type \code{SHT_X86_64_UNWIND}. In the simplest
+case there
 will be one such section per object file and it will be named
 \code{.eh_frame}.  An \code{.eh_frame} section consists of one or more
 subsections. Each subsection contains a CIE (Common Information Entry)
@@ -219,7 +220,7 @@ enhanced LSB Chapter 7 for \code{Eh_Frame_Hdr}.
 
 \begin{table}[H]
 \Hrule
-\caption{CIE augmentation section content}
+\caption{CIE Augmentation Section Content}
 \label{format-cieaug}
 \begin{center}
 \begin{tabular}{l|p{6em}|l|p{16em}}
@@ -297,7 +298,7 @@ enhanced LSB Chapter 7 for \code{Eh_Frame_Hdr}.
 
 \begin{table}[H]
 \Hrule
-\caption{FDE augmentation section content}
+\caption{FDE Augmentation Section Content}
 \label{format-fdeaug}
 \begin{center}
 \begin{tabular}{l|p{6em}|l|p{16em}}
@@ -323,7 +324,7 @@ preceding fields of the CIE or FDE.
 
 The overall size of a \code{.eh_frame} section is given in the ELF section
 header.  The only way to determine the number of entries is to scan
-the section till the end and count.
+the section until the end, counting entries as they are encountered.
 
 \section{Symbol Table}
 
@@ -493,7 +494,7 @@ full 64-bit addressing.  See figure \ref{large_relocation_types}.
 
 \begin{figure}[H]
 \Hrule
-\caption{Large model relocation types}\label{large_relocation_types}
+\caption{Large Model Relocation Types}\label{large_relocation_types}
 \begin{footnotesize}
 \begin{tabular}{|l|l|l|l|}
 \hline

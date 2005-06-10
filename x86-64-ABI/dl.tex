@@ -29,7 +29,7 @@ the system expunges them is unspecified.
 One aspect of segment loading differs between executable files and
 shared objects. Executable file segments typically contain absolute
 code (see section \ref{sec_coding_examples} ``Coding Examples'').
-To let the process
+For the process to
 execute correctly, the segments must reside at the virtual addresses
 used to build the executable file. Thus the system uses the {\tt p_vaddr}
 values unchanged as virtual addresses.
@@ -54,7 +54,7 @@ The following \xARCH program header types are defined:
 
 \begin{table}[H]
 \Hrule
-  \caption{Program header types}
+  \caption{Program Header Types}
   \begin{center}
     \begin{tabular}[t]{l|l}
       \multicolumn{1}{c}{Name} & \multicolumn{1}{c}{Value} \\
@@ -130,7 +130,7 @@ For the large models the GOT is allowed to be up to 16EB in size.
 
 The symbol \code{\_GLOBAL\_OFFSET\_TABLE\_} may reside in the
 middle of the {\tt .got} section, allowing both negative and
-non-negative ``subscripts'' into the array of addresses.
+non-negative offsets into the array of addresses.
 
 \subsubsection{Function Addresses}
 
@@ -285,7 +285,7 @@ in \code{\%r15}\footnote{See Function Prologue.}.
 
 \begin{figure}[H]
 \Hrule
-\caption{Final large code model PLT} \label{final_large_plt}
+\caption{Final Large Code Model PLT} \label{final_large_plt}
 \begin{footnotesize}
 \begin{verbatim}
 .PLT0:  pushq   8(%r15)          # GOT[1]

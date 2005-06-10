@@ -179,7 +179,7 @@ have the same range as a bit-field of the same size with the
 corresponding unsigned type. Bit-fields obey the same size and
 alignment rules as other structure and union members.
 
-Also  
+Also:
 \begin{itemize}
  \item bit-fields are allocated from right to left
  \item bit-fields must be contained in a storage unit appropriate 
@@ -290,7 +290,7 @@ epilogue.  This area is known as the \textindex{red zone}.
 \label{sec-calling-conventions}
 
 After the argument values have been computed, they are placed in
-registers, or pushed on the stack.  The way how values are passed is
+registers or pushed on the stack.  The way how values are passed is
 described in the following sections.
 
 \paragraph{Definitions}
@@ -472,9 +472,9 @@ arguments & No\\
 \Hrule
 \end{figure}
 
-If there is no register available anymore for any \eightbyte of an
+If there are no registers available for any \eightbyte of an
 argument, the whole argument is passed on the stack. If registers have
-already been assigned for some \eightbytes of this argument, those
+already been assigned for some \eightbytes of such an argument, the
 assignments get reverted.
 
 Once registers are assigned, the arguments passed in memory are pushed
@@ -1189,7 +1189,7 @@ are free to use any other register. Throughout this document,
 
 \begin{figure}[H]
 \Hrule
-\caption{Position-independent function prolog code} \label{large_pic_prolog}
+\caption{Position-Independent Function Prolog Code} \label{large_pic_prolog}
 medium model:
 \begin{footnotesize}
 \begin{verbatim}
@@ -1447,7 +1447,7 @@ model.
 
 \begin{figure}[H]
 \Hrule
-\caption{Absolute global data load and store}\label{large_abs_data_load_store}
+\caption{Absolute Global Data Load and Store}\label{large_abs_data_load_store}
 \begin{center}
 \begin{footnotesize}
 \begin{tabular}{|l|l|}
@@ -1478,7 +1478,7 @@ model.
             
 \begin{figure}[H]
 \Hrule
-\caption{Faster absolute global data load and store}
+\caption{Faster Absolute Global Data Load and Store}
 \label{large_rip_rel_addr_abs}
 \begin{center}
 \begin{footnotesize}
@@ -1504,7 +1504,7 @@ addressing mode can be used instead. See example in figure
 
 \begin{figure}[H]
 \Hrule
-\caption{Position-independent global data load and store}
+\caption{Position-Independent Global Data Load and Store}
 \label{large_pic_data_load_store}
 \begin{center}
 \begin{footnotesize}
@@ -1538,7 +1538,7 @@ addressing mode can be used instead. See example in figure
 
 \begin{figure}[H]
 \Hrule
-\caption{Faster position-independent global data load and store}
+\caption{Faster Position-Independent Global Data Load and Store}
 \label{large_rip_rel_addr_pic}
 \begin{center}
 \begin{footnotesize}
@@ -1604,7 +1604,7 @@ desired address reaching the whole 64-bit address space.
 
 \begin{figure}[H]
 \Hrule
-\caption{Absolute direct and indirect function call} \label{large_abs_dir_func_call}
+\caption{Absolute Direct and Indirect Function Call} \label{large_abs_dir_func_call}
 \begin{footnotesize}
 \begin{tabular}{|l|l|}
 \hline
@@ -1636,7 +1636,7 @@ And in the case of position-independent objects
 
 \begin{figure}[H]
 \Hrule
-\caption{Position-independent direct and indirect function call}\label{large_pic_pic_ind_func_call}
+\caption{Position-Independent Direct and Indirect Function Call}\label{large_pic_pic_ind_func_call}
 \begin{footnotesize}
 \begin{tabular}{|l|l|}
 \hline
@@ -1745,7 +1745,7 @@ implicitly (see figure \ref{large_cal_tgt_addr}}. For absolute objects:
 
 \begin{figure}[H]
 \Hrule
-\caption{Absolute branching code}\label{large_abs_branching}
+\caption{Absolute Branching Code}\label{large_abs_branching}
 \begin{footnotesize}
 \begin{tabular}{|l|l|}
 \hline
@@ -1767,7 +1767,7 @@ implicitly (see figure \ref{large_cal_tgt_addr}}. For absolute objects:
 
 \begin{figure}
 \Hrule
-\caption{Implicit calculation of target address}\label{large_cal_tgt_addr}
+\caption{Implicit Calculation of Target Address}\label{large_cal_tgt_addr}
 \begin{footnotesize}
 \begin{tabular}{|l|l|}
 \hline
@@ -1788,7 +1788,7 @@ For position-independent objects:
 
 \begin{figure}[H]
 \Hrule
-\caption{Position-independent branching code}\label{large_pic_branching}
+\caption{Position-Independent Branching Code}\label{large_pic_branching}
 \begin{footnotesize}
 \begin{tabular}{|l|l|}
 \hline
@@ -1816,7 +1816,7 @@ For absolute objects, the implementation of the \code{switch} statement is:
 
 \begin{figure}[H]
 \Hrule
-\caption{Absolute switch code}\label{large_abs_switch}
+\caption{Absolute Switch Code}\label{large_abs_switch}
 \begin{footnotesize}
 \begin{tabular}{|l|l|}
 \hline
@@ -1849,7 +1849,7 @@ statement implementation changes to:
 
 \begin{figure}[H]
 \Hrule
-\caption{Position-independent switch code}\label{large_pic_switch}
+\caption{Position-Independent Switch Code}\label{large_pic_switch}
 \begin{footnotesize}
 \begin{tabular}{|l|l|}
 \hline
@@ -1886,8 +1886,8 @@ subsystems to thrash.}
 \subsection{Variable Argument Lists}
 
 Some otherwise portable C programs depend on the argument passing
-scheme, implicitly assuming that 1) all arguments are passed on the
-stack, and 2) arguments appear in increasing order on the stack.
+scheme, implicitly assuming that all arguments are passed on the
+stack, and arguments appear in increasing order on the stack.
 Programs that make these assumptions never have been portable, but
 they have worked on many implementations. However, they do not work on
 the \xARCH architecture because some arguments are passed in
@@ -2116,8 +2116,8 @@ This section\footnote{This section is structured in a way similar to
   the PowerPC psABI}
 defines the Debug With Arbitrary Record Format (DWARF) debugging
 format for the \xARCH processor family. The \xARCH ABI does not define
-a debug format.  However, all systems that do implement DWARF shall use
-the following definitions.
+a debug format.  However, all systems that do implement DWARF on \xARCH shall
+use the following definitions.
 
 DWARF is a specification developed for symbolic, source-level debugging.
 The debugging information format does not favor the design of any
@@ -2217,7 +2217,7 @@ extensions:
 
 \begin{figure}
 \Hrule
-\caption{Pointer encoding specification byte} \label{tbl-pointer-encoding}
+\caption{Pointer Encoding Specification Byte} \label{tbl-pointer-encoding}
 \begin{center}
 \begin{tabular}{r|l}
 \multicolumn{1}{c}{Mask}&\multicolumn{1}{c}{Meaning}\\

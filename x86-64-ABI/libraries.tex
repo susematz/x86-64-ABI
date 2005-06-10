@@ -68,7 +68,7 @@ There are two major reasons for unwinding the stack:
 \begin{itemize}
   \item exceptions, as defined by languages that support them (such as C++)
   \item ``forced'' unwinding (such as caused by \codeindex{longjmp} or thread
-    termination).
+    termination)
 \end{itemize}
 
 The interface described here tries to keep both similar. There is a
@@ -200,7 +200,7 @@ The interpretations of these codes are described below.
 The unwind interface uses a pointer to an exception header object
 as its representation of an exception being thrown. In general,
 the full representation of an exception object is language- and
-implementation-specific, but it will be prefixed by a header understood
+implementation-specific, but is prefixed by a header understood
 by the unwind interface, defined as follows:
 
 \code{
@@ -872,7 +872,7 @@ are added:
 
 \begin{figure}[H]
 \Hrule
-\caption{Examples for unwinding in assembler}
+\caption{Examples for Unwinding in Assembler}
 \label{fig_asm_unwinding}
 \begin{center}
 \begin{small}
