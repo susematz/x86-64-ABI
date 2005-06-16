@@ -1,7 +1,7 @@
 #!/bin/bash
 
 test -z "$CC" && CC=gcc
-test -z "$LD" && LD=gcc
+test -z "$LD" && LD="$CC"
 
 # Do not set this flag to anything. It is being set by the different passes
 CFLAGS=

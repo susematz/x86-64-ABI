@@ -45,6 +45,7 @@ snapshot:
 .globl snapshot_ret
 	.type	snapshot_ret, @function
 snapshot_ret:
+	movq	%rdi, rdi(%rip)
 	call	*callthis(%rip)
 	movq	%rax, rax(%rip)
 	movq	%rdx, rdx(%rip)

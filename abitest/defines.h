@@ -135,4 +135,11 @@ extern void abort (void);
 #define ATTRIBUTE_UNUSED
 #endif
 
+#ifdef __GNUC__
+#define PACKED __attribute__((__packed__))
+#else
+#warning Some tests will fail due to missing __packed__ support
+#define PACKED
+#endif
+
 #endif /* DEFINED_DEFINES_H */

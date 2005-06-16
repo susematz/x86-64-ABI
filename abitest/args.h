@@ -24,6 +24,7 @@ typedef union {
   double _double[2];
   long _long[2];
   int _int[4];
+  unsigned long _ulong[2];
 } XMM_T;
 
 typedef union {

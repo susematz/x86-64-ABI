@@ -1,3 +1,15 @@
+2005-06-16  Michael Matz  <matz@suse.de>
+
+	Support for testing returning of structs.
+
+	* abitest: Use $CC as default for $LD.
+	* args.h (XMM_T._ulong): New member.
+	* asm-support.S (snapshot_ret): Save %rdi away before calling.
+	* defines.h (PACKED): New macro.
+	* make_returning.c (make_test_struct_returning): Remove.
+	(main): Don't call it.
+	* test_struct_returning.c: New file.
+
 2005-06-10  Michael Matz  <matz@suse.de>
 
 	Support for testing passing of floating point types.

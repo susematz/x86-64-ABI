@@ -1,6 +1,6 @@
-#include "typelist.h"
 #include <stdio.h>
 #include <string.h>
+#include "typelist.h"
 
 
 /* This builds the tests for returning arguments.  */
@@ -63,9 +63,6 @@ make_test_functions ()
     sprintf (ret, "%d", i+64);
     make_testing_callee (types[i], args, ret);
   }
-
-  /* Make struct return test functions.  */
-  /* TODO: This.  */
 }
 
 void
@@ -87,11 +84,6 @@ make_test_scalar_returning ()
   printf ("  return 0;\n}\n");
 }
 
-void
-make_test_struct_returning ()
-{
-}
-
 int
 main (int argc, char **argv)
 {
@@ -102,9 +94,6 @@ main (int argc, char **argv)
   make_test_functions ();
   make_testing_caller ();
   make_test_scalar_returning ();
-
-  /* TODO: Test structs and unions return.  */
-  make_test_struct_returning ();
 
   return 0;
 }
