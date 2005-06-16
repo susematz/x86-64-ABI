@@ -55,6 +55,7 @@ snapshot_ret:
 	fstpt	x87_regs+16(%rip)
 	fldt	x87_regs+16(%rip)
 	fldt	x87_regs(%rip)
+	ret
 	.size	snapshot_ret, .-snapshot_ret
 
 	.comm	callthis,8,8
@@ -76,3 +77,4 @@ snapshot_ret:
 	.comm	r15,8,8
 	.comm	xmm_regs,256,32
 	.comm	x87_regs,128,32
+	.comm   volatile_var,8,8

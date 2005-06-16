@@ -1,5 +1,13 @@
 2005-06-16  Michael Matz  <matz@suse.de>
 
+	* args.h (volatile_var): Declare.
+	* asm-support.S (volatile_var): Define.
+	(snapshot_ret): Add a 'ret' to the function. ;-)
+	* make_returning (make_testing_callee): Use volatile_var.
+	(make_testing_caller): Also check the actual return value.
+
+2005-06-15  Michael Matz  <matz@suse.de>
+
 	Support for testing returning of structs.
 
 	* abitest: Use $CC as default for $LD.

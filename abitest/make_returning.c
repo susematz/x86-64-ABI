@@ -39,15 +39,21 @@ make_testing_callee (const char *type, const char *args, const char *ret)
 {
   printf ("%s\nfun_test_returning_", type);
   print_no_spaces (type);
-  printf (" (%s)\n{\n  return %s;\n}\n\n", args, ret);
+  /* We need to make sure that 'typeof' of this function (used in the
+     WRAP* macros) does not contain an automatically determined 'const pure'
+     specified.  If it does, then using this type as type for a
+     function pointer inherits this specifier.  When calling such
+     function pointer GCC can optimize away the call, it it thinks it's
+     pure (even though overridden with 'snapshot*' meanwhile).  */
+  printf (" (%s)\n{\n  volatile_var++;\n  return %s;\n}\n\n", args, ret);
 }
 
 void
 make_testing_caller ()
 {
   printf ("#define def_test_returning_type_xmm(fun, type, ret, reg) \\\n");
-  printf ("  WRAP_RET (fun) (); \\\n");
-  printf ("  assert (ret == (type) reg);\n");
+  printf ("  { type var = WRAP_RET (fun) (); \\\n");
+  printf ("  assert (ret == (type) reg && ret == var); }\n");
 }
 
 void
