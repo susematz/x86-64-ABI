@@ -36,10 +36,46 @@ Not complete, and mentions some stuff which already is done
 3.2.2 Stack Frame
   - end of input area is 16-byte aligned (asm)
   - check red zone is not destroyed by signal handlers (asm)?
-  - passing of structs where two eightbytes are in different classes
-  - passing of structs where multiple member are in one eightbyte
-  - passing of structs
-  - returning of structs (hidden param and %rax holding address)
 
 3.2.3 Parameter Passing
+  - passing of basic types
+  - passing of __int128, __float128
+  - passing of __complex types
+  - passing of structs
+  - passing of structs where two eightbytes are in different classes
+  - passing of structs where multiple member are in one eightbyte
+  - passing of arguments needing more than one reg, where only one is
+    free (should be in memory then), this register is then free again
+  - passing like the ABI example (figures 3.5, 3.6)
+  - returning of basic types
+  - returning of __int128, __float128
+  - returning of __complex types
+  - returning of structs (hidden param and %rax holding address)
+  - returning of unions?
   - varargs set %al
+
+3.4 Process Initialization
+3.4.1 Initial Stack and Register State
+  - check that SSE and x87 exceptions status is cleared at program start
+    (no GCC test)
+  - check that control words have the correct content (table 3.3 and 3.4)
+    (no GCC test)
+  - check content of DF flag (must be zero on entry and exit of functions)
+
+3.5 Coding Examples
+3.5.7 Variable Argument Lists
+  - create check as per figures 3.31 and 3.32
+  - check layout of register save area (get to it by the va_start macro)
+
+Medium Model
+  - large objects should be in .lbss/.ldata
+  - large objects with small model should _not_ be in .lbss/.ldata
+  - large objects should _not_ be declarable in small model
+  - -G SIZE should have an effect with ld
+  - test uninit data (.*bss) and inited data (.*data)
+  - test static and non-static global objects
+  - test arrays or structs containing big arrays
+  - test multiple large arrays
+  - create various access to the elements: explicit pointers, direct
+    array/member accesses
+  - debug info correct for large objects?

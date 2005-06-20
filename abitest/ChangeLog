@@ -1,3 +1,14 @@
+2005-06-20  Michael Matz  <matz@suse.de>
+
+	* medium-test.c: New test.
+	* abitest: Recognize -m option.  Do a loop over medium-test.c
+	checking with various settings.
+
+	* abi-x86_64.exp: New file.  Can be used in GCC testsuite.
+
+	* TOCHECK: Update.
+	* README: Update.
+
 2005-06-16  Michael Matz  <matz@suse.de>
 
 	* args.h (volatile_var): Declare.

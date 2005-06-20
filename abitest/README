@@ -23,9 +23,6 @@ Make a test that clobbers all registers and just returns. This is
 meant to test if all callee-saved registers are saved and restored. A
 similar test should be made to test caller-saved registers.
 
-The value returning tests could be augmented with a test to check that the
-values are not just correct, but also passed in the correct registers.
-
 
 Documentation
 -------------
