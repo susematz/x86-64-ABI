@@ -1,3 +1,9 @@
+2005-06-27  Michael Matz  <matz@suse.de>
+
+	* test_struct_returning.c: Change return-in-memory tests to
+	not compare the passed return address with struct_addr.
+	* abi-x86_64.exp: Add target test.
+
 2005-06-20  Michael Matz  <matz@suse.de>
 
 	* medium-test.c: New test.

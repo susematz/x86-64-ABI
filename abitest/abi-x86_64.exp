@@ -18,6 +18,13 @@
 # testcases.  For simplicity we will just link it into each test.
 
 load_lib c-torture.exp
+load_lib target-supports.exp
+
+if { (![istarget x86_64-*-*] && ![istarget i?86-*-*])
+     || ![is-effective-target lp64] } then {
+  return
+}
+
 
 set additional_flags "-W -Wall"
 
