@@ -229,8 +229,15 @@ every function that uses the \MMX registers is required to issue an
 \op{emms} or \op{femms} instruction after using \MMX registers, before
 returning or calling another function.  \footnote{All x87 registers
 are caller-saved, so callees that make use of the \MMX registers may
-use the faster \op{femms} instruction.}  The direction flag in the
-\reg{eflags} register must be clear on function entry and return.
+use the faster \op{femms} instruction.}  The direction flag \code{DF} in the
+\reg{rFLAGS} register must be clear (set to ``forward'' direction) on function
+entry and return.  Other user flags have no specified role in the
+standard calling sequence and are {\em not} preserved across calls.
+
+The control bits of the \code{MXCSR} register are callee-saved
+(preserved across calls), while the status bits are caller-saved (not
+preserved).  The x87 status word register is caller-saved, whereas
+the x87 control word is callee-saved.
 
 \subsection{The Stack Frame}
 \label{sec-stack-frame}
@@ -432,7 +439,7 @@ left-to-right order) for passing as follows:
   \caption{Register Usage}
   \label{fig-reg-usage}
   \begin{center}
-    \begin{tabular}{l|p{6.35cm}|l}
+    \begin{tabular}{l|p{8.35cm}|l}
       \noalign{\smallskip}
       \multicolumn{1}{c}{} &
       \multicolumn{1}{c}{}&
@@ -462,10 +469,12 @@ arguments & No\\
 \reg{xmm2}--\reg{xmm7} & used to pass floating point arguments & No\\
 \reg{xmm8}--\reg{xmm15} & temporary registers & No\\
 \reg{mmx0}--\reg{mmx7}& temporary registers & No\\
-\reg{st0} & temporary register; used to return \code{long double} arguments & No \\
-\reg{st1} & temporary registers; used to return \code{long double} arguments & No \\
+\reg{st0},\reg{st1} & temporary registers; used to return \code{long double} arguments & No \\
 \reg{st2}--\reg{st7} & temporary registers & No \\
-\reg{fs}& Reserved for system use (as thread specific data register) & No\\
+\reg{fs}& Reserved for system (as thread specific data register) & No\\
+\code{mxcsr}& SSE2 control and status word & partial\\
+\code{x87 SW}& x87 status word & No\\
+\code{x87 CW}& x87 control word & Yes\\
     \end{tabular}
 
   \end{center}
@@ -815,11 +824,6 @@ is shown in table \ref{rflags-status}.
   \end{center}
 \Hrule
 \end{table}
-
-The direction flag \code{DF} must be set to
-the ``forward'' direction (that is to zero) before entry and upon exit
-from a function. Other user flags have no specified role in the
-standard calling sequence and are {\em not} preserved.
 
 \subsubsection{Stack State}
 

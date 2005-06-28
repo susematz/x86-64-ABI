@@ -4,10 +4,16 @@
 \newif\ifpdf
 
 \ifx\pdfoutput\undefined
-  \pdffalse
 \else
-  \pdftrue
+  \ifx\pdfoutput\relax
+  \else
+    \ifcase\pdfoutput
+    \else
+      \pdftrue
+    \fi
+  \fi
 \fi
+
 
 \ifpdf
 \pdfcompresslevel 5
@@ -40,7 +46,7 @@
 \usepackage{here}
 
 % Version number of document - increment occasionally ;-)
-\newcommand{\version}{0.96}
+\newcommand{\version}{0.97}
 
 % Print a footer everywhere with current date
 % prelim2e needs \thistime

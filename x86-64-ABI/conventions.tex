@@ -1,4 +1,3 @@
-\chapter{Conventions}
 
 \editornote{This chapter is used to document some features special to
   the \xARCH ABI.  The different sections might be moved to another
@@ -25,116 +24,9 @@ For the \textindex{C++} ABI we will use the IA-64 C++ ABI and instantiate it
 appropriately.  The current draft of that ABI is available at:\\
 \url{http://www.codesourcery.com/cxx-abi/}
 
-\section{Fortran}
-
-A formal Fortran ABI does not exist.  Most Fortran compilers are
-designed for very specific high performance computing applications, so
-Fortran compilers use different passing conventions and memory layouts
-optimized for their specific purpose.  For example, Fortran
-applications that must run on distributed memory machines need a
-different data representation for array descriptors (also known as
-dope vectors, or fat pointers) than applications running on symmetric
-multiprocessor shared memory machines.  A normative ABI for Fortran is
-therefore not desirable.  However, for interoperability of different
-Fortran compilers, as well as for interoperability with other
-languages, this section provides some some guidelines for data types
-representation, and argument passing.  The guidelines in this section
-are derived from the GNU Fortran 77 (G77) compiler.  Other Fortran
-compilers already available for AMD64 at the time of this writing may
-use different conventions, so compatibility is not guaranteed.
-
-When this text uses the term {\em Fortran function}, the test applies
-to both Fortran \code{FUNCTION} and \code{SUBROUTINE} subprograms
-unless specifically stated otherwise.
-
-
-\subsection{Representation of Fortran Types}
-
-For historical reasons, GNU Fortran 77 maps Fortran programs to the C
-ABI, so the data representation can be explained best by providing the
-mapping of Fortran types to C types used by G77 on AMD64\footnote{G77
-  provides a header \code{g2c.h} with the equivalent C type
-  definitions for all supported Fortran scalar types.} as in figure
-\ref{fortran-c-types}.  The ``\code{TYPE*N}'' notation specifies that
-variables or aggregate members of type \code{TYPE} shall occupy
-\code{N} bytes of storage.
-
-
-\begin{figure}
-\Hrule
-\caption{Mapping of Fortran to C types} \label{fortran-c-types}
-\begin{center}
-\begin{footnotesize}
-\begin{tabular}{l|l|l}
-\multicolumn{1}{c}{Fortran}&\multicolumn{1}{c}{Data
-  kind}&\multicolumn{1}{c}{Equivalent C type}\\
-\hline
-\code{INTEGER*4}      &  Default integer                       &  \code{signed int} \\
-\code{INTEGER*8}      &  Double precision integer              &  \code{signed long}\\
-\code{REAL*4}         &  Single precision FP number            &  \code{float}\\
-\code{REAL*8}         &  Double precision FP number            &  \code{double}\\
-\code{COMPLEX}        &  Single precision complex FP number    &  \code{complex float}\\
-\code{DOUBLE COMPLEX} &  Double precision complex FP number    &  \code{complex double}\\
-\code{LOGICAL}        &  Boolean logical type                  &  \code{signed char}\\
-\code{CHARACTER}      &  Text string                           &  \code{char[] + length}\\
-\end{tabular}
-\end{footnotesize}
-\end{center}
-\Hrule
-\end{figure}
-
-Data objects with a \code{CHARACTER} type are represented as an array
-of characters of the C char type (not guaranteed to be
-``\code{$\backslash$0}'' terminated) with a separate length counter to
-distinguish between between \code{CHARACTER} data objects with a
-length parameter, and aggregate types of \code{CHARACTER} data
-objects, possibly also with a length parameter.
-
-Layout of other aggregate types is implementation defined.  GNU
-Fortran puts all arrays in contiguous memory in column-major order.
-GNU Fortran 95 builds an equivalent C struct for derived types without
-reordering the type fields.  Other compilers may use other
-representations as needed.  The representation and use of Fortran
-90/95 array descriptors is implementation defined.
-
-Fortran 90/95 allow different kinds of each basic type using the kind
-type parameter of a type.  Kind type parameter values are
-implementation defined.
-
-
-\subsection{Argument Passing}
-
-For each given Fortran 77 function, an equivalent C prototype can be
-derived. Once this equivalent C prototype is known, the C ABI
-conventions should be applied to determine how arguments are passed to
-the Fortran function.
-
-G77 passes all (user defined) formal arguments of a function by
-reference.  Specifically, pointers to the location in memory of a
-variable, array, array element, a temporary location that holds the
-result of evaluating an expression or a temporary or permanent
-location that holds the value of a constant (xf. g77 manual) are
-passed as actual arguments. Artificial compiler generated arguments
-may be passed by value or by reference.
-
-Data objects with a \code{CHARACTER} type are passed as a pointer to
-the character string and its length, so that each \code{CHARACTER}
-formal argument in a Fortran function results in two actual arguments
-in the equivalent C prototype.  The first argument occupies the
-position in the formal argument list of the Fortran function.  This
-argument is a pointer to the array of characters that make up the
-string, passed by the caller.  The second argument is appended to the
-end of the user-specified formal argument list.  This argument is of
-the default integer type and its value is the length of the array of
-characters, that is the length, passed as the first argument.  When
-more than one \code{CHARACTER} argument is present in an argument
-list, the length arguments are appended in the order the original
-arguments appear.
-
-Fortran 90/95 function arguments with the \code{INTENT(IN)} attribute
-should also passed by value whenever possible.  Fortran 90/95 passing
-of arrays is implementation defined.
-
+%%% We would like to include the fortran text here, but we can't nest
+%%% includes.  Hence, do it in the main file.
+%%% \include{fortran}
 
 %%% Local Variables:
 %%% mode: latex

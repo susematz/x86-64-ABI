@@ -21,6 +21,7 @@ Draft Version \version}}
 
 \begin{description}
 
+\item[0.97] Integrate fortran ABI.
 \item[0.96] Use \code{SHF_X86_64_LARGE} instead \code{SHF_AMD64_LARGE}
   (thanks to Evandro Menenez).  Correct various grammatical errors
   noted by Mark F. Haigh, who also noted that there are no global VLAs
@@ -78,7 +79,13 @@ Draft Version \version}}
 \include{libraries}
 \include{development}
 \include{execution}
+
+%%% Bah, we can't nest includes, hence begin the chapter outside
+%%% of the included file, so that conventions and fortran come to lie
+%%% in the same chapter
+\chapter{Conventions}
 \include{conventions}
+\include{fortran}
 
 \appendix
 \include{kernel}
