@@ -64,11 +64,12 @@ make_test_functions ()
   char ret[100];
 
   /* Make scalar return test functions.  */
-  for (i=0; i<typecount; i++) {
-    sprintf (args, "void");
-    sprintf (ret, "%d", i+64);
-    make_testing_callee (types[i], args, ret);
-  }
+  for (i=0; i<typecount; i++)
+    if ((testflags[i] & NO_AUTORETURN) == 0) {
+      sprintf (args, "void");
+      sprintf (ret, "%d", i+64);
+      make_testing_callee (types[i], args, ret);
+    }
 }
 
 void
@@ -80,12 +81,13 @@ make_test_scalar_returning ()
   printf ("int\nmain (void)\n{\n");
 
   /* Make the tests.  */
-  for (i=0; i<typecount; i++) {
-    printf ("  def_test_returning_type_xmm");
-    printf ("(fun_test_returning_");
-    print_no_spaces (types[i]);
-    printf (", %s, %d, %s);\n", types[i], i+64, returns[i]);
-  }
+  for (i=0; i<typecount; i++) 
+    if ((testflags[i] & NO_AUTORETURN) == 0) {
+      printf ("  def_test_returning_type_xmm");
+      printf ("(fun_test_returning_");
+      print_no_spaces (types[i]);
+      printf (", %s, %d, %s);\n", types[i], i+64, returns[i]);
+    }
 
   printf ("  return 0;\n}\n");
 }

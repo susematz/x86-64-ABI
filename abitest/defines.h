@@ -18,7 +18,7 @@ typedef long double ldouble;
 /* #define CHECK_FLOAT128 */
 
 /* Scalar types __m64 and __m128.  */
-/* #define CHECK_M64_M128 */
+#define CHECK_M64_M128
 
 /* Returning of complex type.  */
 #define CHECK_COMPLEX
@@ -38,6 +38,10 @@ typedef long double ldouble;
 /* Check argument passing and returning for scalar types with sizeof = 16.  */
 /* TODO: Implement these tests. Don't activate them for now.  */
 #define CHECK_LARGE_SCALAR_PASSING
+
+#ifdef CHECK_M64_M128
+#include <xmmintrin.h>
+#endif
 
 /* Defines for sizing and alignment.  */
 
@@ -81,44 +85,52 @@ typedef long double ldouble;
 #define CI128_SIZ TYPE_SIZE_INT128,
 #define CI128_ALI TYPE_ALIGN_INT128,
 #define CI128_RET "???",
+#define CI128_TES 0,
 #else
 #define CI128_STR
 #define CI128_SIZ
 #define CI128_ALI
 #define CI128_RET
+#define CI128_TES
 #endif
 #ifdef CHECK_LONG_DOUBLE
 #define CLD_STR "long double",
 #define CLD_SIZ TYPE_SIZE_LONG_DOUBLE,
 #define CLD_ALI TYPE_ALIGN_LONG_DOUBLE,
 #define CLD_RET "x87_regs[0]._ldouble",
+#define CLD_TES 0,
 #else
 #define CLD_STR
 #define CLD_SIZ
 #define CLD_ALI
 #define CLD_RET
+#define CLD_TES
 #endif
 #ifdef CHECK_FLOAT128
 #define CF128_STR "__float128",
 #define CF128_SIZ TYPE_SIZE_FLOAT128,
 #define CF128_ALI TYPE_ALIGN_FLOAT128, 
 #define CF128_RET "???",
+#define CF128_TES 0,
 #else
 #define CF128_STR
 #define CF128_SIZ
 #define CF128_ALI
 #define CF128_RET
+#define CF128_TES
 #endif
 #ifdef CHECK_M64_M128
 #define CMM_STR "__m64", "__m128",
 #define CMM_SIZ TYPE_SIZE_M64, TYPE_SIZE_M128,
 #define CMM_ALI TYPE_ALIGN_M64, TYPE_ALIGN_M128,
 #define CMM_RET "???", "???",
+#define CMM_TES NO_AUTORETURN, NO_AUTORETURN,
 #else
 #define CMM_STR
 #define CMM_SIZ
 #define CMM_ALI
 #define CMM_RET
+#define CMM_TES
 #endif
 
 /* Used in size and alignment tests.  */

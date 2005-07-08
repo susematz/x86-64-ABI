@@ -1,6 +1,10 @@
 #ifndef TYPELIST_H
 #define TYPELIST_H
 
+/* Don't generate returning or passing tests for this type,
+   but _do_ generate size and alignment tests.  */
+#define NO_AUTORETURN 1
+
 /* This is the list of types to be tested. The content of the list can be
    controlled by the defines in defines.h.  */
 
@@ -9,6 +13,7 @@ extern int sizes[];
 extern int aligns[];
 extern int typecount;
 extern const char *returns[];
+extern int testflags[];
 
 
 /* The following lists are subsets of the above defined.  */

@@ -9,6 +9,7 @@ int sizes[] = { 1, 2, 4, 8, 8, 4, 8, CI128_SIZ CLD_SIZ CF128_SIZ CMM_SIZ };
 int aligns[] = { 1, 2, 4, 8, 8, 4, 8, CI128_ALI CLD_ALI CF128_ALI CMM_ALI };
 const char *returns[] = { "rax", "rax", "rax", "rax", "rax", "xmm_regs[0]._float[0]",
 			  "xmm_regs[0]._double[0]", CI128_RET CLD_RET CF128_RET CMM_RET };
+int testflags[] = { 0, 0, 0, 0, 0, 0, 0, CI128_TES CLD_TES CF128_TES CMM_TES };
 
 int typecount = 1000000; /* This should give an error, if init() wasn't run. */
 

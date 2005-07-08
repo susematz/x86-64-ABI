@@ -8,14 +8,14 @@ CFLAGS=
 
 trap : SIGABRT
 
-failed=
+failed_tests=
 
 # Run a test
 function runtest() {
   ./the-test > test.out 2>&1
   if [ $? -ne 0 ] ; then
     echo "*** Fail! ***"
-    failed="$failed $1 [$MORE_CFLAGS]"
+    failed_tests="$failed_tests $1 [$MORE_CFLAGS]"
   else
     echo "Ok."
   fi
@@ -71,6 +71,36 @@ function run_all_tests() {
   fi
 }
 
+function check_medium() {
+  echo -n "medium-test.c: "
+  failed=
+  build medium-test.c
+  if [ -f the-test ] ; then
+    rm -rf symtab.txt
+    objdump -t the-test | egrep "the_struct|big_ar" > symtab.txt
+    while read ofs scope type section length name; do
+	length=$((0x`echo $length | sed -e 's/^0*//'`))
+	if test $length -gt 65536; then
+	  case $section in
+	    .lbss | .ldata ) ;;
+	    * ) failed=yes
+          	echo -en "\n    Bad section: $name: $section $length"
+		;;
+	  esac
+	fi
+    done < symtab.txt
+    rm -rf symtab.txt
+    if test -z "$failed"; then
+      runtest medium-test.c
+    else
+      echo -e "\n    Fail! [$MORE_CFLAGS]"
+      failed_tests="${failed_tests}medium-test.c[$MORE_CFLAGS]\n"
+    fi
+  else
+    echo "Compile error [$MORE_CFLAGS]"
+  fi
+}
+
 function medium_test() {
   echo -e "\nTesting medium model"
   old_CFLAGS="$CFLAGS"
@@ -84,7 +114,7 @@ function medium_test() {
 	    for INIT in "" '={1}'; do
 	      for PIC in "" "-fPIC"; do
 	        MORE_CFLAGS="$PIC -DT=$T -DSIZE=$S -DNUM_ARRAY=${NUM_A} -DNUM_STRUCT=${NUM_S} -DSTATIC=$STATIC -DINIT=$INIT"
-		test_file medium-test.c
+		check_medium
 	      done
 	    done
 	  done
@@ -116,8 +146,8 @@ CFLAGS=-O2
 run_all_tests $*
 test -n "$do_medium" && medium_test
 
-if test -n "$failed"; then
-  echo "failed: $failed"
+if test -n "$failed_tests"; then
+  echo -e "failed: $failed_tests"
   exit 1
 fi
 exit 0

@@ -25,6 +25,10 @@ typedef union {
   long _long[2];
   int _int[4];
   unsigned long _ulong[2];
+#ifdef CHECK_M64_M128
+  __m64 _m64[2];
+  __m128 _m128[1];
+#endif
 } XMM_T;
 
 typedef union {
@@ -111,7 +115,7 @@ extern unsigned int num_iregs, num_fregs;
   clear_int_hardware_registers
 
 /* TODO: Do the checking.  */
-#define check_f_arguments(T) { \
+#define check_f_arguments(T) do { \
   assert (num_fregs <= 0 || fregs.xmm0._ ## T [0] == xmm_regs[0]._ ## T [0]); \
   assert (num_fregs <= 1 || fregs.xmm1._ ## T [0] == xmm_regs[1]._ ## T [0]); \
   assert (num_fregs <= 2 || fregs.xmm2._ ## T [0] == xmm_regs[2]._ ## T [0]); \

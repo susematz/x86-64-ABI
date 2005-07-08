@@ -45,8 +45,46 @@ snapshot:
 .globl snapshot_ret
 	.type	snapshot_ret, @function
 snapshot_ret:
+	pushq	%rbp
+	movq	%rsp, %rbp
 	movq	%rdi, rdi(%rip)
+	subq	$128, %rsp
+	pushq   %rax
+	movq	8+8+120(%rbp), %rax
+	movq	%rax,8+120(%rsp)
+	movq	8+8+112(%rbp), %rax
+	movq	%rax,8+112(%rsp)
+	movq	8+8+104(%rbp), %rax
+	movq	%rax,8+104(%rsp)
+	movq	8+8+96(%rbp), %rax
+	movq	%rax,8+96(%rsp)
+	movq	8+8+88(%rbp), %rax
+	movq	%rax,8+88(%rsp)
+	movq	8+8+80(%rbp), %rax
+	movq	%rax,8+80(%rsp)
+	movq	8+8+72(%rbp), %rax
+	movq	%rax,8+72(%rsp)
+	movq	8+8+64(%rbp), %rax
+	movq	%rax,8+64(%rsp)
+	movq	8+8+56(%rbp), %rax
+	movq	%rax,8+56(%rsp)
+	movq	8+8+48(%rbp), %rax
+	movq	%rax,8+48(%rsp)
+	movq	8+8+40(%rbp), %rax
+	movq	%rax,8+40(%rsp)
+	movq	8+8+32(%rbp), %rax
+	movq	%rax,8+32(%rsp)
+	movq	8+8+24(%rbp), %rax
+	movq	%rax,8+24(%rsp)
+	movq	8+8+16(%rbp), %rax
+	movq	%rax,8+16(%rsp)
+	movq	8+8+8(%rbp), %rax
+	movq	%rax,8+8(%rsp)
+	movq	8+8+0(%rbp), %rax
+	movq	%rax,8+0(%rsp)
+	popq	%rax
 	call	*callthis(%rip)
+	addq	$128, %rsp
 	movq	%rax, rax(%rip)
 	movq	%rdx, rdx(%rip)
 	movdqu	%xmm0, xmm_regs+0(%rip)
@@ -55,6 +93,7 @@ snapshot_ret:
 	fstpt	x87_regs+16(%rip)
 	fldt	x87_regs+16(%rip)
 	fldt	x87_regs(%rip)
+	leave
 	ret
 	.size	snapshot_ret, .-snapshot_ret
 
