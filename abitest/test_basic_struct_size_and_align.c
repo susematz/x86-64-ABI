@@ -15,7 +15,8 @@ main (void)
   run_signed_tests3(check_basic_struct_size_and_align, long, TYPE_SIZE_LONG, TYPE_ALIGN_LONG);
   run_signed_tests3(check_basic_struct_size_and_align, long long, TYPE_SIZE_LONG_LONG, TYPE_ALIGN_LONG_LONG);
 #ifdef CHECK_INT128
-  run_signed_tests3(check_basic_struct_size_and_align, __int128, TYPE_SIZE_INT128, TYPE_ALIGN_INT128);
+  check_basic_struct_size_and_align (__int128, TYPE_SIZE_INT128, TYPE_ALIGN_INT128);
+  check_basic_struct_size_and_align (__uint128, TYPE_SIZE_INT128, TYPE_ALIGN_INT128);
 #endif
   check_basic_struct_size_and_align(enum dummytype, TYPE_SIZE_ENUM, TYPE_ALIGN_ENUM);
 

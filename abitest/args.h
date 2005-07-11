@@ -99,6 +99,7 @@ extern unsigned int num_iregs, num_fregs;
 #define check_char_arguments check_int_arguments
 #define check_short_arguments check_int_arguments
 #define check_long_arguments check_int_arguments
+#define check___int128_arguments check_int_arguments
 
 /* Clear register struct.  */
 #define clear_struct_registers \

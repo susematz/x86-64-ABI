@@ -3,13 +3,15 @@
 
 typedef unsigned long ulong;
 typedef long double ldouble;
+typedef __int128_t __int128;
+typedef __uint128_t __uint128;
 
 /* These defines determines what part of the test should be run.  When
    GCC implements these parts, the defines should be uncommented to
    enable testing.  */
 
 /* Scalar type __int128.  */
-/* #define CHECK_INT128 */
+#define CHECK_INT128
 
 /* Scalar type long double.  */
 #define CHECK_LONG_DOUBLE
@@ -84,7 +86,8 @@ typedef long double ldouble;
 #define CI128_STR "__int128",
 #define CI128_SIZ TYPE_SIZE_INT128,
 #define CI128_ALI TYPE_ALIGN_INT128,
-#define CI128_RET "???",
+/* Right now we can't check the high part of __int128 returns (in %rdx).  */
+#define CI128_RET "rax",
 #define CI128_TES 0,
 #else
 #define CI128_STR

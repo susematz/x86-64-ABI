@@ -149,16 +149,17 @@ make_checking_function (int test_type, char *type, int arg_count)
 
 /* Construct a macro used to test argument passing.  */
 void
-make_checking_define (int test_type, int arg_count)
+make_checking_define (int test_type, int arg_count, int for_int128)
 {
-  int i;
+  int i, regnum;
   int max_regs = test_setting[test_type].reg_count;
   char arg_prefix = test_setting[test_type].arg_prefix;
   char reg_prefix = test_setting[test_type].reg_prefix;
   char *type_str = test_setting[test_type].string;
 
   /* Print define header.  */
-  fprintf (file, "#define def_check_%s_passing%d(", type_str, arg_count);
+  fprintf (file, "#define def_check_%s_passing%d%s(", type_str, arg_count,
+    for_int128 ? "_128": "");
   for (i=0; i<arg_count; i++)
     fprintf (file, "_%c%d, ", arg_prefix, i);
   fprintf (file, "_func1, _func2, TYPE) \\\n");
@@ -177,14 +178,23 @@ make_checking_define (int test_type, int arg_count)
 
   /* Test values passed in registers.  */
   fprintf (file, "  clear_%s_registers; \\\n", type_str);
-  for (i=0; i<arg_count && i<max_regs; i++)
+  for (i=0, regnum=0; i<arg_count && regnum<max_regs; i++, regnum++)
     if (arg_prefix == 'i')
-      fprintf (file, "  %cregs.%c%d = _%c%d; \\\n", arg_prefix, reg_prefix, i,
-	       arg_prefix, i);
+      {
+	if (!for_int128)
+          fprintf (file, "  %cregs.%c%d = _%c%d; \\\n", arg_prefix, reg_prefix, regnum,
+	           arg_prefix, i);
+        else if (i < max_regs)
+	  {
+	    fprintf (file, "  %cregs.%c%d = (unsigned long) _%c%d; \\\n", arg_prefix, reg_prefix, regnum, arg_prefix, i);
+	    fprintf (file, "  %cregs.%c%d = _%c%d >> 64; \\\n", arg_prefix, reg_prefix, regnum+1, arg_prefix, i);
+	    regnum++;
+	  }
+      }
     else
-      fprintf (file, "  %cregs.%c%d._ ## TYPE [0] = _%c%d; \\\n", arg_prefix, reg_prefix, i,
+      fprintf (file, "  %cregs.%c%d._ ## TYPE [0] = _%c%d; \\\n", arg_prefix, reg_prefix, regnum,
 	       arg_prefix, i);
-  fprintf (file, "  num_%cregs = %d; \\\n", arg_prefix, i);
+  fprintf (file, "  num_%cregs = %d; \\\n", arg_prefix, regnum);
 
   /* Make function call.  */
   fprintf (file, "  WRAP_CALL(_func2) (");
@@ -204,19 +214,23 @@ make_test_defs (int use_ints, int use_floats)
   /* Make defines for integer-type functions.  */
   if (use_ints)
     {
-      make_checking_define (INT_TEST, 6);
-      make_checking_define (INT_TEST, 12);
+      make_checking_define (INT_TEST, 6, 0);
+      make_checking_define (INT_TEST, 12, 0);
+#if defined (CHECK_LARGE_SCALAR_PASSING) && defined (CHECK_INT128)
+      make_checking_define (INT_TEST, 3, 1);
+      make_checking_define (INT_TEST, 10, 1);
+#endif
     }
 
   /* Make defines for floating-type point functions.  */
   if (use_floats)
     {
-      make_checking_define (FLOAT_TEST, 8);
-      make_checking_define (FLOAT_TEST, 16);
-      make_checking_define (FLOAT_TEST, 20);
-      make_checking_define (X87_TEST, 8);
-      make_checking_define (X87_TEST, 16);
-      make_checking_define (X87_TEST, 20);
+      make_checking_define (FLOAT_TEST, 8, 0);
+      make_checking_define (FLOAT_TEST, 16, 0);
+      make_checking_define (FLOAT_TEST, 20, 0);
+      make_checking_define (X87_TEST, 8, 0);
+      make_checking_define (X87_TEST, 16, 0);
+      make_checking_define (X87_TEST, 20, 0);
     }
 }
 
@@ -233,6 +247,25 @@ make_test (char *name, int test_type, char *type, int arg_count)
   fprintf (file, "  def_check_%s_passing%d(", type_str, arg_count);
   for (i=0; i<arg_count; i++)
     fprintf (file, "%d, ", 32+i);
+  fprintf (file, "fun_check_%s_passing_%s%d_values, ", type_str, type, arg_count);
+  fprintf (file, "fun_check_%s_passing_%s%d_regs, %s);\n}\n\n", type_str, type,
+	  arg_count, type);
+}
+
+void
+make_test_int128 (char *name, int test_type, char *type, int arg_count)
+{
+  int i;
+  char *type_str = test_setting[test_type].string;
+
+  fprintf (file, "void\n%s ()\n{\n", name);
+  for (i=0; i<arg_count; i++)
+    fprintf (file, "  %s _local%d = %d;\n", type, i, 32+i);
+  for (i=0; i<arg_count; i++)
+    fprintf (file, "  _local%d = _local%d | (_local%d << 64);\n", i, i, i);
+  fprintf (file, "  def_check_%s_passing%d_128(", type_str, arg_count);
+  for (i=0; i<arg_count; i++)
+    fprintf (file, "_local%d, ", i);
   fprintf (file, "fun_check_%s_passing_%s%d_values, ", type_str, type, arg_count);
   fprintf (file, "fun_check_%s_passing_%s%d_regs, %s);\n}\n\n", type_str, type,
 	  arg_count, type);
@@ -282,7 +315,7 @@ make_int_tests ()
   make_checking_function (INT_TEST, "long", 12);
 #if defined (CHECK_LARGE_SCALAR_PASSING) && defined (CHECK_INT128)
   make_checking_function (INT_TEST, "__int128", 3);
-  make_checking_function (INT_TEST, "__int128", 12);
+  make_checking_function (INT_TEST, "__int128", 10);
 #endif
 
   make_test_defs (1, 0);
@@ -294,8 +327,8 @@ make_int_tests ()
   make_test ("test_too_many_longs", INT_TEST, "long", 12);
 
 #if defined (CHECK_LARGE_SCALAR_PASSING) && defined (CHECK_INT128)
-  make_test ("test_int128s_on_stack", INT_TEST, "__int128", 3);
-  make_test ("test_too_many_int128s", INT_TEST, "__int128", 10);
+  make_test_int128 ("test_int128s_on_stack", INT_TEST, "__int128", 3);
+  make_test_int128 ("test_too_many_int128s", INT_TEST, "__int128", 10);
 #else
   make_empty_tests ("int128");
 #endif

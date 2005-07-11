@@ -1,3 +1,21 @@
+2005-07-11  Michael Matz  <matz@suse.de>
+
+	__int128 checking.
+	* args.h (check___int128_arguments): New.
+	* defines.h (__int128, __uint128): New.
+	(CHECK_INT128): Define.
+	(CI128_RET): Define.
+	* make_passing_tests (make_checking_define): New argument for_int128.
+	Change callers.  Use new argument.
+	(make_test_defs): Create new defs.
+	(make_test_int128): New.
+	(make_int_tests): Use it.
+	* test_basic_alignment.c (main): Split unsigned/signed test.
+	* test_basic_array_size_and_align.c: Ditto.
+	* test_basic_sizes.c: Ditto.
+	* test_basic_struct_size_and_align.c: Ditto.
+	* test_basic_union_size_and_align.c: Ditto.
+
 2005-07-08  Michael Matz  <matz@suse.de>
 
 	Better medium model check.

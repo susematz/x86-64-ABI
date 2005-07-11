@@ -14,7 +14,8 @@ main (void)
   run_signed_tests2(check_size, long, TYPE_SIZE_LONG);
   run_signed_tests2(check_size, long long, TYPE_SIZE_LONG_LONG);
 #ifdef CHECK_INT128
-  run_signed_tests2(check_size, __int128, TYPE_SIZE_INT128);
+  check_size (__int128, TYPE_SIZE_INT128);
+  check_size (__uint128, TYPE_SIZE_INT128);
 #endif
   check_size(enumtype, TYPE_SIZE_ENUM);
 

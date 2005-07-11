@@ -14,7 +14,8 @@ main (void)
   run_signed_tests2(check_align, long, TYPE_ALIGN_LONG);
   run_signed_tests2(check_align, long long, TYPE_ALIGN_LONG_LONG);
 #ifdef CHECK_INT128
-  run_signed_tests2(check_align, __int128, TYPE_ALIGN_INT128);
+  check_align (__int128, TYPE_ALIGN_INT128);
+  check_align (__uint128, TYPE_ALIGN_INT128);
 #endif
   check_align(enumtype, TYPE_ALIGN_ENUM);
 
