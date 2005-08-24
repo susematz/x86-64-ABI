@@ -4,20 +4,6 @@
   place or removed completely.}
 
 
-\section{GOT pointer and IP relative addressing}
-
-\index{global offset table}
-A basic difference between the \intelabi and the \xARCH ABI is the
-way the GOT table is found.  The \intelabi, like (most) other processor
-specific ABIs, uses a dedicated register (\reg{ebx}) to address the
-base of the GOT table.  The function prologue of every function needs
-to set up this register to the correct value.  The \xARCH processor
-family introduces a new IP-relative addressing mode which is used in
-this ABI instead of using a dedicated register.
-
-On \xARCH the GOT table contains 64-bit entries.
-
-
 \section{C++\label{section-cpp}}
 
 For the \textindex{C++} ABI we will use the IA-64 C++ ABI and instantiate it

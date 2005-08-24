@@ -1,3 +1,22 @@
+2005-08-24  Michael Matz  <matz@suse.de>
+
+	Include Sun feedback.
+	* abi.tex (changelog): Describe 0.98.
+	* macros.tex (version): Increase to 098.
+	* conventions.tex (GOT pointer and IP relative addressing): Remove.
+	* dl.tex (Function Addresses): Label it.
+	* introduction.tex (Differences from the intelabi): Remove.
+	* low-level-sys-info.tex (Scalar Types): Explain "enum".
+	(Bit-Field Ranges): Include more types.
+	(Stack Frame with Base Pointer): Clarify.
+	(Thread State): New subsection.
+	(Small code model): Explain the "24".
+	(Position-Independent Function Prologue): Merge with removed section
+	of conventions.tex.
+	* object-files.tex (Symbol Table): Refer to Function Addresses.
+	(Relocation Types): Refer to table.
+	* sw-installation.tex: Specify that nothing is specified here.
+
 2005-06-28  Michael Matz  <matz@suse.de>
 
 	Merge fortran ABI.

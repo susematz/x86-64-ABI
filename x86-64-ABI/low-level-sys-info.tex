@@ -54,7 +54,7 @@ scalar types and the processor's. The \code{__int128},
     \cline{2-5}
     & \texttt{int} & 4 & 4 & signed \fourbyte \\
     Integral & \texttt{signed int} & & \\
-    & \texttt{enum} & & \\
+    & \texttt{enum}$^{\dagger\dagger\dagger}$ & & \\
     \cline{2-5}
     & \texttt{unsigned int} & 4 & 4 & unsigned \fourbyte \\
     \cline{2-5}
@@ -86,6 +86,10 @@ scalar types and the processor's. The \code{__int128},
 \multicolumn{3}{l}{\small $^\dagger$ This type is called \texttt{bool}
 in C++.}\\
 \multicolumn{3}{l}{\small $^{\dagger\dagger}$ These types are optional.}\\
+\multicolumn{5}{p{14cm}}{\small $^{\dagger\dagger\dagger}$ C++ and some
+implementations of C permit enums larger than an int.  The underlying
+type is bumped to an unsigned int, long int or unsigned long int, in
+that order.}\\
   \end{tabular}
 }
 \end{figure}
@@ -160,6 +164,18 @@ integral values of a specified size.
          & \multicolumn{1}{c}{Width $w$}
          & \multicolumn{1}{c}{Range} \\
       \hline
+      \texttt{signed char} & & $-2^{w - 1}$ to $2^{w-1}-1$ \\
+      \texttt{char} & 1 to 8 & 0 to $2^{w}-1$ \\
+      \texttt{unsigned char} & & 0 to $2^{w}-1$ \\
+      \hline
+      \texttt{signed short} & & $-2^{w - 1}$ to $2^{w-1}-1$ \\
+      \texttt{short} & 1 to 16 & 0 to $2^{w}-1$ \\
+      \texttt{unsigned short} & & 0 to $2^{w}-1$ \\
+      \hline
+      \texttt{signed int} & & $-2^{w - 1}$ to $2^{w-1}-1$ \\
+      \texttt{int} & 1 to 32 & 0 to $2^{w}-1$ \\
+      \texttt{unsigned int} & & 0 to $2^{w}-1$ \\
+      \hline
       \texttt{signed long} & & $-2^{w - 1}$ to $2^{w-1}-1$ \\
       \texttt{long} & 1 to 64 & 0 to $2^{w}-1$ \\
       \texttt{unsigned long} & & 0 to $2^{w}-1$ \\
@@ -212,7 +228,7 @@ In addition the architecture provides 16 SSE registers, each 128 bits
 wide and 8 x87 floating point registers, each 80 bits wide.  Each of
 the x87 floating point registers may be referred to in \MMX/\threednow
 mode as a 64-bit register.  All of these registers are global to all
-procedures in a running program.
+procedures active for a given thread.
 
 This subsection discusses usage of each register.  Registers \RBP, \RBX and
 \reg{r12} through \reg{r15} ``belong'' to the calling function and the
@@ -257,9 +273,9 @@ stack.  This stack grows downwards from high addresses.  Figure
       \multicolumn{1}{c}{Contents} &
       \multicolumn{1}{l}{Frame} \\
       \noalign{\smallskip}  \cline{1-3}
-      \code{8n+16(\RBP)} & argument \eightbyte $n$ \\
+      \code{8n+16(\RBP)} & memory argument \eightbyte $n$ \\
       & \dots & Previous \\
-      \code{16(\RBP)} & argument \eightbyte $0$ \\
+      \code{16(\RBP)} & memory argument \eightbyte $0$ \\
       \cline{1-3}
       \code{8(\RBP)} & return address \\ \cline{2-2}
       \code{0(\RBP)} & previous \RBP value \\
@@ -296,7 +312,7 @@ epilogue.  This area is known as the \textindex{red zone}.
 \subsection{Parameter Passing}
 \label{sec-calling-conventions}
 
-After the argument values have been computed, they are placed in
+After the argument values have been computed, they are placed either in
 registers or pushed on the stack.  The way how values are passed is
 described in the following sections.
 
@@ -385,7 +401,8 @@ types works as follows:
     Similar issues apply when returning a non-POD object from a
     function.}
 
-\item Both \eightbytes get initialized to class NO_CLASS.
+\item If the size of the aggregate exceeds a single \eightbyte, each is
+    classified separately.  Each \eightbyte gets initialized to class NO_CLASS.
 
 \item Each field of an object is classified recursively so that always
    two fields are considered.  The resulting class is calculated
@@ -907,6 +924,11 @@ Applications which need to execute code on the stack or data
 segments should take proper precautions, e.g., by calling
 \code{mprotect()}.
 
+\subsection{Thread State}
+
+New threads inherit the floating-point state of the parent thread
+and the state is private to the thread thereafter.
+
 \subsection{Auxiliary Vector}
 
 The \textindex{auxiliary vector} is an array of the following structures
@@ -1018,8 +1040,7 @@ The \xARCH ABI uses the auxiliary vector types defined in figure \ref{aux-vec}.
 This section discusses example code sequences for fundamental
 operations such as calling functions, accessing static objects, and
 transferring control from one part of a program to another.  Unlike
-previous material, this material is not normative.  It shows only the
-difference to the \intelabi.
+previous material, this material is not normative.
 
 \subsection{Architectural Constraints}
 
@@ -1050,7 +1071,12 @@ that are of general interest:
 \item[\textindex{Small code model}]
   The virtual address of code executed is known at link time.
   Additionally all symbols are known to be located in the virtual
-  addresses in the range from $0$ to $2^{31}-2^{24} - 1$.
+  addresses in the range from $0$ to $2^{31}-2^{24} - 1$.\footnote{
+    The number $24$ is chosen arbitrarily.  It allows for all memory of
+    objects of size up to $2^{24}$ to be addressed directly because the
+    base address of objects is constrained to be $2^{31}-2^{24}$.
+    Without such constraint only the base address would be accessible
+    directly, but not any offsetted variant of it.}
 
   This allows the compiler to encode symbolic references with offsets
   in the range from $-2^{31}$ to $2^{24}$ directly in the sign
@@ -1172,9 +1198,10 @@ examples and discussion.  They are:
 
 \subsection{Position-Independent Function Prologue}
 
-In the small code model \xARCH does not need any function prologue for
-calculating the global offset table address since it does not have an explicit
-GOT pointer.
+In the small code model all addresses (including GOT entries) are
+accessible via the IP-relative addressing provided by the \xARCH
+architecture.  Hence there is no need for an explicit GOT pointer and
+therefore no function prologue for setting it up is necessary.
 
 In the medium and large code models a register has to be allocated to hold the
 address of the GOT in position-independent objects, because the \xARCH ISA does
