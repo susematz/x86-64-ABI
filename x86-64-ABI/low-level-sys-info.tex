@@ -25,7 +25,7 @@ object, and the term \emph{\textindex{\sixteenbyte{}}} refers to a
 \subsubsection{Fundamental Types}
 
 Figure~\ref{basic-types} shows the correspondence between ISO C's
-scalar types and the processor's. The \code{__int128},
+scalar types and the processor's.  \code{__int128},
 \code{__float128}, \code{__m64} and \code{__m128} types are optional.
 
 \begin{figure}
@@ -65,21 +65,25 @@ scalar types and the processor's. The \code{__int128},
     \cline{2-5}
     & \texttt{unsigned long} & 8 & 8 & unsigned \eightbyte \\
     & \texttt{unsigned long long} & 8 & 8 & unsigned \eightbyte \\
-    \hline
+    \cline{2-5}
     & \texttt{__int128}$^{\dagger\dagger}$ & 16 & 16 & signed \sixteenbyte \\
     & \texttt{signed __int128}$^{\dagger\dagger}$ & 16 & 16 & signed \sixteenbyte \\
-    \hline
+    \cline{2-5}
     & \texttt{unsigned __int128}$^{\dagger\dagger}$ & 16 & 16 & unsigned \sixteenbyte \\
     \hline
     Pointer & \texttt{\textit{any-type} *} & 8 & 8 & unsigned \eightbyte \\
     & \texttt{\textit{any-type} (*)()} & & \\
     \hline
-    Floating-& \texttt{float} & 4 & 4 & single (IEEE) \\
-    point & \texttt{double} & 8 & 8 & double (IEEE) \\
-    & \texttt{long double} & 16 & 16 & 80-bit extended (IEEE) \\
-    & \texttt{__float128}$^{\dagger\dagger}$ & 16 & 16 & 128-bit extended (IEEE) \\
+    Floating-& \texttt{float} & 4 & 4 & single (IEEE-754) \\
+    \cline{2-5}
+    point & \texttt{double} & 8 & 8 & double (IEEE-754) \\
+    \cline{2-5}
+    & \texttt{long double} & 16 & 16 & 80-bit extended (IEEE-754) \\
+    \cline{2-5}
+    & \texttt{__float128}$^{\dagger\dagger}$ & 16 & 16 & 128-bit extended (IEEE-754) \\
     \hline
     Packed & \texttt{__m64}$^{\dagger\dagger}$ & 8 & 8 & \MMX{} and \threednow \\
+    \cline{2-5}
     & \texttt{__m128}$^{\dagger\dagger}$ & 16 & 16 & SSE and SSE-2 \\
 \noalign{\smallskip}
 \cline{1-2}
@@ -1071,19 +1075,19 @@ that are of general interest:
 \item[\textindex{Small code model}]
   The virtual address of code executed is known at link time.
   Additionally all symbols are known to be located in the virtual
-  addresses in the range from $0$ to $2^{31}-2^{24} - 1$.\footnote{
+  addresses in the range from $0$ to $2^{31}-2^{24}-1$ or from $0x00000000$ to $0x7effffff$\footnote{
     The number $24$ is chosen arbitrarily.  It allows for all memory of
-    objects of size up to $2^{24}$ to be addressed directly because the
-    base address of objects is constrained to be $2^{31}-2^{24}$.
+    objects of size up to $2^{24}$ or 16M bytes to be addressed directly because the
+    base address of such objects is constrained to be less than $2^{31}-2^{24}$ or $0x7f000000$.
     Without such constraint only the base address would be accessible
-    directly, but not any offsetted variant of it.}
+    directly, but not any offsetted variant of it.}.
 
   This allows the compiler to encode symbolic references with offsets
-  in the range from $-2^{31}$ to $2^{24}$ directly in the sign
+  in the range from $-(2^{31})$ to $2^{24}$ or from $0x80000000$ to $0x01000000$ directly in the sign
   extended immediate operands, with offsets in the range from $0$ to
-  $2^{31}-2^{24}$ in the zero extended immediate operands and use
+  $2^{31}-2^{24}$ or from $0x00000000$ to $0x7f000000$ in the zero extended immediate operands and use
   instruction pointer relative addressing for the symbols with offsets
-  in the range $-2^{24}$ to $2^{24}$.
+  in the range $-(2^{24})$ to $2^{24}$ or $0xff000000$ to $0x01000000$.
 
   This is the fastest code model and we expect it to be suitable for
   the vast majority of programs.
@@ -1092,12 +1096,12 @@ that are of general interest:
 
   The kernel of an operating system is usually rather small but runs
   in the negative half of the address space.  So we define all symbols
-  to be in the range from $2^{64}-2^{31}$ to $2^{64}-2^{24}$.
+  to be in the range from $2^{64}-2^{31}$ to $2^{64}-2^{24}$ or from $0xffffffff80000000$ to $0xffffffffff000000$.
 
   This code model has advantages similar to those of the small model,
   but allows encoding of zero extended symbolic references only for
-  offsets from $2^{31}$ to $2^{31}+2^{24}$. The range offsets for
-  sign extended reference changes to $0$--$2^{31}+2^{24}$.
+  offsets from $2^{31}$ to $2^{31}+2^{24}$ or from $0x80000000$ to $0x81000000$. The range offsets for
+  sign extended reference changes to $0$ to $2^{31}+2^{24}$ or $0x00000000$ to $0x81000000$.
 
 \item[\textindex{Medium code model}]
 
@@ -1140,10 +1144,10 @@ that are of general interest:
   have to be relative to the instruction pointer.
 
   Additionally the maximum distance between a symbol and the end of an
-  instruction is limited to $2^{31}-2^{24}-1$, allowing the compiler
+  instruction is limited to $2^{31}-2^{24}-1$ or $0x7effffff$, allowing the compiler
   to use instruction pointer relative branches and addressing modes
   supported by the hardware for every symbol with an offset in the
-  range $-2^{24}$ to $2^{24}$.
+  range $-(2^{24})$ to $2^{24}$ or $0xff000000$ to $0x01000000$.
 
 \item[\textindex{Medium position independent code model}
   (\textindex{PIC})]
