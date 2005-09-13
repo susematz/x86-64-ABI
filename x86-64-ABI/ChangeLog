@@ -1,3 +1,10 @@
+2005-09-13  Michael Matz  <matz@suse.de>
+
+	From Jan Beulich <JBeulich@novell.com>:
+	* low-level-sys-info.tex (DWARF Register Number Mapping):
+	Add rflags,es,cs,ss,ds,fs,gs,fs.base,gs.base,tr,ldtr,mxcsr,fcw,
+	fsw numbers.
+
 2005-08-24  Evandro Menezes <evandro.menezes@amd.com>
 	Fix typo.
 	* abi.tex (changelog): Fixed my name.

@@ -2198,6 +2198,22 @@ SSE Registers 0--7              & 17-24 & \reg{xmm0}--\reg{xmm7} \\
 Extended SSE Registers 8--15    & 25-32 & \reg{xmm8}--\reg{xmm15} \\
 Floating Point Registers 0--7   & 33-40 & \reg{st0}--\reg{st7} \\
 MMX Registers 0--7              & 41-48 & \reg{mm0}--\reg{mm7} \\
+Flag Register                   & 49    & \reg{rFLAGS} \\
+Segment Register ES             & 50    & \reg{es} \\
+Segment Register CS             & 51    & \reg{cs} \\
+Segment Register SS             & 52    & \reg{ss} \\
+Segment Register DS             & 53    & \reg{ds} \\
+Segment Register FS             & 54    & \reg{fs} \\
+Segment Register GS             & 55    & \reg{gs} \\
+Reserved                        & 56-57 & \\
+FS Base address                 & 58    & \reg{fs.base} \\
+GS Base address                 & 59    & \reg{gs.base} \\
+Reserved                        & 60-61 & \\
+Task Register                   & 62    & \reg{tr} \\
+LDT Register                    & 63    & \reg{ldtr} \\
+128-bit Media Control and Status & 64   & \reg{mxcsr} \\
+x87 Control Word                & 65    & \reg{fcw} \\
+x87 Status Word                 & 66    & \reg{fsw} \\
 \end{tabular}
 \end{center}
 \Hrule
