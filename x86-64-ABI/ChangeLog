@@ -1,5 +1,9 @@
 2005-09-15  Michael Matz  <matz@suse.de>
 
+	* object-files.tex (Number of Program Headers): New subsection.
+
+2005-09-15  Michael Matz  <matz@suse.de>
+
 	* object-files.tex (Relocation Types): Add R_X86_64_SIZE32 and
 	R_X86_64_SIZE64, and description of 'Z' field.
 
@@ -11,12 +15,14 @@
 	fsw numbers.
 
 2005-08-24  Evandro Menezes <evandro.menezes@amd.com>
+
 	Fix typo.
 	* abi.tex (changelog): Fixed my name.
 	(conventions): Moved footnote here from...
 	* conventions.tex (Conventions): ... here.
 	* low-level-sys-info.tex (Scalar Types): Fixed table grid.
-	(Architectural Constraints): Added conversion of powers of two to hexadecimal.
+	(Architectural Constraints): Added conversion of powers of two
+	to hexadecimal.
 	
 2005-08-24  Michael Matz  <matz@suse.de>
 
