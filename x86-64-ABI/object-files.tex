@@ -387,6 +387,8 @@ The following notations are used for specifying relocations in table
   storage unit being relocated (computed using \code{r_offset}).
 \item[S] Represents the value of the symbol whose index resides in the
   relocation entry.
+\item[Z] Represents the size of the symbol whose index resides in the
+  relocation entry.
 \end{description}
 
 The \xARCH ABI architectures uses only \texttt{Elf64_Rela} relocation
@@ -431,6 +433,8 @@ the relocation addend.
       \texttt{R_X86_64_PC64}  & 24 & \textit{word64} & \texttt{S + A - P} \\
       \texttt{R_X86_64_GOTOFF64} & 25 & \textit{word64} & \texttt{S + A - GOT} \\
       \texttt{R_X86_64_GOTPC32} & 26 & \textit{word32} & \texttt{GOT + A - P} \\
+      \texttt{R_X86_64_SIZE32} & 32 & \textit{word32} & \texttt{Z + A} \\
+      \texttt{R_X86_64_SIZE64} & 33 & \textit{word64} & \texttt{Z + A} \\
 %      \texttt{R_X86_64_GOT64} & 16 & \textit{word64} & \texttt{G + A} \\
 %      \texttt{R_X86_64_PLT64} & 17 & \textit{word64} & \texttt{L + A - P} \\
     \end{tabular}
@@ -494,7 +498,7 @@ In order to extend both the PLT and the GOT beyond 2GB, it
 is necessary to add appropriate relocation types to handle
 full 64-bit addressing.  See figure \ref{large_relocation_types}.
 
-\begin{figure}[H]
+\begin{table}[H]
 \Hrule
 \caption{Large Model Relocation Types}\label{large_relocation_types}
 \begin{footnotesize}
@@ -514,7 +518,7 @@ Name                        &  Value &   Field   & Calculation            \\
 \hline
 \end{tabular}
 \end{footnotesize}
-\end{figure}
+\end{table}
 
 
 %%% Local Variables: 

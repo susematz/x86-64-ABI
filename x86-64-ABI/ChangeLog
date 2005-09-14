@@ -1,3 +1,8 @@
+2005-09-15  Michael Matz  <matz@suse.de>
+
+	* object-files.tex (Relocation Types): Add R_X86_64_SIZE32 and
+	R_X86_64_SIZE64, and description of 'Z' field.
+
 2005-09-13  Michael Matz  <matz@suse.de>
 
 	From Jan Beulich <JBeulich@novell.com>:
