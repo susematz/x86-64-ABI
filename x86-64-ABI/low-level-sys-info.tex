@@ -390,20 +390,30 @@ types works as follows:
 
 \begin{enumerate}
 \item If the size of an object is larger than two \eightbytes, or
-    in C++, is a non-\textindex{POD}%
-\footnote{The term POD is from the ANSI/ISO C++ Standard, and
-    stands for Plain Old Data.  Although the exact definition is
-    technical, a POD is essentially a structure or union that could
-    have been written in C; there cannot be any member
-    functions, or base classes, or similar C++ extensions.}
-  structure or union type, or contains unaligned fields, it has class
-  MEMORY.%
-   \footnote{A non-POD object cannot be passed in registers
-    because such objects must have well defined addresses; the address
-    at which an object is constructed (by the caller) and the address
-    at which the object is destroyed (by the callee) must be the same.
-    Similar issues apply when returning a non-POD object from a
-    function.}
+  it contains unaligned fields, it has class MEMORY.
+
+\item If a C++ object has either a non-trivial copy constructor
+    or a non-trivial destructor
+  \footnote{A de/constructor is trivial if it is an implicitly-declared
+             default de/constructor and if:
+    \begin{itemize}
+        \item its class has no virtual functions
+          and no virtual base classes, and
+
+        \item all the direct base classes of its class have trivial
+          de/constructors, and
+
+        \item for all the nonstatic data members of its class that are
+          of class type (or array thereof), each such class has a
+          trivial de/constructor.
+    \end{itemize}}
+    it is passed by invisible reference
+    (the object is replaced in the parameter list by a pointer that
+    has class INTEGER).
+  \footnote{An object with either a non-trivial copy
+   constructor or a non-trivial destructor cannot be passed by value
+   because such objects must have well defined addresses.  Similar
+   issues apply when returning an object from a function.}
 
 \item If the size of the aggregate exceeds a single \eightbyte, each is
     classified separately.  Each \eightbyte gets initialized to class NO_CLASS.
