@@ -322,7 +322,16 @@ described in the following sections.
 
 \paragraph{Definitions}
 We first define a number of classes to classify arguments.  The
-classes are corresponding to \xARCH register classes and defined as:
+classes are corresponding to \xARCH register classes and defined as
+\footnote{This footnote is informative only: The IEEE 754 standard is
+currently under revision and the draft proposes types
+\code{decimal32}, \code{decimal64} and \code{decimal128} of 32 bit, 64
+bit and 128 bit each.  The exact definition of these types is not
+finalized.  For argument passing, variables of type \code{decimal32}
+should be treated exactly as variables of \code{float}, variables of
+type \code{decimal64} as variables of type \code{double} and variables
+of type \code{decimal128} as variables of type \code{__float128}.}%
+:
 
 \begin{description}
 \item[INTEGER] This class consists of integral types that fit into one of
