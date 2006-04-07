@@ -1,3 +1,8 @@
+2006-04-07  Michael Matz  <matz@suse.de>
+
+	* low-level-sys-info.tex (Passing): Clarify that _Bools are
+	converted to 0/1 at the caller.
+
 2006-01-17  Andreas Jaeger  <aj@suse.de>
 
 	* low-level-sys-info.tex (paragraph{Definitions}): Add note about

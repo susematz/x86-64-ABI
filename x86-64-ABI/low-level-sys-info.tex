@@ -121,8 +121,8 @@ The type \codeindex{size\_t} is defined as \code{unsigned long}.
 
 Booleans\index{boolean}, when stored in a memory object, are stored as
 single byte objects the value of which is always 0 (\code{false}) or 1
-(\code{true}).  When stored in integer registers or passed as
-arguments on the stack, all 8 bytes of the register are significant;
+(\code{true}).  When stored in integer registers (except for passing
+as arguments), all 8 bytes of the register are significant;
 any nonzero value is considered \code{true}.
 
 Like the Intel386 architecture, the \xARCH architecture in general
@@ -473,6 +473,9 @@ left-to-right order) for passing as follows:
 
 \item If the class is X87, X87UP or COMPLEX\_X87, it is passed in memory.
 \end{enumerate}
+
+When a value of type \code{_Bool} is passed in a register or on the stack,
+the upper 63 bits of the eightbyte shall be zero.
 
 \begin{figure}
 \Hrule
