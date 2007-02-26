@@ -1,3 +1,8 @@
+2007-02-26  Michael Matz  <matz@suse.de>
+
+	* low-level-sys-info.tex (CIE Augmentations <L> figure): Correct
+	typo specifying sdata2 three times.
+
 2006-04-07  Michael Matz  <matz@suse.de>
 
 	* low-level-sys-info.tex (Passing): Clarify that _Bools are
