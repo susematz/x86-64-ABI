@@ -1,3 +1,29 @@
+2007-12-07  Michael Matz  <matz@suse.de>
+
+	* abi.tex (changelog): Describe 0.99.
+	* macros.tex: Make this work with TeX Live.
+	(version): Increase to 0.99.
+	* prelim2e.sty: New file for convenience, for tex distributions
+	which don't include it.
+
+2007-12-07  Michael Matz  <matz@suse.de>
+
+	from H.J. Lu  <hjl@lucon.org>
+
+	* low-level-sys-info.tex (Types, Classification): Mention and deal
+	with _Decimal32, _Decimal64 and _Decimal128.
+
+2007-12-07  Michael Matz  <matz@suse.de>
+
+	from  Alexandre Oliva  <aoliva@redhat.com>
+
+	* object-files.tex (Relocation Types): Add
+	R_X86_64_GOTPC32_TLSDESC, R_X86_64_TLSDESC_CALL and
+	R_X86_64_TLSDESC.  Add pointer to description.  Add short
+	description of all TLS relocations.  Fix typo in DTPMOD64.
+	* dl.tex (Procedure Linkage Table): Mention lazy relocation of TLS
+	descriptors.  Add short description.
+
 2007-02-26  Michael Matz  <matz@suse.de>
 
 	* low-level-sys-info.tex (CIE Augmentations <L> figure): Correct

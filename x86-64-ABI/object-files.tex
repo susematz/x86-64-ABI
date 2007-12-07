@@ -435,7 +435,7 @@ the relocation addend.
       \texttt{R_X86_64_PC16}  & 13 & \textit{word16} & \texttt{S + A - P} \\
       \texttt{R_X86_64_8}     & 14 & \textit{word8} & \texttt{S + A} \\
       \texttt{R_X86_64_PC8}   & 15 & \textit{word8} & \texttt{S + A - P} \\
-      \texttt{R_X86_64_DPTMOD64}   & 16 & \textit{word64} &  \\
+      \texttt{R_X86_64_DTPMOD64}   & 16 & \textit{word64} &  \\
       \texttt{R_X86_64_DTPOFF64}   & 17 & \textit{word64} &  \\
       \texttt{R_X86_64_TPOFF64}   & 18 & \textit{word64} &  \\
       \texttt{R_X86_64_TLSGD}   & 19 & \textit{word32} &  \\
@@ -448,6 +448,9 @@ the relocation addend.
       \texttt{R_X86_64_GOTPC32} & 26 & \textit{word32} & \texttt{GOT + A - P} \\
       \texttt{R_X86_64_SIZE32} & 32 & \textit{word32} & \texttt{Z + A} \\
       \texttt{R_X86_64_SIZE64} & 33 & \textit{word64} & \texttt{Z + A} \\
+      \texttt{R_X86_64_GOTPC32_TLSDESC} & 34 & \textit{word32} &  \\
+      \texttt{R_X86_64_TLSDESC_CALL} & 35 & none &  \\
+      \texttt{R_X86_64_TLSDESC} & 36 & \textit{word64}$\times 2$ & \\
 %      \texttt{R_X86_64_GOT64} & 16 & \textit{word64} & \texttt{G + A} \\
 %      \texttt{R_X86_64_PLT64} & 17 & \textit{word64} & \texttt{L + A - P} \\
     \end{tabular}
@@ -469,6 +472,7 @@ to those used for the \intelabi.  \footnote{Even though
   loading the offset into a displacement register; the base plus
   immediate displacement addressing form can be used.}
 
+\begin{sloppypar}
 The \texttt{R_X86_64_GOTPCREL} relocation has different semantics from the
 \texttt{R_X86_64_GOT32} or equivalent i386 \texttt{R_I386_GOTPC} relocation.
 In particular, because the \xARCH architecture has an addressing mode relative
@@ -477,6 +481,7 @@ using a single instruction.  The calculation done by the
 \texttt{R_X86_64_GOTPCREL} relocation gives the difference between the location
 in the GOT where the symbol's address is given and the location where the
 relocation is applied.
+\end{sloppypar}
 
 \begin{sloppypar}
 The \texttt{R_X86_64_32} and \texttt{R_X86_64_32S} relocations truncate
@@ -492,18 +497,71 @@ relocations is not conformant to this ABI, these relocations are only
 added for documentation purposes.  The \texttt{R_X86_64_16}, and
 \texttt{R_X86_64_8} relocations truncate the computed value to 16-bits
 resp. 8-bits.
+\end{sloppypar}
 
-The relocations \texttt{R_X86_64_DPTMOD64},
-\texttt{R_X86_64_DTPOFF64}, \texttt{R_X86_64_TPOFF64} ,
-\texttt{R_X86_64_TLSGD} , \texttt{R_X86_64_TLSLD} ,
+\begin{sloppypar}
+The relocations \texttt{R_X86_64_DTPMOD64},
+\texttt{R_X86_64_DTPOFF64}, \texttt{R_X86_64_TPOFF64},
+\texttt{R_X86_64_TLSGD}, \texttt{R_X86_64_TLSLD},
 \texttt{R_X86_64_DTPOFF32}, \texttt{R_X86_64_GOTTPOFF} and
 \texttt{R_X86_64_TPOFF32} are listed for completeness.  They are part
 of the Thread-Local Storage ABI extensions and are documented in the
 document called ``ELF Handling for Thread-Local
 Storage''\footnote{This document is currently available via
-  \url{http://people.redhat.com/drepper/tls.pdf}}\index{Thread-Local Storage}.
-
+  \url{http://people.redhat.com/drepper/tls.pdf}}\index{Thread-Local
+  Storage}.  The relocations \texttt{R_X86_64_GOTPC32_TLSDESC},
+\texttt{R_X86_64_TLSDESC_CALL} and \texttt{R_X86_64_TLSDESC} are also
+used for Thread-Local Storage, but are not documented there as of this
+writing.  A description can be found in the document ``Thread-Local
+Storage Descriptors for IA32 and AMD64/EM64T''\footnote{This document
+  is currently available via
+  \url{http://people.redhat.com/aoliva/writeups/TLS/RFC-TLSDESC-x86.txt}}.
 \end{sloppypar}
+
+In order to make this document self-contained, a description of the
+TLS relocations follows.
+
+\begin{sloppypar}
+\texttt{R_X86_64_DTPMOD64} resolves to the index of the dynamic thread
+vector entry that points to the base address of the TLS block
+corresponding to the module that defines the referenced symbol.
+\texttt{R_X86_64_DTPOFF64} and \texttt{R_X86_64_DTPOFF32} compute the
+offset from the pointer in that entry to the referenced symbol.  The
+linker generates such relocations in adjacent entries in the GOT, in
+response to \texttt{R_X86_64_TLSGD} and \texttt{R_X86_64_TLSLD}
+relocations.  If the linker can compute the offset itself, because the
+referenced symbol binds locally, the relocations \texttt{R_X86_64_64} and \texttt{R_X86_64_32} may be used instead.
+Otherwise, such relocations are always in pairs, such that the
+\texttt{R_X86_64_DTPOFF64} relocation applies to the word64 right past the
+corresponding \texttt{R_X86_64_DTPMOD64} relocation.
+\end{sloppypar}
+
+\texttt{R_X86_64_TPOFF64} and \texttt{R_X86_64_TPOFF32} resolve to the
+offset from the thread pointer to a thread-local variable.  The former
+is generated in response to \texttt{R_X86_64_GOTTPOFF}, that resolves
+to a PC-relative address of a GOT entry containing such a 64-bit
+offset.
+
+\texttt{R_X86_64_TLSGD} and \texttt{R_X86_64_TLSLD} both resolve to
+PC-relative offsets to a \texttt{DTPMOD} GOT entry.  The difference
+between them is that, for \texttt{R_X86_64_TLSGD}, the following GOT entry will
+contain the offset of the referenced symbol into its TLS block,
+whereas, for \texttt{R_X86_64_TLSLD}, the following GOT entry will contain the
+offset for the base address of the TLS block.  The idea is that adding
+this offset to the result of \texttt{R_X86_64_DTPMOD32} for a symbol ought to
+yield the same as the result of \texttt{R_X86_64_DTPMOD64} for the same symbol.
+
+\texttt{R_X86_64_TLSDESC} resolves to a pair of word64s, called TLS
+Descriptor, the first of which is a pointer to a function, followed by
+an argument.  The function is passed a pointer to the this pair of
+entries in \%rax and, using the argument in the second entry, it must
+compute and return in \%rax the offset from the thread pointer to the
+symbol referenced in the relocation, without modifying any registers
+other than processor flags.  \texttt{R_X86_64_GOTPC32_TLSDESC}
+resolves to the PC-relative address of a TLS descriptor corresponding
+to the named symbol.  \texttt{R_X86_64_TLSDESC_CALL} must annotate the
+instruction used to call the TLS Descriptor resolver function, so as
+to enable relaxation of that instruction.
 
 \subsection{Large Models}
 

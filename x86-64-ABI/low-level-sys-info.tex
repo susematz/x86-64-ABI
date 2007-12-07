@@ -82,6 +82,12 @@ scalar types and the processor's.  \code{__int128},
     \cline{2-5}
     & \texttt{__float128}$^{\dagger\dagger}$ & 16 & 16 & 128-bit extended (IEEE-754) \\
     \hline
+    Decimal-& \texttt{_Decimal32} & 4 & 4 & 32bit BID (IEEE-754R) \\
+    \cline{2-5}
+    floating-& \texttt{_Decimal64} & 8 & 8 & 64bit BID (IEEE-754R) \\
+    \cline{2-5}
+    point & \texttt{_Decimal128} & 16 & 16 & 128bit BID (IEEE-754R) \\
+    \hline
     Packed & \texttt{__m64}$^{\dagger\dagger}$ & 8 & 8 & \MMX{} and \threednow \\
     \cline{2-5}
     & \texttt{__m128}$^{\dagger\dagger}$ & 16 & 16 & SSE and SSE-2 \\
@@ -322,16 +328,7 @@ described in the following sections.
 
 \paragraph{Definitions}
 We first define a number of classes to classify arguments.  The
-classes are corresponding to \xARCH register classes and defined as
-\footnote{This footnote is informative only: The IEEE 754 standard is
-currently under revision and the draft proposes types
-\code{decimal32}, \code{decimal64} and \code{decimal128} of 32 bit, 64
-bit and 128 bit each.  The exact definition of these types is not
-finalized.  For argument passing, variables of type \code{decimal32}
-should be treated exactly as variables of \code{float}, variables of
-type \code{decimal64} as variables of type \code{double} and variables
-of type \code{decimal128} as variables of type \code{__float128}.}%
-:
+classes are corresponding to \xARCH register classes and defined as:
 
 \begin{description}
 \item[INTEGER] This class consists of integral types that fit into one of
@@ -359,11 +356,11 @@ The basic types are assigned their natural classes:
 \item Arguments of types (signed and unsigned) \code{_Bool}, \code{char},
   \code{short}, \code{int}, \code{long}, \code{long long}, and
   pointers are in the INTEGER class.
-\item Arguments of types \code{float}, \code{double} and \code{__m64}
-  are in class SSE.
-\item Arguments of types \code{__float128} and \code{__m128} are split
-  into two halves.  The least significant ones belong to class SSE, the
-  most significant one to class SSEUP.
+\item Arguments of types \code{float}, \code{double}, \code{_Decimal32},
+  \code{_Decimal64} and \code{__m64} are in class SSE.
+\item Arguments of types \code{__float128}, \code{_Decimal128}
+  and \code{__m128} are split into two halves.  The least significant
+  ones belong to class SSE, the most significant one to class SSEUP.
 \item The 64-bit mantissa of arguments of type \code{long double}
   belongs to class X87, the 16-bit exponent plus 6 bytes of padding
   belongs to class X87UP.

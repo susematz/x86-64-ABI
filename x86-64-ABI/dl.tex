@@ -265,6 +265,22 @@ evaluates procedure linkage table entries lazily, delaying symbol
 resolution and relocation until the first execution of a table entry.
 \index{procedure linkage table|)}
 
+Relocation entries of type \codeindex{R_X86_64_TLSDESC} may also be
+subject to lazy relocation, using a single entry in the procedure
+linkage table and in the global offset table, at locations given by
+\texttt{DT_TLSDESC_PLT} and \texttt{DT_TLSDESC_GOT}, respectively, as
+described in ``Thread-Local Storage Descriptors for IA32 and
+AMD64/EM64T''\footnote{This document is currently available via
+  \url{http://people.redhat.com/aoliva/writeups/TLS/RFC-TLSDESC-x86.txt}}.
+
+For self-containment, \texttt{DT_TLSDESC_GOT} specifies a GOT entry in
+which the dynamic loader should store the address of its internal TLS
+Descriptor resolver function, whereas \texttt{DT_TLSDESC_PLT}
+specifies the address of a PLT entry to be used as the TLS descriptor
+resolver function for lazy resolution from within this module.  The
+PLT entry must push the linkmap of the module onto the stack and
+tail-call the internal TLS Descriptor resolver function.
+
 \subsubsection{Large Models}
 
 In the small and medium code models the size of both the PLT and the GOT

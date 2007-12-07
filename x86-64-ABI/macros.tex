@@ -43,10 +43,11 @@
 \newcommand{\codeindexwo}[1]{\texttt{#1}\index{#1@\texttt{#1}}}
 
 % Control placement of floats
-\usepackage{here}
+%\usepackage{here}
+\usepackage{float}
 
 % Version number of document - increment occasionally ;-)
-\newcommand{\version}{0.98}
+\newcommand{\version}{0.99}
 
 % Print a footer everywhere with current date
 % prelim2e needs \thistime
@@ -97,7 +98,7 @@
 
 % Use Hyperref for PDF support - this should be last
 \ifpdf
-\usepackage[pdftex]{hyperref}
+\usepackage[pdftex]{hyperref,changebar}
 \else
 \usepackage[dvips]{hyperref,changebar}
 \fi
