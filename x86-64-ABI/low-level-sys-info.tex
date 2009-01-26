@@ -25,8 +25,8 @@ object, and the term \emph{\textindex{\sixteenbyte{}}} refers to a
 \subsubsection{Fundamental Types}
 
 Figure~\ref{basic-types} shows the correspondence between ISO C's
-scalar types and the processor's.  \code{__int128},
-\code{__float128}, \code{__m64} and \code{__m128} types are optional.
+scalar types and the processor's.  \code{__int128}, \code{__float128},
+\code{__m64}, \code{__m128} and \code{__m256} types are optional.
 
 \begin{figure}
   \caption{Scalar Types}\label{basic-types}
@@ -91,8 +91,10 @@ scalar types and the processor's.  \code{__int128},
     Packed & \texttt{__m64}$^{\dagger\dagger}$ & 8 & 8 & \MMX{} and \threednow \\
     \cline{2-5}
     & \texttt{__m128}$^{\dagger\dagger}$ & 16 & 16 & SSE and SSE-2 \\
+    \cline{2-5}
+    & \texttt{__m256}$^{\dagger\dagger}$ & 32 & 32 & AVX \\
 \noalign{\smallskip}
-\cline{1-2}
+\cline{1-5}
 \multicolumn{3}{l}{\small $^\dagger$ This type is called \texttt{bool}
 in C++.}\\
 \multicolumn{3}{l}{\small $^{\dagger\dagger}$ These types are optional.}\\
@@ -134,8 +136,8 @@ any nonzero value is considered \code{true}.
 Like the Intel386 architecture, the \xARCH architecture in general
 does not require all data accesses to be properly aligned.  Misaligned
 data accesses are slower than aligned accesses
-but otherwise behave identically.  The only exception is that
-\code{__m128} must always be aligned properly.
+but otherwise behave identically.  The only exceptions are that
+\code{__m128} and \code{__m256} must always be aligned properly.
 
 \subsubsection{Aggregates and Unions}
 
@@ -194,9 +196,9 @@ integral values of a specified size.
 \Hrule
 \end{figure}
 
-The ABI does not permit bit-fields having the type \texttt{__m64} or
-\texttt{__m128}.  Programs using bit-fields of these types are not
-portable.
+The ABI does not permit bit-fields having the type \texttt{__m64},
+\texttt{__m128} or \texttt{__m256}.  Programs using bit-fields of
+these types are not portable.
 
 Bit-fields that are neither signed nor unsigned
 always have non-negative values. Although they may have type char,
@@ -239,6 +241,13 @@ wide and 8 x87 floating point registers, each 80 bits wide.  Each of
 the x87 floating point registers may be referred to in \MMX/\threednow
 mode as a 64-bit register.  All of these registers are global to all
 procedures active for a given thread.
+
+Intel AVX (Advanced Vector Extensions) provides 16 256-bit wide AVX registers
+(\reg{ymm0} - \reg{ymm15}).  The lower 128-bits of \reg{ymm0} - \reg{ymm15}
+are aliased to the respective 128b-bit SSE registers (\reg{xmm0} -
+\reg{xmm15}). For purposes of parameter passing and function return,
+\reg{xmmN} and \reg{ymmN} refer to the same register. Only one of them
+can be used at the same time.
 
 This subsection discusses usage of each register.  Registers \RBP, \RBX and
 \reg{r12} through \reg{r15} ``belong'' to the calling function and the
@@ -300,9 +309,10 @@ stack.  This stack grows downwards from high addresses.  Figure
 \Hrule
 \end{figure}
 
-The end of the input argument area shall be aligned on a 16 byte
-boundary.  In other words, the value $(\RSP - 8)$ is always a multiple
-of $16$ when control is transferred to the function entry point.  The
+The end of the input argument area shall be aligned on a 16 (32, if
+\texttt{__m256} is passed on stack) byte boundary.  In other
+words, the value $(\RSP - 8)$ is always a multiple of $16$ ($32$) when
+control is transferred to the function entry point.  The
 stack pointer, \RSP, always points to the end of the latest allocated
 stack frame.  \footnote{The conventional use of \RBP{} as a frame
   pointer for the stack frame may be avoided by using \RSP (the stack
@@ -333,9 +343,10 @@ classes are corresponding to \xARCH register classes and defined as:
 \begin{description}
 \item[INTEGER] This class consists of integral types that fit into one of
   the general purpose registers.
-\item[SSE] The class consists of types that fits into a SSE register.
+\item[SSE] The class consists of types that fit into a SSE register.
 \item[SSEUP] The class consists of types that fit into a SSE register
   and can be passed and returned in the most significant half of it.
+\item[AVX] The class consists of types that fit into a AVX register.
 \item[X87, X87UP] These classes consists of types that will be returned via
   the x87 FPU.
 \item[COMPLEX\_X87] This class consists of types that will be returned
@@ -361,6 +372,7 @@ The basic types are assigned their natural classes:
 \item Arguments of types \code{__float128}, \code{_Decimal128}
   and \code{__m128} are split into two halves.  The least significant
   ones belong to class SSE, the most significant one to class SSEUP.
+\item Arguments of type \code{__m256} are in class AVX.
 \item The 64-bit mantissa of arguments of type \code{long double}
   belongs to class X87, the 16-bit exponent plus 6 bytes of padding
   belongs to class X87UP.
@@ -468,6 +480,9 @@ left-to-right order) for passing as follows:
 \item If the class is SSEUP, the \eightbyte is passed in the upper
    half of the last used SSE register.
 
+\item If the class is AVX, the next available AVX register is used, the
+   registers are taken in the order from \reg{ymm0} to \reg{ymm7}.
+
 \item If the class is X87, X87UP or COMPLEX\_X87, it is passed in memory.
 \end{enumerate}
 
@@ -544,6 +559,9 @@ the number of SSE registers used. The contents of \reg{al} do not need to
 match exactly the number of registers, but must be an upper bound on
 the number of SSE registers used and is in the range 0--8 inclusive.
 
+When passing \texttt{__m256} arguments to functions that use varargs
+or stdarg, function prototypes must be provided.  Otherwise, the
+run-time behavior is undefined.
 
 \paragraph{Returning of Values}
 The returning of values is done according to the following algorithm:
@@ -566,6 +584,9 @@ The returning of values is done according to the following algorithm:
 
 \item If the class is SSEUP, the \eightbyte is passed in the upper half of the
    last used SSE register.
+
+\item If the class is AVX, the next available AVX register of the
+   sequence \reg{ymm0}, \reg{ymm1} is used.
 
 \item If the class is X87, the value is returned on the X87 stack in
    \reg{st0} as 80-bit x87 number.
@@ -598,13 +619,15 @@ structparm s;\\
 int e, f, g, h, i, j, k;\\
 long double ld;\\
 double m, n;\\
+__m256 y;\\
 \\
 extern void func (int e, int f,\\
 \phantom{extern void func (}structparm s, int g, int h,\\
 \phantom{extern void func (}long double ld, double m,\\
+\phantom{extern void func (}__m256 y,\\
 \phantom{extern void func (}double n, int i, int j, int k);\\
 \\
-func (e, f, s, g, h, ld, m, n, i, j, k);\\
+func (e, f, s, g, h, ld, m, y, n, i, j, k);\\
 \cline{1-1}
 \end{tabular}
 }
@@ -622,12 +645,12 @@ func (e, f, s, g, h, ld, m, n, i, j, k);\\
 \multicolumn{2}{c}{Floating Point Registers} &
 \multicolumn{2}{c}{Stack Frame Offset}\\
 \hline
-\RDI: &\code{e} & \reg{xmm0}: &\code{s.d} &\code{0:}& \code{ld} \\
-\RSI: &\code{f} & \reg{xmm1}: &\code{m}& \code{16:}& \code{j} \\
-\RDX: &\code{s.a,s.b} & \reg{xmm2}: &\code{n}&\code{24:}& \code{k} \\
-\RCX: &\code{g} & & & \\
-\reg{r8}:&\code{h} & && & \\
-\reg{r9}:&\code{i} & && & \\
+\RDI:    &\code{e}      &\reg{xmm0}:&\code{s.d}&\code{0:} &\code{ld} \\
+\RSI:    &\code{f}      &\reg{xmm1}:&\code{m}  &\code{16:}&\code{j} \\
+\RDX:    &\code{s.a,s.b}&\reg{ymm2}:&\code{y}  &\code{24:}&\code{k} \\
+\RCX:    &\code{g}      &\reg{xmm3}:&\code{n}  &          & \\
+\reg{r8}:&\code{h}      &           &          &          & \\
+\reg{r9}:&\code{i}      &           &          &          & \\
 \end{tabular}
 
 \end{center}
@@ -1957,6 +1980,10 @@ the function in SSE registers.%
 %%% XXX: Really only floating pointer parameters?
 %%% XXX: Use %al or %rax?
 
+When \texttt{__m256} is passed as variable-argument, it should always
+be passed on stack. Only named \texttt{__m256} arguments may be passed
+in register as specified in section \ref{sec-calling-conventions}.
+
 \begin{figure}[H]
 \Hrule
 \caption{Parameter Passing Example with Variable-Argument List}
@@ -1968,10 +1995,11 @@ the function in SSE registers.%
 int a, b;\\
 long double ld;\\
 double m, n;\\
+__m256 u, y;\\
 \\
-extern void func (int a, double  m,...);\\
+extern void func (int a, double m, __m256 u, ...);\\
 \\
-func (a, m, b, ld, n);\\
+func (a, m, u, b, ld, y, n);\\
 \cline{1-1}
 \end{tabular}
 }
@@ -1989,9 +2017,9 @@ func (a, m, b, ld, n);\\
 \multicolumn{2}{c}{Floating Point Registers} &
 \multicolumn{2}{c}{Stack Frame Offset}\\
 \hline
-\RDI: &\code{a} & \reg{xmm0}: &\code{m} &\code{0:}& \code{ld} \\
-\RSI: &\code{b} & \reg{xmm1}: &\code{n}& &  \\
-\RAX: & 2 & & & \\
+\RDI: &\code{a}&\reg{xmm0}:&\code{m}&\code{0:} &\code{ld} \\
+\RSI: &\code{b}&\reg{ymm1}:&\code{u}&\code{32:}&\code{y} \\
+\RAX: & 3      &\reg{xmm2}:&\code{n}& \\
 \end{tabular}
 \end{center}
 \Hrule
@@ -2177,14 +2205,15 @@ DWARF is a specification developed for symbolic, source-level debugging.
 The debugging information format does not favor the design of any
 compiler or debugger.  For more information on DWARF,
 see \emph{DWARF Debugging Information Format},
-revision: Version 2.0.0, July 27, 1993, UNIX International,
-Program Languages SIG.
+revision: Version 3, January, 2006, Free Standards Group,
+DWARF Standard Committee.  It's available at:
+\url{http://www.dwarfstd.org/}.
 
 \subsection{DWARF Release Number}
 
 The DWARF definition requires some machine-specific definitions.
 The register number mapping needs to be specified for the \xARCH
-registers. In addition, the DWARF Version 2 specification
+registers. In addition, the DWARF Version 3 specification
 requires processor-specific address class codes to be defined.
 
 \subsection{DWARF Register Number Mapping}
@@ -2306,7 +2335,7 @@ extensions:
 \Hrule
 \end{figure}
 
-The default DWARF2 pointer encoding (direct 4-byte absolute pointers)
+The default DWARF3 pointer encoding (direct 4-byte absolute pointers)
 is represented by value 0.
 
 \item[R]  
