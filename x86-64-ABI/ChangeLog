@@ -1,3 +1,9 @@
+2009-03-11  Michael Matz  <matz@suse.de>
+
+	* dl.tex (Program Header): Add PT_SUNW_UNWIND with value
+	0x6464e550, like it's used in actual Solaris.  Add PT_SUNW_EH_FRAME
+	with old value (to have something in the Solaris namespace).
+
 2009-01-23  Michael Matz  <matz@suse.de>
 
 	from H.J. Lu <hjl.tools@gmail.com>
