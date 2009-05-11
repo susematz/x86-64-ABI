@@ -247,7 +247,8 @@ Intel AVX (Advanced Vector Extensions) provides 16 256-bit wide AVX registers
 are aliased to the respective 128b-bit SSE registers (\reg{xmm0} -
 \reg{xmm15}). For purposes of parameter passing and function return,
 \reg{xmmN} and \reg{ymmN} refer to the same register. Only one of them
-can be used at the same time.
+can be used at the same time.  We use vector register to refer to either
+SSE or AVX register.
 
 This subsection discusses usage of each register.  Registers \RBP, \RBX and
 \reg{r12} through \reg{r15} ``belong'' to the calling function and the
@@ -343,10 +344,9 @@ classes are corresponding to \xARCH register classes and defined as:
 \begin{description}
 \item[INTEGER] This class consists of integral types that fit into one of
   the general purpose registers.
-\item[SSE] The class consists of types that fit into a SSE register.
-\item[SSEUP] The class consists of types that fit into a SSE register
-  and can be passed and returned in the most significant half of it.
-\item[AVX] The class consists of types that fit into a AVX register.
+\item[SSE] The class consists of types that fit into a vector register.
+\item[SSEUP] The class consists of types that fit into a vector
+  register and can be passed and returned in the upper bytes of it.
 \item[X87, X87UP] These classes consists of types that will be returned via
   the x87 FPU.
 \item[COMPLEX\_X87] This class consists of types that will be returned
@@ -372,7 +372,9 @@ The basic types are assigned their natural classes:
 \item Arguments of types \code{__float128}, \code{_Decimal128}
   and \code{__m128} are split into two halves.  The least significant
   ones belong to class SSE, the most significant one to class SSEUP.
-\item Arguments of type \code{__m256} are in class AVX.
+\item Arguments of type \code{__m256} are split into four \eightbyte
+  chunks.  The least significant one belongs to class SSE and all the
+  others to class SSEUP.
 \item The 64-bit mantissa of arguments of type \code{long double}
   belongs to class X87, the 16-bit exponent plus 6 bytes of padding
   belongs to class X87UP.
@@ -407,8 +409,16 @@ The classification of aggregate (structures and arrays) and union
 types works as follows:
 
 \begin{enumerate}
-\item If the size of an object is larger than two \eightbytes, or
-  it contains unaligned fields, it has class MEMORY.
+\item If the size of an object is larger than four \eightbytes, or
+  it contains unaligned fields, it has class MEMORY
+  \footnote{The post merger clean up described later ensures that,
+  for the processors that do not support the \code{__m256} type, if
+  the size of an object is larger than two \eightbytes and the first
+  \eightbyte is not SSE or any other \eightbyte is not SSEUP, it still
+  has class MEMORY. This in turn ensures that for processors that
+  do support the \code{__m256} type, if the size of an object is
+  four \eightbytes and the first eightbyte is SSE and all other
+  eightbytes are SSEUP, it can be passed in a register.}.
 
 \item If a C++ object has either a non-trivial copy constructor
     or a non-trivial destructor
@@ -424,14 +434,14 @@ types works as follows:
         \item for all the nonstatic data members of its class that are
           of class type (or array thereof), each such class has a
           trivial de/constructor.
-    \end{itemize}}
+    \end{itemize}},
     it is passed by invisible reference
     (the object is replaced in the parameter list by a pointer that
-    has class INTEGER).
+    has class INTEGER)
   \footnote{An object with either a non-trivial copy
    constructor or a non-trivial destructor cannot be passed by value
    because such objects must have well defined addresses.  Similar
-   issues apply when returning an object from a function.}
+   issues apply when returning an object from a function.}.
 
 \item If the size of the aggregate exceeds a single \eightbyte, each is
     classified separately.  Each \eightbyte gets initialized to class NO_CLASS.
@@ -452,7 +462,12 @@ types works as follows:
 \item Then a post merger cleanup is done:
   \begin{enumerate}
   \item If one of the classes is MEMORY, the whole argument is passed in memory.
-  \item If SSEUP is not preceeded by SSE, it is converted to SSE.
+  \item If X87UP is not preceded by X87, the whole argument is passed in
+    memory.
+  \item If the size of the aggregate exceeds two \eightbytes and the first
+    \eightbyte isn't SSE or any other \eightbyte isn't SSEUP, the whole
+    argument is passed in memory.
+  \item If SSEUP is not preceded by SSE or SSEUP, it is converted to SSE.
   \end{enumerate}
 \end{enumerate}
 
@@ -470,18 +485,15 @@ left-to-right order) for passing as follows:
     available as scratch register means that code in the PLT need not
     spill any registers when computing the address to which control
     needs to be transferred.  \RAX is used to indicate the number of
-    SSE arguments passed to a function requiring a variable number of
+    vector arguments passed to a function requiring a variable number of
     arguments. \reg{r10} is used for passing a function's static chain
     pointer.}.
 
-\item If the class is SSE, the next available SSE register is used, the
+\item If the class is SSE, the next available vector register is used, the
    registers are taken in the order from \reg{xmm0} to \reg{xmm7}.
 
-\item If the class is SSEUP, the \eightbyte is passed in the upper
-   half of the last used SSE register.
-
-\item If the class is AVX, the next available AVX register is used, the
-   registers are taken in the order from \reg{ymm0} to \reg{ymm7}.
+\item If the class is SSEUP, the \eightbyte is passed in the next
+   available \eightbyte chunk of the last used vector register.
 
 \item If the class is X87, X87UP or COMPLEX\_X87, it is passed in memory.
 \end{enumerate}
@@ -504,7 +516,7 @@ the upper 63 bits of the eightbyte shall be zero.
       \multicolumn{1}{l}{function calls}\\
       \hline
 \RAX & temporary register; with variable arguments passes
-information about the number of SSE registers used; 1$^{\rm st}$
+information about the number of vector registers used; 1$^{\rm st}$
 return register & No \\
 \RBX & callee-saved register; optionally used as base pointer & Yes \\
 \RCX & used to pass 4$^{\rm th}$ integer argument to functions & No \\
@@ -554,10 +566,10 @@ For calls that may call functions that use varargs or stdargs
 (\dots) in the declaration) \reg{al}%
 \footnote{Note that the rest of \RAX is undefined, only the contents
   of \reg{al} is defined.}
- is used as hidden argument to specify
-the number of SSE registers used. The contents of \reg{al} do not need to
+ is used as hidden argument to specify the number of vector registers
+ used. The contents of \reg{al} do not need to
 match exactly the number of registers, but must be an upper bound on
-the number of SSE registers used and is in the range 0--8 inclusive.
+the number of vector registers used and is in the range 0--8 inclusive.
 
 When passing \texttt{__m256} arguments to functions that use varargs
 or stdarg, function prototypes must be provided.  Otherwise, the
@@ -579,14 +591,11 @@ The returning of values is done according to the following algorithm:
 \item If the class is INTEGER, the next available register of the
    sequence \RAX, \RDX is used.
 
-\item If the class is SSE, the next available SSE register of the
+\item If the class is SSE, the next available vector register of the
    sequence \reg{xmm0}, \reg{xmm1} is used.
 
-\item If the class is SSEUP, the \eightbyte is passed in the upper half of the
-   last used SSE register.
-
-\item If the class is AVX, the next available AVX register of the
-   sequence \reg{ymm0}, \reg{ymm1} is used.
+\item If the class is SSEUP, the \eightbyte is returned in the next
+   available \eightbyte chunk of the last used vector register.
 
 \item If the class is X87, the value is returned on the X87 stack in
    \reg{st0} as 80-bit x87 number.
@@ -1973,7 +1982,7 @@ registers.  Portable C programs must use the header file
 
 When a function taking variable-arguments is called, \RAX\index{\RAX}
 must be set to the total number of floating point parameters passed to
-the function in SSE registers.%
+the function in vector registers.%
 \footnote{This implies that the only legal values for \RAX when
   calling a function with variable-argument lists are 0 to 8
   (inclusive).}
@@ -2242,8 +2251,8 @@ Stack Pointer Register   RSP & 7 &\RSP\\
 Extended Integer Registers 8-15 & 8-15 &\reg{r8}--\reg{r15}\\
 Return Address RA
 & 16&\\
-SSE Registers 0--7              & 17-24 & \reg{xmm0}--\reg{xmm7} \\
-Extended SSE Registers 8--15    & 25-32 & \reg{xmm8}--\reg{xmm15} \\
+Vector Registers 0--7              & 17-24 & \reg{xmm0}--\reg{xmm7} \\
+Extended Vector Registers 8--15    & 25-32 & \reg{xmm8}--\reg{xmm15} \\
 Floating Point Registers 0--7   & 33-40 & \reg{st0}--\reg{st7} \\
 MMX Registers 0--7              & 41-48 & \reg{mm0}--\reg{mm7} \\
 Flag Register                   & 49    & \reg{rFLAGS} \\

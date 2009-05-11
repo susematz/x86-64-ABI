@@ -1,3 +1,14 @@
+2009-05-11  Michael Matz  <matz@suse.de>
+
+	from H.J. Lu <hjl.tools@gmail.com>
+
+	* low-level-sys-info.tex: Clarify post merger cleanup for
+	aggregate with X87UP is not preceded by X87.  Replace SSE register
+	with vector register.  Remove AVX class. Pass aggregate with one
+	eightbyte in SSE class and rest in SSEUP class in register.  Pass
+	aggregate > 32 bytes in memory.  Add a footnote to explain
+	compatibility without AVX.
+
 2009-03-11  Michael Matz  <matz@suse.de>
 
 	* dl.tex (Program Header): Add PT_SUNW_UNWIND with value
