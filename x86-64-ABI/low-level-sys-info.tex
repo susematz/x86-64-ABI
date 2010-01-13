@@ -312,7 +312,7 @@ stack.  This stack grows downwards from high addresses.  Figure
 
 The end of the input argument area shall be aligned on a 16 (32, if
 \texttt{__m256} is passed on stack) byte boundary.  In other
-words, the value $(\RSP - 8)$ is always a multiple of $16$ ($32$) when
+words, the value $(\RSP + 8)$ is always a multiple of $16$ ($32$) when
 control is transferred to the function entry point.  The
 stack pointer, \RSP, always points to the end of the latest allocated
 stack frame.  \footnote{The conventional use of \RBP{} as a frame
@@ -498,8 +498,11 @@ left-to-right order) for passing as follows:
 \item If the class is X87, X87UP or COMPLEX\_X87, it is passed in memory.
 \end{enumerate}
 
-When a value of type \code{_Bool} is passed in a register or on the stack,
-the upper 63 bits of the eightbyte shall be zero.
+When a value of type \code{_Bool} is returned or passed in a register or
+on the stack, bit 0 contains the truth value and bits 1 to 7 shall be
+zero\footnote{Other bits are left unspecified, hence the consumer
+side of those values can rely on it being 0 or 1 when truncated to 8
+bit.}.
 
 \begin{figure}
 \Hrule

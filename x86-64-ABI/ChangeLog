@@ -1,3 +1,10 @@
+2010-01-13  Michael Matz  <matz@suse.de>
+
+	* low-level-sys-info.tex (Parameter passing): Specify only the
+	lowest 8 bit for passing or returning _Bool.
+	* low-level-sys-info.tex (Stackframe): %rsp+8, not %rsp-8 is aligned
+	to 16 or 32 (makes a difference only for alignment 16).
+
 2009-05-11  Michael Matz  <matz@suse.de>
 
 	from H.J. Lu <hjl.tools@gmail.com>
